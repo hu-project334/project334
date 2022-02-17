@@ -27,3 +27,9 @@ npm run lint
 ### Customize configuration
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+## Testing a Progressive web app (PWA)
+
+- npm run build
+- npx http-server dist
+- recommended checking Application > Service Workers > Update on reload [x] in chrome
