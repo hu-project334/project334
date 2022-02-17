@@ -1,7 +1,7 @@
 module.exports = {
   // ...Other Vue config options here, possibly
   pwa: {
-    name: "Sensortechnologie voor de fysio",
-    themeColor: "#121212",
+    name: "sensortechnology voor de fysiotherapeut",
+    themeColor: "#e96851",
   },
 };
