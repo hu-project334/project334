@@ -1,10 +1,15 @@
 <template>
+  <PWAPrompt></PWAPrompt>
   <img alt="Vue logo" src="./assets/logo.png" />
 </template>
 
 <script>
+import PWAPrompt from "./components/PWAPrompt.vue";
 export default {
   name: "App",
+  components: {
+    PWAPrompt,
+  },
 };
 </script>
 

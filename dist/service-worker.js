@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/precache-manifest.71f6c311855dbff6d3aec996e3147b20.js"
+  "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/precache-manifest.7618c08994746a10cea2deae2e657ad1.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "project334"});
