@@ -6,12 +6,14 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy":"sh deploy.sh"
+    "deploy": "sh deploy.sh"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "firebase": "^9.6.7",
     "register-service-worker": "^1.7.1",
-    "vue": "^3.0.0"
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
