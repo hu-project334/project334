@@ -6,7 +6,7 @@ Register.vue - base vue
 </template>
 
 <script>
-import { roundTo20 } from "/src/libraries/bluethooth.js";
+import { findBluetoothDevices } from "/src/libraries/bluethooth.js";
 export default {
   name: "regster",
   data() {
@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     getData() {
-      console.log(roundTo20(), "hoort 5 te returnen");
+      findBluetoothDevices()
     },
   },
 };
