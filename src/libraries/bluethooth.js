@@ -43,8 +43,23 @@ function findBluetoothDevices() {
   .then(server => { return server.getPrimaryService((prefix + serviceEnum.battery_service + suffix)); })
   .then(service => { return service.getCharacteristic((prefix + serviceEnum.battery_level + suffix)); })
   .then(characteristic => { return characteristic.readValue(); })
-  .then(value => { console.log(`Battery percentage is ${value.getUint8(0)}`); })
+function identifyDevice() {
+  // For this function to work there needs to be a device connected.
+  let dataViewObject
+  return XsensDotSensor.getDeviceControlData()
+  .then(value => { dataViewObject = value; }) // Get the current device control data and save it
+  .then(() => { return XsensDotSensor.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix)); })
+  .then(service => { return service.getCharacteristic((prefix + serviceEnum.device_control + suffix)); })
+  .then(characteristic => {
+    console.log(dataViewObject)
+    dataViewObject.setUint8(0, 0x1); // Enable identify function on sensor
+    dataViewObject.setUint8(1, 0x01); // Set the identify bit
+    console.log(dataViewObject)
+    return characteristic.writeValue(dataViewObject); // Write the full object back to the sensor
+   })
+  .then(() => { console.log('Identifying sensor'); })
   .catch(error => { console.error(error); });
 }
 
 export { findBluetoothDevices };
+export { identifyDevice };
