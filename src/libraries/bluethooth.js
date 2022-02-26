@@ -26,23 +26,89 @@ const serviceEnum = Object.freeze({
   'message_notification' : 7003
 });
 
-function findBluetoothDevices() {
-  navigator.bluetooth.requestDevice({
+
+class XsensDot {
+
+  constructor() {
+    this.device = null;
+    this.onDisconnected = this.onDisconnected.bind(this);
+  }
+
+  request() {
+    return navigator.bluetooth.requestDevice({
       filters: [{
-      manufacturerData: [{
-        companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
-      }]
-    }],
-    optionalServices: [(prefix + serviceEnum.battery_service + suffix),
-                       (prefix + serviceEnum.measurement_service + suffix),
-                       (prefix + serviceEnum.configuration_service + suffix),
-                       (prefix + serviceEnum.message_service + suffix)
-                      ]
-  })
-  .then(device => { return device.gatt.connect(); }) // Connect to device
-  .then(server => { return server.getPrimaryService((prefix + serviceEnum.battery_service + suffix)); })
-  .then(service => { return service.getCharacteristic((prefix + serviceEnum.battery_level + suffix)); })
-  .then(characteristic => { return characteristic.readValue(); })
+        manufacturerData: [{
+          companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
+        }]
+      }],
+      optionalServices: [(prefix + serviceEnum.battery_service + suffix),
+                         (prefix + serviceEnum.measurement_service + suffix),
+                         (prefix + serviceEnum.configuration_service + suffix),
+                         (prefix + serviceEnum.message_service + suffix)]
+    })
+    .then(device => {
+      this.device = device;
+      this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
+    });
+  }
+
+  connect() {
+    if (!this.device) {
+      return Promise.reject('Device is not connected.');
+    }
+    return this.device.gatt.connect();
+  }
+
+  disconnect() {
+    if (!this.device) {
+      return Promise.reject('Device is not connected.');
+    }
+    return this.device.gatt.disconnect();
+  }
+
+  onDisconnected() {
+    console.log('Device is disconnected.');
+  }
+
+  getDeviceControlData() {
+    return XsensDotSensor.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix))
+    .then(service => { return service.getCharacteristic((prefix + serviceEnum.device_control + suffix)); })
+    .then(characteristic => { return characteristic.readValue(); })
+  }
+
+  readDeviceName() {
+    return this.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix))
+    .then(service => service.getCharacteristic((prefix + serviceEnum.device_control + suffix)))
+    .then(characteristic => characteristic.readValue())
+    .then(value => {
+      let startOffset = 8;
+      let res = '';
+      for (let index = startOffset; index < (16 + startOffset); index++) {
+        res += String.fromCharCode(value.getUint8(index, true));
+      }
+      console.log(res);
+     })
+    .catch(error => { console.error(error); });
+  }
+
+  getBatteryLevel() {
+    return this.device.gatt.getPrimaryService((prefix + serviceEnum.battery_service + suffix))
+    .then(service => service.getCharacteristic((prefix + serviceEnum.battery_level + suffix)))
+    .then(characteristic => characteristic.readValue())
+    .then(value => { console.log(`Battery percentage: ${value.getUint8(0, true)}`); })
+    .catch(error => { console.error(error); });
+  }
+}
+
+let XsensDotSensor = new XsensDot();
+
+function findBluetoothDevices() {
+  XsensDotSensor.request()
+  .then(() => { return XsensDotSensor.connect()})
+  .then(() => { XsensDotSensor.readDeviceName()})
+  .then(() => { XsensDotSensor.getBatteryLevel()});
+}
+
 function identifyDevice() {
   // For this function to work there needs to be a device connected.
   let dataViewObject
