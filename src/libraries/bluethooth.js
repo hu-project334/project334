@@ -249,30 +249,39 @@ class XsensDot {
      * to a bluetooth charactaristic.
      */
     createMessageObject(MID, LEN, ReID, ReDATA) {
-        let buffer = new ArrayBuffer((LEN + 3))
+        let realLEN = LEN + 1
+        let buffer = new ArrayBuffer(160)
         let dataViewObject = new DataView(buffer)
 
-        dataViewObject.setUint8(0, MID)  // set MID
-        dataViewObject.setUint8(1, LEN)  // set length
-        dataViewObject.setUint8(2, ReID) // Set ReID
-        for(let i = 0; i < ReDATA.length; i++) {
+        dataViewObject.setUint8(0, MID)      // set MID
+        dataViewObject.setUint8(1, realLEN)  // set length
+        dataViewObject.setUint8(2, ReID)     // Set ReID
+        for(let i = 0; i < LEN; i++) {
             dataViewObject.setUint8((i+3), ReDATA[i]) // set ReDATA
         }
-        dataViewObject.setUint8(LEN+2, this.computeChecksum(dataViewObject)) // set checksum
+        dataViewObject.setUint8(realLEN+2, this.computeChecksum(dataViewObject)) // set checksum
+
+        // Append message with all zeroes
+        for(let i = (LEN + 4); i < (160 - (LEN + 4)); i++) {
+            dataViewObject.setUint8(i, 0)
+        }
 
         return dataViewObject
     }
 
     /**
     * computeChecksum function returns a single byte checksum of the given dataViewObject
+    * Function from: https://github.com/xsens/xsens_dot_server/blob/master/bleHandler.js#L473
     */
     computeChecksum(dataViewObject) {
         let sum = 0;
         let len = dataViewObject.getUint8(1, true);
 
+        // Sum all the bytes
         for(let i = 0; i < len; i++) {
             sum += dataViewObject.getUint8(i, true);
         }
+        // Invert sum and get lower byte
         return (0x00FF & (-sum))
     }
 }
@@ -327,14 +336,24 @@ function findBluetoothDevices() {
 }
 
 function startRecording() {
-    console.log("Enabeling message notifications")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
 
-    // Request flash info
-    let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFlashInfo, [])
-    console.log("Request flash info 0x1, 0x1, 0x50 (checksum)")
-    console.log(dataViewObject)
-    XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    // Enable notifications
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        // Request flash info
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.requestFlashInfo, [])
+        console.log("Request flash info 0x1, 0x1, 0x50 (checksum)")
+        console.log(dataViewObject)
+        XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    })
+    .then(() => {
+        // Read ACK of request flash info
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+    })
+    .then(value => {
+        console.log("Request flash info ack:")
+        console.log(value)
+    })
     .then(() => {
         // Start recording
         let res = intToBytesArray(Math.floor(Date.now() / 1000))
@@ -344,7 +363,7 @@ function startRecording() {
         }
         ReData[4] = 0xFF
         ReData[5] = 0xFF
-        dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 7, recMsgEnum.startRecording, ReData)
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 6, recMsgEnum.startRecording, ReData)
         console.log("Start recording, 0x1 0x7 0x40 (4 bytes UTC time in seconds) (2 bytes recording time) (1 byte checksum)")
         console.log(dataViewObject)
         XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
