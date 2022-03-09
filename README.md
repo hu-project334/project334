@@ -39,3 +39,11 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ```
 
 - recommended checking Application > Service Workers > Update on reload [x] in chrome
+
+## REQUIREMENTS FOR BLUETOOTH
+
+Windows 10, de app werkt niet op Windows 11
+
+HTTPS verbinding of localhost
+
+Zorg ervoor dat `Experimental Web Platform features` in `about://flags`
