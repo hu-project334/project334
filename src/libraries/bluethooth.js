@@ -343,7 +343,7 @@ function findBluetoothDevices() {
 }
 
 function startRecording() {
-
+    console.log("")
     console.log("=====================startRecording=====================")
     // Enable notifications
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
@@ -388,21 +388,13 @@ function startRecording() {
     })
     .then(() => {
         console.log("=======================================================")
-        console.log("")
         return
     })
     .catch(error => { console.error(error); })
-
-    // Request state during recording
-
-    // Read ACK of request
-
-    // Stop recording
-
-    // Read ack of stop recording
 }
 
 function stopRecording() {
+    console.log("")
     console.log("=====================stopRecording=====================")
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
@@ -467,7 +459,48 @@ function stopRecording() {
     })
     .then(() => {
         console.log("=======================================================")
-        console.log("")
+        return
+    })
+    .catch(error => { console.error(error); })
+}
+
+function exportData() {
+    console.log("")
+    console.log("======================requestData======================")
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.selectExportData, [0x04]) //0x04 = Euler Angles
+        console.log("Select export data")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    }) // Select export data
+    .then(() => {
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+    })
+    .then(value => {
+        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
+        console.log(`Select export data ack: ${x}`)
+        return
+    })
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileInfo, [0])
+        console.log("Request file info")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    }) // Request file info
+    .then(() => {
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+    })
+    .then(value => {
+        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
+        console.log(`Request file info ack: ${x}`)
+        return
+    })
+    .then() // Start data export
+    .then() // Stop data export
+    .then(() => {
+        console.log("=======================================================")
+        return
     })
     .catch(error => { console.error(error); })
 }
@@ -476,4 +509,5 @@ function stopRecording() {
 export { findBluetoothDevices };
 export { startRecording };
 export { stopRecording };
+export { exportData };
 export { XsensDotSensor };

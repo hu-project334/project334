@@ -7,6 +7,7 @@ Register.vue - base vue
   <h2>Battery level: <p id="batterylevel">0</p></h2>
   <p><button @click="startRec()">start recording</button></p>
   <p><button @click="stopRec()">stop recording</button></p>
+  <p><button @click="startDataExport()">Export data</button></p>
 </template>
 
 <script>
@@ -14,6 +15,7 @@ import { findBluetoothDevices } from "/src/libraries/bluethooth.js";
 import { XsensDotSensor } from "/src/libraries/bluethooth.js";
 import { startRecording } from "/src/libraries/bluethooth.js";
 import { stopRecording } from "/src/libraries/bluethooth.js";
+import { exportData } from "/src/libraries/bluethooth.js";
 export default {
   name: "regster",
   data() {
@@ -34,6 +36,9 @@ export default {
     },
     stopRec() {
       stopRecording()
+    },
+    startDataExport() {
+      exportData()
     }
   },
 };
