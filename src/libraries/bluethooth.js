@@ -320,15 +320,40 @@ function handleBatteryChanged(event) {
     element.innerHTML = value.getUint8(0, true)
     console.log("Received new battery level: " + value.getUint8(0, true));
 }
-
+// eslint-disable-next-line no-unused-vars
+var latestNotificationType = 0x00
+// eslint-disable-next-line no-unused-vars
+var latestNotificationObject
+// eslint-disable-next-line no-unused-vars
+var dataArr = [];
 /**
  * handleNotificationChanged is executed when the message_service notification characteristic is changed
  */
 // eslint-disable-next-line no-unused-vars
 function handleNotificationChanged(event) {
     const value = event.target.value
+    latestNotificationObject = value
+    latestNotificationType = value.getUint8(2, true)
     console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
     console.log(value)
+    if (latestNotificationType == recMsgNotEnum.storeFlashInfoDone1 || latestNotificationType == recMsgNotEnum.storeFlashInfoDone2){
+        console.log("CALLING NEXT PART OF START RECORDING")
+        startRecording2()
+    } else if (latestNotificationType == recMsgNotEnum.exportFileData) {
+        let timestampArr = []
+        for (var i = 7; i < 11; i++){
+            timestampArr.push(value.getUint8(i, true))
+        }
+        var result = ((timestampArr[timestampArr.length - 24]) |
+                      (timestampArr[timestampArr.length - 2] << 16) |
+                      (timestampArr[timestampArr.length - 3] << 8) |
+                      (timestampArr[timestampArr.length - 4] << 1));
+        result = result * 1000
+        dataArr.push(result)
+    } else if (latestNotificationType == recMsgNotEnum.exportFileDataDone) {
+        console.log("EXPORT FILE DATA DONE")
+        console.log(dataArr)
+    }
 }
 
 // END OF HELPER FUNCTIONS
@@ -346,6 +371,33 @@ function startRecording() {
     console.log("")
     console.log("=====================startRecording=====================")
     // Enable notifications
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        // Erase flash
+        let res = intToBytesArray(Math.floor(Date.now() / 1000))
+        let ReData = new Array(3)
+        for (let i = 0; i < res.length; i++) {
+            ReData[i] = res[i]
+        }
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 4, recMsgEnum.eraseFlash, ReData)
+        console.log("Erase flash")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    })
+    .then(() => {
+        // Read ACK of erase flash
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+    })
+    .then(value => {
+        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
+        console.log(`Erase flash ack: ${x}`)
+        return
+    })
+    .catch(error => { console.error(error); })
+}
+
+function startRecording2() {
+
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
         // Request flash info
@@ -469,7 +521,7 @@ function exportData() {
     console.log("======================requestData======================")
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.selectExportData, [0x04]) //0x04 = Euler Angles
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.selectExportData, [0x00]) //0x04 = Euler Angles
         console.log("Select export data")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
@@ -483,7 +535,7 @@ function exportData() {
         return
     })
     .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileInfo, [0])
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileInfo, [0x01])
         console.log("Request file info")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
@@ -496,7 +548,20 @@ function exportData() {
         console.log(`Request file info ack: ${x}`)
         return
     })
-    .then() // Start data export
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileData, [0x01])
+        console.log("Request file data")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    })
+    .then(() => {
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+    })
+    .then(value => {
+        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
+        console.log(`Request file data ack: ${x}`)
+        return
+    })
     .then() // Stop data export
     .then(() => {
         console.log("=======================================================")
