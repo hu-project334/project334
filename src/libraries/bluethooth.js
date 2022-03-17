@@ -120,9 +120,10 @@ function getKeyByValue(object, value) {
 
 class XsensDot {
 
-    constructor() {
+    constructor(verbose = true) {
         this.device = null;
         this.onDisconnected = this.onDisconnected.bind(this);
+        this.verbose = verbose;
     }
 
     /**
@@ -183,12 +184,29 @@ class XsensDot {
     }
 
     /**
+     * readMessageAck reads the acknowledge of a given dataViewObject
+     */
+    readMessageAck(dataViewObject) {
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+        .then((value) => {
+            if(this.verbose){
+                let str = `${getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))} ack: ${getKeyByValue(recMsgAckEnum, value.getUint8(3, true))}`
+                console.log(str)
+            }
+            return value
+        })
+    }
+
+    /**
      * writeCharacteristicData allows you to write a dataViewObject to the given characteristic
      */
     writeCharacteristicData(service, characteristic, dataViewObject) {
         return this.device.gatt.getPrimaryService((prefix + service + suffix))
         .then(service => { return service.getCharacteristic((prefix + characteristic + suffix)); })
         .then(characteristic => { return characteristic.writeValue(dataViewObject); })
+        .then(() => {
+            return XsensDotSensor.readMessageAck(dataViewObject)
+        })
         .catch(error => { console.error(error); })
     }
 
@@ -348,7 +366,7 @@ function handleNotificationChanged(event) {
                       (timestampArr[timestampArr.length - 2] << 16) |
                       (timestampArr[timestampArr.length - 3] << 8) |
                       (timestampArr[timestampArr.length - 4] << 1));
-        result = result * 1000
+        result = result / 1000
         dataArr.push(result)
     } else if (latestNotificationType == recMsgNotEnum.exportFileDataDone) {
         console.log("EXPORT FILE DATA DONE")
@@ -356,8 +374,9 @@ function handleNotificationChanged(event) {
     }
 }
 
-// END OF HELPER FUNCTIONS
-// BELOW ARE PUBLIC FUNCTIONS
+//                                                                      END OF HELPER FUNCTIONS
+// ============================================================================================================================================================
+//                                                                    BELOW ARE PUBLIC FUNCTIONS
 
 function findBluetoothDevices() {
     XsensDotSensor.request()
@@ -384,15 +403,6 @@ function startRecording() {
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
-    .then(() => {
-        // Read ACK of erase flash
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Erase flash ack: ${x}`)
-        return
-    })
     .catch(error => { console.error(error); })
 }
 
@@ -407,15 +417,6 @@ function startRecording2() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
-        // Read ACK of request flash info
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request flash info ack: ${x}`)
-        return
-    })
-    .then(() => {
         // Start recording
         let res = intToBytesArray(Math.floor(Date.now() / 1000))
         let ReData = new Array(5)
@@ -428,15 +429,6 @@ function startRecording2() {
         console.log("Start recording")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        // Read ACK of start recording
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Start recording ack: ${x}`)
-        return
     })
     .then(() => {
         console.log("=======================================================")
@@ -456,14 +448,6 @@ function stopRecording() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request sensor state ack: ${x}`)
-        return
-    })
-    .then(() => {
         // Request recording time
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.requestRecordingTime, [])
         console.log("Request recording time")
@@ -471,43 +455,16 @@ function stopRecording() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request recording time ack: ${x}`)
-        return
-    })
-    .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.stopRecording, [])
         console.log("Stop recording")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)})
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        if(x == undefined){
-            console.log("Received an undefined ack for stop recording:")
-            console.log(value)
-        } else {
-            console.log(`Stop recording ack: ${x}`)
-        }
-        return
     })
     .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.getState, [])
         console.log("Request sensor state")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request sensor state ack: ${x}`)
-        return
     })
     .then(() => {
         console.log("=======================================================")
@@ -527,42 +484,17 @@ function exportData() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     }) // Select export data
     .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Select export data ack: ${x}`)
-        return
-    })
-    .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileInfo, [0x01])
         console.log("Request file info")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     }) // Request file info
     .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request file info ack: ${x}`)
-        return
-    })
-    .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileData, [0x01])
         console.log("Request file data")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
-    .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request file data ack: ${x}`)
-        return
-    })
-    .then() // Stop data export
     .then(() => {
         console.log("=======================================================")
         return
