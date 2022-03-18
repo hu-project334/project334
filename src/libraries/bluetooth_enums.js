@@ -1,3 +1,4 @@
+// DIFFERENT XSENS DOT SERVICES AND UUID's
 export let prefix = '1517'
 export let suffix = '-4947-11e9-8646-d663bd873d93'
 export const serviceEnum = Object.freeze({

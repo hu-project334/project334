@@ -1,5 +1,3 @@
-// DIFFERENT XSENS DOT SERVICES AND UUID's
-
 import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
 
 // =========================================================================
@@ -232,6 +230,8 @@ var latestNotificationType = 0x00
 var latestNotificationObject
 // eslint-disable-next-line no-unused-vars
 var dataArr = [];
+// eslint-disable-next-line no-unused-vars
+var recordingTimeRaw = 0
 /**
  * handleNotificationChanged is executed when the message_service notification characteristic is changed
  */
@@ -256,9 +256,16 @@ function handleNotificationChanged(event) {
                       (timestampArr[timestampArr.length - 4] << 1));
         result = result / 1000
         dataArr.push(result)
+        if(dataArr.length > 1){
+            if(dataArr[dataArr.length - 1] > dataArr[dataArr.length - 2]){
+                recordingTimeRaw += dataArr[dataArr.length - 1] - dataArr[dataArr.length - 2]
+            } else {
+                recordingTimeRaw += dataArr[dataArr.length - 2] - dataArr[dataArr.length - 1]
+            }
+        }
     } else if (latestNotificationType == recMsgNotEnum.exportFileDataDone) {
         console.log("EXPORT FILE DATA DONE")
-        console.log(dataArr)
+        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
     }
 }
 
@@ -276,6 +283,7 @@ function findBluetoothDevices() {
 
 function startRecording() {
     console.log("")
+    recordingTimeRaw = 0
     console.log("=====================startRecording=====================")
     // Enable notifications
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
