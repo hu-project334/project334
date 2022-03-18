@@ -199,29 +199,24 @@ class XsensDot {
 //                           NOTIFICATION HANDLER
 // =========================================================================
 
-var dataArr = [];
-var recordingTimeRaw = 0
-
-
-var genericNotHandler = function (event) {
-    const value = event.target.value
-    let latestNotificationType = value.getUint8(2, true)
-    console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
-    console.log(value)
-    // if (latestNotificationType == recMsgNotEnum.storeFlashInfoDone1 || latestNotificationType == recMsgNotEnum.storeFlashInfoDone2){
-    //     console.log("CALLING NEXT PART OF START RECORDING")
-    //     startRecording2()
-    // }
-}
 
 class notification_handler {
+
+    /**
+     * genericNotHandler is the default function which is called when a notication comes in
+     */
+    genericNotHandler = function (event) {
+        const value = event.target.value
+        console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
+        console.log(value)
+    }
 
     /**
      * The constructor adds all possible notifications to its own member variables
      * and assigns the default notification handler
      */
     constructor() {
-        Object.keys(recMsgNotEnum).map(key => { notification_handler[key] = genericNotHandler })
+        Object.keys(recMsgNotEnum).map(key => { notification_handler[key] = this.genericNotHandler })
     }
 
     /**
@@ -278,6 +273,8 @@ function handleBatteryChanged(event) {
 
 let XsensDotSensor = new XsensDot();
 let NotificationHandler = new notification_handler();
+var dataArr = [];
+var recordingTimeRaw = 0
 
 function findBluetoothDevices() {
     XsensDotSensor.request()
