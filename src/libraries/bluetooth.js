@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
 
 // =========================================================================
@@ -194,15 +195,61 @@ class XsensDot {
     }
 }
 
-// END OF XSENS DOT OBJECT
-// BELOW ARE HELPER FUNCTIONS
+// =========================================================================
+//                           NOTIFICATION HANDLER
+// =========================================================================
 
-let XsensDotSensor = new XsensDot();
+var dataArr = [];
+var recordingTimeRaw = 0
+
+
+var genericNotHandler = function (event) {
+    const value = event.target.value
+    let latestNotificationType = value.getUint8(2, true)
+    console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
+    console.log(value)
+    // if (latestNotificationType == recMsgNotEnum.storeFlashInfoDone1 || latestNotificationType == recMsgNotEnum.storeFlashInfoDone2){
+    //     console.log("CALLING NEXT PART OF START RECORDING")
+    //     startRecording2()
+    // }
+}
+
+class notification_handler {
+
+    /**
+     * The constructor adds all possible notifications to its own member variables
+     * and assigns the default notification handler
+     */
+    constructor() {
+        Object.keys(recMsgNotEnum).map(key => { notification_handler[key] = genericNotHandler })
+    }
+
+    /**
+     * The setCallback function assigns a new callback to a notification type
+     *
+     */
+    setCallback(notification_type, callback_function){
+        notification_handler[getKeyByValue(recMsgNotEnum, notification_type)] = callback_function
+    }
+
+    /**
+     * The handle notification function calls the function assigned to the notification
+     */
+    handleNotification(event) {
+        const value = event.target.value
+        let notification_type = getKeyByValue(recMsgNotEnum, value.getUint8(2, true))
+        return notification_handler[notification_type](event)
+    }
+
+}
+
+// =========================================================================
+//                            HELPER FUNCTIONS
+// =========================================================================
 
 /**
  * intToBytesArray takes an int and converts it to a 4 bytes array
  */
-// eslint-disable-next-line no-unused-vars
 function intToBytesArray(int) {
     let ByteArray = new Array(4);
 
@@ -224,54 +271,13 @@ function handleBatteryChanged(event) {
     element.innerHTML = value.getUint8(0, true)
     console.log("Received new battery level: " + value.getUint8(0, true));
 }
-// eslint-disable-next-line no-unused-vars
-var latestNotificationType = 0x00
-// eslint-disable-next-line no-unused-vars
-var latestNotificationObject
-// eslint-disable-next-line no-unused-vars
-var dataArr = [];
-// eslint-disable-next-line no-unused-vars
-var recordingTimeRaw = 0
-/**
- * handleNotificationChanged is executed when the message_service notification characteristic is changed
- */
-// eslint-disable-next-line no-unused-vars
-function handleNotificationChanged(event) {
-    const value = event.target.value
-    latestNotificationObject = value
-    latestNotificationType = value.getUint8(2, true)
-    console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
-    console.log(value)
-    if (latestNotificationType == recMsgNotEnum.storeFlashInfoDone1 || latestNotificationType == recMsgNotEnum.storeFlashInfoDone2){
-        console.log("CALLING NEXT PART OF START RECORDING")
-        startRecording2()
-    } else if (latestNotificationType == recMsgNotEnum.exportFileData) {
-        let timestampArr = []
-        for (var i = 7; i < 11; i++){
-            timestampArr.push(value.getUint8(i, true))
-        }
-        var result = ((timestampArr[timestampArr.length - 24]) |
-                      (timestampArr[timestampArr.length - 2] << 16) |
-                      (timestampArr[timestampArr.length - 3] << 8) |
-                      (timestampArr[timestampArr.length - 4] << 1));
-        result = result / 1000
-        dataArr.push(result)
-        if(dataArr.length > 1){
-            if(dataArr[dataArr.length - 1] > dataArr[dataArr.length - 2]){
-                recordingTimeRaw += dataArr[dataArr.length - 1] - dataArr[dataArr.length - 2]
-            } else {
-                recordingTimeRaw += dataArr[dataArr.length - 2] - dataArr[dataArr.length - 1]
-            }
-        }
-    } else if (latestNotificationType == recMsgNotEnum.exportFileDataDone) {
-        console.log("EXPORT FILE DATA DONE")
-        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
-    }
-}
 
-//                                                                      END OF HELPER FUNCTIONS
-// ============================================================================================================================================================
-//                                                                    BELOW ARE PUBLIC FUNCTIONS
+// =========================================================================
+//                            PUBLIC FUNCTIONS
+// =========================================================================
+
+let XsensDotSensor = new XsensDot();
+let NotificationHandler = new notification_handler();
 
 function findBluetoothDevices() {
     XsensDotSensor.request()
@@ -282,11 +288,14 @@ function findBluetoothDevices() {
 }
 
 function startRecording() {
+
+    NotificationHandler.setCallback(recMsgNotEnum.storeFlashInfoDone1, startRecording2)
+
     console.log("")
     recordingTimeRaw = 0
     console.log("=====================startRecording=====================")
     // Enable notifications
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
         // Erase flash
         let res = intToBytesArray(Math.floor(Date.now() / 1000))
@@ -302,9 +311,9 @@ function startRecording() {
     .catch(error => { console.error(error); })
 }
 
-function startRecording2() {
+export function startRecording2() {
 
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
         // Request flash info
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.requestFlashInfo, [])
@@ -336,7 +345,7 @@ function startRecording2() {
 function stopRecording() {
     console.log("")
     console.log("=====================stopRecording=====================")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.getState, [])
         console.log("Request sensor state")
@@ -370,11 +379,38 @@ function stopRecording() {
 }
 
 function exportData() {
+
+    NotificationHandler.setCallback(recMsgNotEnum.exportFileDataDone, () => {
+        console.log("EXPORT FILE DATA DONE")
+        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
+    })
+
+    NotificationHandler.setCallback(recMsgNotEnum.exportFileData, (event) => {
+        const value = event.target.value
+        let timestampArr = []
+        for (var i = 7; i < 11; i++){
+            timestampArr.push(value.getUint8(i, true))
+        }
+        var result = ((timestampArr[timestampArr.length - 24]) |
+        (timestampArr[timestampArr.length - 2] << 16) |
+        (timestampArr[timestampArr.length - 3] << 8) |
+        (timestampArr[timestampArr.length - 4] << 1));
+        result = result / 1000
+        dataArr.push(result)
+        if(dataArr.length > 1){
+            if(dataArr[dataArr.length - 1] > dataArr[dataArr.length - 2]){
+                recordingTimeRaw += dataArr[dataArr.length - 1] - dataArr[dataArr.length - 2]
+            } else {
+                recordingTimeRaw += dataArr[dataArr.length - 2] - dataArr[dataArr.length - 1]
+            }
+        }
+    })
+
     console.log("")
     console.log("======================requestData======================")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.selectExportData, [0x00]) //0x04 = Euler Angles
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 2, recMsgEnum.selectExportData, [0x00, 0x04]) //0x04 = Euler Angles
         console.log("Select export data")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)

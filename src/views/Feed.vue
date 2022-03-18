@@ -11,11 +11,11 @@ Register.vue - base vue
 </template>
 
 <script>
-import { findBluetoothDevices } from "/src/libraries/bluethooth.js";
-import { XsensDotSensor } from "/src/libraries/bluethooth.js";
-import { startRecording } from "/src/libraries/bluethooth.js";
-import { stopRecording } from "/src/libraries/bluethooth.js";
-import { exportData } from "/src/libraries/bluethooth.js";
+import { findBluetoothDevices } from "/src/libraries/bluetooth.js";
+import { XsensDotSensor } from "/src/libraries/bluetooth.js";
+import { startRecording } from "/src/libraries/bluetooth.js";
+import { stopRecording } from "/src/libraries/bluetooth.js";
+import { exportData } from "/src/libraries/bluetooth.js";
 export default {
   name: "regster",
   data() {
