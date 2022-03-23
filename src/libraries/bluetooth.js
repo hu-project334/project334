@@ -273,7 +273,8 @@ function handleBatteryChanged(event) {
 
 let XsensDotSensor = new XsensDot();
 let NotificationHandler = new notification_handler();
-var dataArr = [];
+var timeDataArr = [];
+var eulerDataArr = [];
 var recordingTimeRaw = 0
 
 function findBluetoothDevices() {
@@ -380,6 +381,8 @@ function exportData() {
     NotificationHandler.setCallback(recMsgNotEnum.exportFileDataDone, () => {
         console.log("EXPORT FILE DATA DONE")
         console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
+        console.log("Euler data:")
+        console.log(eulerDataArr)
     })
 
     NotificationHandler.setCallback(recMsgNotEnum.exportFileData, (event) => {
@@ -389,18 +392,35 @@ function exportData() {
             timestampArr.push(value.getUint8(i, true))
         }
         var result = ((timestampArr[timestampArr.length - 24]) |
-        (timestampArr[timestampArr.length - 2] << 16) |
-        (timestampArr[timestampArr.length - 3] << 8) |
-        (timestampArr[timestampArr.length - 4] << 1));
+                      (timestampArr[timestampArr.length - 2] << 16) |
+                      (timestampArr[timestampArr.length - 3] << 8) |
+                      (timestampArr[timestampArr.length - 4] << 1));
+                      
         result = result / 1000
-        dataArr.push(result)
-        if(dataArr.length > 1){
-            if(dataArr[dataArr.length - 1] > dataArr[dataArr.length - 2]){
-                recordingTimeRaw += dataArr[dataArr.length - 1] - dataArr[dataArr.length - 2]
+        timeDataArr.push(result)
+        if(timeDataArr.length > 1){
+            if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
             } else {
-                recordingTimeRaw += dataArr[dataArr.length - 2] - dataArr[dataArr.length - 1]
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
             }
         }
+        var axis = []
+
+        let axisArray = []
+        for (var j = 0; j < 3; j++){
+            for (var k = 11 + (4*j); k < 15 + (4*j); k++){
+                axisArray.push(value.getUint8(k, true))
+            }
+            result = ((axisArray[axisArray.length - 24]) |
+                        (axisArray[axisArray.length - 2] << 16) |
+                        (axisArray[axisArray.length - 3] << 8) |
+                        (axisArray[axisArray.length - 4] << 1));
+            axisArray = []
+            axis.push(result)
+        }
+        axis.push(timeDataArr[timeDataArr.length - 1])
+        eulerDataArr.push(axis)
     })
 
     console.log("")
