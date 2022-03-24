@@ -8,11 +8,6 @@
         <ErrorMessage name="email" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="email">Email</label>
-        <Field name="email" type="email" class="form-control" />
-        <ErrorMessage name="email" class="error-feedback" />
-      </div>
-      <div class="form-group">
         <label for="password">Password</label>
         <Field name="password" type="password" class="form-control" />
         <ErrorMessage name="passwordConfirmation" class="error-feedback" />
