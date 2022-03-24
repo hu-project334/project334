@@ -1,118 +1,5 @@
-// DIFFERENT XSENS DOT SERVICES AND UUID's
-let prefix = '1517'
-let suffix = '-4947-11e9-8646-d663bd873d93'
-const serviceEnum = Object.freeze({
-    // Configuration service
-    'configuration_service' : 1000,
-    'device_info' : 1001,
-    'device_control' : 1002,
-    'device_report' : 1004,
-    // Measurement service
-    'measurement_service' : 2000,
-    'control' : 2001,
-    'long_payload_length' : 2002,
-    'medium_payload_length' : 2003,
-    'short_payload_length' : 2004,
-    'magnetic_field_mapper' : 2005,
-    'orientation_reset_control' : 2006,
-    'orientation_reset_status' : 2007,
-    'orientation_reset_data' : 2008,
-    // Battery service
-    'battery_service' : 3000,
-    'battery_level': 3001,
-    // Message service
-    'message_service' : 7000,
-    'message_control' : 7001,
-    'message_acknowledge' : 7002,
-    'message_notification' : 7003
-});
-
-// ========================================================================
-// ALL MESSAGES CAN FOUND IN 5.4 OF THE XSENS DOT BLE SERVICE SPECIFICATION
-// ========================================================================
-
-// Recording messages
-// eslint-disable-next-line no-unused-vars
-const recMsgEnum = Object.freeze({
-    // ReID || Hex value
-    'getState' : 0x02,              // Request sensor recording state
-    'eraseFlash' : 0x30,            // Clear all recording data space
-    'startRecording' : 0x40,        // Start recording message
-    'stopRecording' : 0x41,         // Stop recording
-    'requestRecordingTime' : 0x42,  // Request recording time since recording started
-    'requestFlashInfo' : 0x50,      // Request recording flash information
-    'requestFileInfo' : 0x60,       // Request recording file information by index
-    'requestFileData' : 0x70,       // Request recording file data information by index
-    'stopExportData' : 0x73,        // Stop data export
-    'selectExportData' : 0x74,      // Configure export data options
-    'retransmission' : 0x75         // Retransmit all the data from retransDataNumber packet
-});
-
-// Recording message types
-// eslint-disable-next-line no-unused-vars
-const recMsgTypeEnum = Object.freeze({
-    // MID || Hex value
-    'recording_message' : 0x01,
-    'sync_message' : 0x02
-})
-
-// Recording acknowledgements messages
-// eslint-disable-next-line no-unused-vars
-const recMsgAckEnum = Object.freeze({
-    // ReID res || Hex value
-    'success' : 0x00,                   // Control message write success
-    'invalidCmd' : 0x02,                // Invalid command
-    'flashProcessBusy' : 0x03,          // Flash is occupied by other process
-    'idleState' : 0x06,                 // Idle state
-    'onErasing' : 0x30,                 // Erasing internal storage
-    'onRecording' : 0x40,               // In recording state
-    'onExportFlashInfo' : 0x50,         // Exporting flash information
-    'onExportRecordingFileInfo' : 0x60, // Exporting flash information
-    'onExportRecordingFileData' : 0x70  // Exporting recording data
-});
-
-// Recording notification messages
-// eslint-disable-next-line no-unused-vars
-const recMsgNotEnum = Object.freeze({
-    // ReID || Hex value
-    'flashProcessBusy' : 0x03,     // Flash is occupied by other process
-    'storeFlashInfoDone1' : 0x33,  // Recording flash erase is completed
-    'storeFlashInfoDone2' : 0x31,  // Recording flash erase is completed
-    'flashFull' : 0x34,            // Recording flash space is full
-    'invalidFlashFormat' : 0x35,   // Recording flash format is invalid (erase flash!)
-    'recordingStopped' : 0x41,     // Recording stopped
-    'recordingTime' : 0x43,        // StartUTC 4 bytes TotRecTime 2 bytes RemRecTie 2 bytes
-    'exportFlashInfo' : 0x51,      // Recording file system info
-    'exportFlashInfoDone' : 0x52,  // Recording flash information export completed
-    'exportFileInfo' : 0x61,       // File structure header
-    'exportFileInfoDone' : 0x62,   // Recording file information export is completed
-    'noRecordingFile' : 0x63,      // Recording file information export is completed
-    'exportFileData' : 0x71,       // Export file data based on fileIndex and selectedData
-    'exportFileDataDone' : 0x72,   // Recording data export is completed
-    'exportDataStopped' : 0x73,    // Export data has been stopped
-    'exportFileDataInvalid' : 0x76 // Invalid data packet due to internal data checksum fail
-});
-
-// Synchronization control messages
-// eslint-disable-next-line no-unused-vars
-const syncMsgEnum = Object.freeze({
-    // SyID || Hex value
-    'startSync' : 0x01,     // Start the synchronization
-    'stopSync' : 0x02,      // Stop the synchronization (stopSyncResult notification will be sent)
-    'getSyncStatus' : 0x08  // Check if the sensor is already synced (syncStatus notification will be sent)
-});
-
-// Synchronization notification messages
-// eslint-disable-next-line no-unused-vars
-const syncMsgNotEnum = Object.freeze({
-      // SyID || Hex value
-    'stopSyncResult' : 0x50, // The result of the stop sync command 0x00 = success 0x01 = fail
-    'syncStatus' : 0x51      // The sync status of the sensor. 0x04 = synced, 0x09 = un-synced
-});
-
-function getKeyByValue(object, value) {
-    return Object.keys(object).find(key => object[key] === value);
-}
+/* eslint-disable */
+import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
 
 // =========================================================================
 //                            XSENS DOT BLE OBJECT
@@ -120,9 +7,10 @@ function getKeyByValue(object, value) {
 
 class XsensDot {
 
-    constructor() {
+    constructor(verbose = true) {
         this.device = null;
         this.onDisconnected = this.onDisconnected.bind(this);
+        this.verbose = verbose;
     }
 
     /**
@@ -183,12 +71,29 @@ class XsensDot {
     }
 
     /**
+     * readMessageAck reads the acknowledge of a given dataViewObject
+     */
+    readMessageAck(dataViewObject) {
+        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+        .then((value) => {
+            if(this.verbose){
+                let str = `${getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))} ack: ${getKeyByValue(recMsgAckEnum, value.getUint8(3, true))}`
+                console.log(str)
+            }
+            return value
+        })
+    }
+
+    /**
      * writeCharacteristicData allows you to write a dataViewObject to the given characteristic
      */
     writeCharacteristicData(service, characteristic, dataViewObject) {
         return this.device.gatt.getPrimaryService((prefix + service + suffix))
         .then(service => { return service.getCharacteristic((prefix + characteristic + suffix)); })
         .then(characteristic => { return characteristic.writeValue(dataViewObject); })
+        .then(() => {
+            return XsensDotSensor.readMessageAck(dataViewObject)
+        })
         .catch(error => { console.error(error); })
     }
 
@@ -290,15 +195,56 @@ class XsensDot {
     }
 }
 
-// END OF XSENS DOT OBJECT
-// BELOW ARE HELPER FUNCTIONS
+// =========================================================================
+//                           NOTIFICATION HANDLER
+// =========================================================================
 
-let XsensDotSensor = new XsensDot();
+
+class notification_handler {
+
+    /**
+     * genericNotHandler is the default function which is called when a notication comes in
+     */
+    genericNotHandler = function (event) {
+        const value = event.target.value
+        console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
+        console.log(value)
+    }
+
+    /**
+     * The constructor adds all possible notifications to its own member variables
+     * and assigns the default notification handler
+     */
+    constructor() {
+        Object.keys(recMsgNotEnum).map(key => { notification_handler[key] = this.genericNotHandler })
+    }
+
+    /**
+     * The setCallback function assigns a new callback to a notification type
+     *
+     */
+    setCallback(notification_type, callback_function){
+        notification_handler[getKeyByValue(recMsgNotEnum, notification_type)] = callback_function
+    }
+
+    /**
+     * The handle notification function calls the function assigned to the notification
+     */
+    handleNotification(event) {
+        const value = event.target.value
+        let notification_type = getKeyByValue(recMsgNotEnum, value.getUint8(2, true))
+        return notification_handler[notification_type](event)
+    }
+
+}
+
+// =========================================================================
+//                            HELPER FUNCTIONS
+// =========================================================================
 
 /**
  * intToBytesArray takes an int and converts it to a 4 bytes array
  */
-// eslint-disable-next-line no-unused-vars
 function intToBytesArray(int) {
     let ByteArray = new Array(4);
 
@@ -321,18 +267,15 @@ function handleBatteryChanged(event) {
     console.log("Received new battery level: " + value.getUint8(0, true));
 }
 
-/**
- * handleNotificationChanged is executed when the message_service notification characteristic is changed
- */
-// eslint-disable-next-line no-unused-vars
-function handleNotificationChanged(event) {
-    const value = event.target.value
-    console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
-    console.log(value)
-}
+// =========================================================================
+//                            PUBLIC FUNCTIONS
+// =========================================================================
 
-// END OF HELPER FUNCTIONS
-// BELOW ARE PUBLIC FUNCTIONS
+let XsensDotSensor = new XsensDot();
+let NotificationHandler = new notification_handler();
+var timeDataArr = [];
+var eulerDataArr = [];
+var recordingTimeRaw = 0
 
 function findBluetoothDevices() {
     XsensDotSensor.request()
@@ -344,24 +287,37 @@ function findBluetoothDevices() {
 
 function startRecording() {
 
+    NotificationHandler.setCallback(recMsgNotEnum.storeFlashInfoDone1, startRecording2)
+
+    console.log("")
+    recordingTimeRaw = 0
     console.log("=====================startRecording=====================")
     // Enable notifications
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        // Erase flash
+        let res = intToBytesArray(Math.floor(Date.now() / 1000))
+        let ReData = new Array(3)
+        for (let i = 0; i < res.length; i++) {
+            ReData[i] = res[i]
+        }
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 4, recMsgEnum.eraseFlash, ReData)
+        console.log("Erase flash")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    })
+    .catch(error => { console.error(error); })
+}
+
+export function startRecording2() {
+
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
         // Request flash info
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.requestFlashInfo, [])
         console.log("Request flash info")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        // Read ACK of request flash info
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request flash info ack: ${x}`)
-        return
     })
     .then(() => {
         // Start recording
@@ -378,46 +334,21 @@ function startRecording() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
-        // Read ACK of start recording
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Start recording ack: ${x}`)
-        return
-    })
-    .then(() => {
         console.log("=======================================================")
-        console.log("")
         return
     })
     .catch(error => { console.error(error); })
-
-    // Request state during recording
-
-    // Read ACK of request
-
-    // Stop recording
-
-    // Read ack of stop recording
 }
 
 function stopRecording() {
+    console.log("")
     console.log("=====================stopRecording=====================")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleNotificationChanged, serviceEnum.message_service, serviceEnum.message_notification)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.getState, [])
         console.log("Request sensor state")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request sensor state ack: ${x}`)
-        return
     })
     .then(() => {
         // Request recording time
@@ -427,29 +358,10 @@ function stopRecording() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request recording time ack: ${x}`)
-        return
-    })
-    .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.stopRecording, [])
         console.log("Stop recording")
         console.log(dataViewObject)
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)})
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        if(x == undefined){
-            console.log("Received an undefined ack for stop recording:")
-            console.log(value)
-        } else {
-            console.log(`Stop recording ack: ${x}`)
-        }
-        return
     })
     .then(() => {
         let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.getState, [])
@@ -458,16 +370,83 @@ function stopRecording() {
         return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-    })
-    .then(value => {
-        let x = getKeyByValue(recMsgAckEnum, value.getUint8(3, true))
-        console.log(`Request sensor state ack: ${x}`)
+        console.log("=======================================================")
         return
+    })
+    .catch(error => { console.error(error); })
+}
+
+function exportData() {
+
+    NotificationHandler.setCallback(recMsgNotEnum.exportFileDataDone, () => {
+        console.log("EXPORT FILE DATA DONE")
+        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
+        console.log("Euler data:")
+        console.log(eulerDataArr)
+    })
+
+    NotificationHandler.setCallback(recMsgNotEnum.exportFileData, (event) => {
+        const value = event.target.value
+        let timestampArr = []
+        for (var i = 7; i < 11; i++){
+            timestampArr.push(value.getUint8(i, true))
+        }
+        var result = ((timestampArr[timestampArr.length - 24]) |
+                      (timestampArr[timestampArr.length - 2] << 16) |
+                      (timestampArr[timestampArr.length - 3] << 8) |
+                      (timestampArr[timestampArr.length - 4] << 1));
+                      
+        result = result / 1000
+        timeDataArr.push(result)
+        if(timeDataArr.length > 1){
+            if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
+            } else {
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
+            }
+        }
+        var axis = []
+
+        let axisArray = []
+        for (var j = 0; j < 3; j++){
+            for (var k = 11 + (4*j); k < 15 + (4*j); k++){
+                axisArray.push(value.getUint8(k, true))
+            }
+            result = ((axisArray[axisArray.length - 24]) |
+                        (axisArray[axisArray.length - 2] << 16) |
+                        (axisArray[axisArray.length - 3] << 8) |
+                        (axisArray[axisArray.length - 4] << 1));
+            axisArray = []
+            axis.push(result)
+        }
+        axis.push(timeDataArr[timeDataArr.length - 1])
+        eulerDataArr.push(axis)
+    })
+
+    console.log("")
+    console.log("======================requestData======================")
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 2, recMsgEnum.selectExportData, [0x00, 0x04]) //0x04 = Euler Angles
+        console.log("Select export data")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    }) // Select export data
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileInfo, [0x01])
+        console.log("Request file info")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    }) // Request file info
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileData, [0x01])
+        console.log("Request file data")
+        console.log(dataViewObject)
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
     })
     .then(() => {
         console.log("=======================================================")
-        console.log("")
+        return
     })
     .catch(error => { console.error(error); })
 }
@@ -476,4 +455,5 @@ function stopRecording() {
 export { findBluetoothDevices };
 export { startRecording };
 export { stopRecording };
+export { exportData };
 export { XsensDotSensor };

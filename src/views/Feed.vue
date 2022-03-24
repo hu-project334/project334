@@ -11,14 +11,16 @@ Register.vue - base vue
   </h2>
   <p><button @click="startRec()">start recording</button></p>
   <p><button @click="stopRec()">stop recording</button></p>
+  <p><button @click="startDataExport()">Export data</button></p>
 </template>
 
 <script>
 import NavbarTop from "@/components/navbars/NavBarTop.vue";
-import { findBluetoothDevices } from "/src/libraries/bluethooth.js";
-import { XsensDotSensor } from "/src/libraries/bluethooth.js";
-import { startRecording } from "/src/libraries/bluethooth.js";
-import { stopRecording } from "/src/libraries/bluethooth.js";
+import { findBluetoothDevices } from "/src/libraries/bluetooth.js";
+import { XsensDotSensor } from "/src/libraries/bluetooth.js";
+import { startRecording } from "/src/libraries/bluetooth.js";
+import { stopRecording } from "/src/libraries/bluetooth.js";
+import { exportData } from "/src/libraries/bluetooth.js";
 export default {
   name: "Feed",
   components: {
@@ -41,8 +43,11 @@ export default {
       startRecording();
     },
     stopRec() {
-      stopRecording();
+      stopRecording()
     },
+    startDataExport() {
+      exportData()
+    }
   },
 };
 </script>
