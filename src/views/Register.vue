@@ -175,7 +175,7 @@ export default {
   width: 100vw;
 } */
 .title {
-  margin-top: 40;
+  margin-top: 1em;
 }
 .main-text {
   color: white;
@@ -186,7 +186,7 @@ export default {
 .logo {
   height: 70px;
 
-  margin-top: 15px;
+  margin-top: 3em;
 }
 
 .loginBTN {

@@ -1,4 +1,4 @@
-const DB_NAME = "duo-run-db";
+const DB_NAME = "Fysio";
 const DB_VERSION = 1;
 let db = null;
 

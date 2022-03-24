@@ -1,5 +1,6 @@
 Register.vue - base vue
 <template>
+  <NavbarTop></NavbarTop>
   <h1>alexander / milo</h1>
 
   <p><button @click="getData()">connect</button></p>
@@ -13,12 +14,16 @@ Register.vue - base vue
 </template>
 
 <script>
+import NavbarTop from "@/components/navbars/NavBarTop.vue";
 import { findBluetoothDevices } from "/src/libraries/bluethooth.js";
 import { XsensDotSensor } from "/src/libraries/bluethooth.js";
 import { startRecording } from "/src/libraries/bluethooth.js";
 import { stopRecording } from "/src/libraries/bluethooth.js";
 export default {
   name: "Feed",
+  components: {
+    NavbarTop,
+  },
   data() {
     return {
       x: 0,
