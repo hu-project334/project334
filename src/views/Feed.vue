@@ -43,11 +43,11 @@ export default {
       startRecording();
     },
     stopRec() {
-      stopRecording()
+      stopRecording();
     },
     startDataExport() {
-      exportData()
-    }
+      exportData();
+    },
   },
 };
 </script>
