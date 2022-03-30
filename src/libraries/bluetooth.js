@@ -376,52 +376,76 @@ function stopRecording() {
     .catch(error => { console.error(error); })
 }
 
+function differenceStartEnd(begin, end) {
+    if (begin < 0){
+        begin = 360 + parseFloat(begin)
+    }
+    if (end < 0){
+        end = 360 + parseFloat(end)
+    }
+    return Math.abs(begin - end).toFixed(2)
+}
+
+function parseCompleteEulerData(event, adjust = 0) {
+    const value = event.target.value
+    console.log(adjust)
+    let timestampArr = []
+    for (var i = 7 - adjust; i < 11 - adjust; i++){                       // Get the currect sensor time
+        timestampArr.push(value.getUint8(i, true))
+    }
+    var result = ((timestampArr[timestampArr.length - 24]) |
+                    (timestampArr[timestampArr.length - 2] << 16) |
+                    (timestampArr[timestampArr.length - 3] << 8) |
+                    (timestampArr[timestampArr.length - 4] << 1));
+
+    result = result / 1000
+    timeDataArr.push(result)
+    if(timeDataArr.length > 1){
+        if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
+            recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
+        } else {
+            recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
+        }
+    }
+    var axis = []
+
+    let axisString = ""
+    for (var j = 0; j < 3; j++){                        // Get the Euler Angle data
+        for (var k = 11 + (4*j) - adjust; k < 15 + (4*j) - adjust; k++){
+            var tmpValue = (value.getUint8(k, true) >>> 0).toString(2)
+            axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
+        }
+
+        var a = parseInt(axisString.charAt(0), 2)
+        var b = parseInt(axisString.substring(1,9), 2)
+        var c = parseInt("1"+axisString.substring(9), 2)
+
+        result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
+        axis.push(result)
+        axisString = ""
+    }
+    axis.push(timeDataArr[timeDataArr.length - 1])
+    eulerDataArr.push(axis)
+    return axis
+}
+
 function exportData() {
 
     NotificationHandler.setCallback(recMsgNotEnum.exportFileDataDone, () => {
         console.log("EXPORT FILE DATA DONE")
-        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
         console.log("Euler data:")
         console.log(eulerDataArr)
+        console.log("Euler data difference:")
+        console.log("Aan het begin: ", eulerDataArr[0][0]," X, ", eulerDataArr[0][1]," Y, ", eulerDataArr[0][2]," Z")
+        console.log("Aan het eind:  ", eulerDataArr[eulerDataArr.length-1][0]," X, ", eulerDataArr[eulerDataArr.length-1][1]," Y, ", eulerDataArr[eulerDataArr.length-1][2]," Z")
+        var diffX = differenceStartEnd(eulerDataArr[0][0], eulerDataArr[eulerDataArr.length-1][0])
+        var diffY = differenceStartEnd(eulerDataArr[0][1], eulerDataArr[eulerDataArr.length-1][1])
+        var diffZ = differenceStartEnd(eulerDataArr[0][2], eulerDataArr[eulerDataArr.length-1][2])
+        console.log(diffX*100," X, ", diffY*100," Y, ", diffZ*100," Z")
+        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
     })
 
-    NotificationHandler.setCallback(recMsgNotEnum.exportFileData, (event) => {
-        const value = event.target.value
-        let timestampArr = []
-        for (var i = 7; i < 11; i++){
-            timestampArr.push(value.getUint8(i, true))
-        }
-        var result = ((timestampArr[timestampArr.length - 24]) |
-                      (timestampArr[timestampArr.length - 2] << 16) |
-                      (timestampArr[timestampArr.length - 3] << 8) |
-                      (timestampArr[timestampArr.length - 4] << 1));
-                      
-        result = result / 1000
-        timeDataArr.push(result)
-        if(timeDataArr.length > 1){
-            if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
-                recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
-            } else {
-                recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
-            }
-        }
-        var axis = []
-
-        let axisArray = []
-        for (var j = 0; j < 3; j++){
-            for (var k = 11 + (4*j); k < 15 + (4*j); k++){
-                axisArray.push(value.getUint8(k, true))
-            }
-            result = ((axisArray[axisArray.length - 24]) |
-                        (axisArray[axisArray.length - 2] << 16) |
-                        (axisArray[axisArray.length - 3] << 8) |
-                        (axisArray[axisArray.length - 4] << 1));
-            axisArray = []
-            axis.push(result)
-        }
-        axis.push(timeDataArr[timeDataArr.length - 1])
-        eulerDataArr.push(axis)
-    })
+    NotificationHandler.setCallback(recMsgNotEnum.exportFileData, parseCompleteEulerData)
 
     console.log("")
     console.log("======================requestData======================")
@@ -451,39 +475,18 @@ function exportData() {
     .catch(error => { console.error(error); })
 }
 
-var payloadArr = []
-var rtStreamTimeArr = []
-var streamingTimeRaw = 0
-
-let payloadHandler =  (event) => {
-    const value = event.target.value
-    payloadArr.push(value)
-    let timestampArr = []
-    for (var i = 7; i < 11; i++){
-        timestampArr.push(value.getUint8(i, true))
-    }
-    var result = ((timestampArr[timestampArr.length - 24]) |
-                  (timestampArr[timestampArr.length - 2] << 16) |
-                  (timestampArr[timestampArr.length - 3] << 8) |
-                  (timestampArr[timestampArr.length - 4] << 1));
-
-    result = result / 1000
-    rtStreamTimeArr.push(result)
-    if(rtStreamTimeArr.length > 1){
-        if(rtStreamTimeArr[rtStreamTimeArr.length - 1] > rtStreamTimeArr[rtStreamTimeArr.length - 2]){
-            streamingTimeRaw += rtStreamTimeArr[rtStreamTimeArr.length - 1] - rtStreamTimeArr[rtStreamTimeArr.length - 2]
-        } else {
-            streamingTimeRaw += rtStreamTimeArr[rtStreamTimeArr.length - 2] - rtStreamTimeArr[rtStreamTimeArr.length - 1]
-        }
-    }
-    console.log("Time: " + (streamingTimeRaw / 1000).toFixed(2))
-}
-
 function startRTStream() {
     console.log("Real time streaming started")
-    streamingTimeRaw = 0
+    recordingTimeRaw = 0
+
+    let handlePayload = (event) => {
+        // parseCompleteEulerData(event)
+        let axis = parseCompleteEulerData(event, 7)
+        console.log("X: " + (axis[0] * 100).toFixed(2) + " Y: " + (axis[1] * 100).toFixed(2) + " Z: " + (axis[2] * 100).toFixed(2) + " Time: " + (axis[3] / 1000).toFixed(2))
+    }
+
     // Set notifications for medium payload
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(payloadHandler, serviceEnum.measurement_service, serviceEnum.medium_payload_length)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.medium_payload_length)
     .then(() => { // Set the normal message notification handler
         return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     })
@@ -514,7 +517,17 @@ function stopRTStream() {
         return
     })
     .then(() => {
-        console.log(payloadArr)
+        console.log("EXPORT FILE DATA DONE")
+        console.log("Euler data:")
+        console.log(eulerDataArr)
+        console.log("Euler data difference:")
+        console.log("Aan het begin: ", eulerDataArr[0][0]," X, ", eulerDataArr[0][1]," Y, ", eulerDataArr[0][2]," Z")
+        console.log("Aan het eind:  ", eulerDataArr[eulerDataArr.length-1][0]," X, ", eulerDataArr[eulerDataArr.length-1][1]," Y, ", eulerDataArr[eulerDataArr.length-1][2]," Z")
+        var diffX = differenceStartEnd(eulerDataArr[0][0], eulerDataArr[eulerDataArr.length-1][0])
+        var diffY = differenceStartEnd(eulerDataArr[0][1], eulerDataArr[eulerDataArr.length-1][1])
+        var diffZ = differenceStartEnd(eulerDataArr[0][2], eulerDataArr[eulerDataArr.length-1][2])
+        console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
+        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
         return
     })
     .catch(error => { console.error(error);})
