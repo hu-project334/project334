@@ -376,19 +376,36 @@ function stopRecording() {
     .catch(error => { console.error(error); })
 }
 
+function differenceStartEnd(begin, end) {
+    if (begin < 0){
+        begin = 360 + parseFloat(begin)
+    }
+    if (end < 0){
+        end = 360 + parseFloat(end)
+    }
+    return Math.abs(begin - end).toFixed(2)
+}
+
 function exportData() {
 
     NotificationHandler.setCallback(recMsgNotEnum.exportFileDataDone, () => {
         console.log("EXPORT FILE DATA DONE")
-        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
         console.log("Euler data:")
         console.log(eulerDataArr)
+        console.log("Euler data difference:")
+        console.log("Aan het begin: ", eulerDataArr[0][0]," X, ", eulerDataArr[0][1]," Y, ", eulerDataArr[0][2]," Z")
+        console.log("Aan het eind:  ", eulerDataArr[eulerDataArr.length-1][0]," X, ", eulerDataArr[eulerDataArr.length-1][1]," Y, ", eulerDataArr[eulerDataArr.length-1][2]," Z")
+        var diffX = differenceStartEnd(eulerDataArr[0][0], eulerDataArr[eulerDataArr.length-1][0])
+        var diffY = differenceStartEnd(eulerDataArr[0][1], eulerDataArr[eulerDataArr.length-1][1])
+        var diffZ = differenceStartEnd(eulerDataArr[0][2], eulerDataArr[eulerDataArr.length-1][2])
+        console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
+        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
     })
 
     NotificationHandler.setCallback(recMsgNotEnum.exportFileData, (event) => {
         const value = event.target.value
         let timestampArr = []
-        for (var i = 7; i < 11; i++){
+        for (var i = 7; i < 11; i++){                       // Get the currect sensor time
             timestampArr.push(value.getUint8(i, true))
         }
         var result = ((timestampArr[timestampArr.length - 24]) |
@@ -407,17 +424,20 @@ function exportData() {
         }
         var axis = []
 
-        let axisArray = []
-        for (var j = 0; j < 3; j++){
+        let axisString = ""
+        for (var j = 0; j < 3; j++){                        // Get the Euler Angle data
             for (var k = 11 + (4*j); k < 15 + (4*j); k++){
-                axisArray.push(value.getUint8(k, true))
+                var tmpValue = (value.getUint8(k, true) >>> 0).toString(2)
+                axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
             }
-            result = ((axisArray[axisArray.length - 24]) |
-                        (axisArray[axisArray.length - 2] << 16) |
-                        (axisArray[axisArray.length - 3] << 8) |
-                        (axisArray[axisArray.length - 4] << 1));
-            axisArray = []
+
+            var a = parseInt(axisString.charAt(0), 2)
+            var b = parseInt(axisString.substring(1,9), 2)
+            var c = parseInt("1"+axisString.substring(9), 2)
+
+            result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
             axis.push(result)
+            axisString = ""
         }
         axis.push(timeDataArr[timeDataArr.length - 1])
         eulerDataArr.push(axis)
@@ -451,79 +471,9 @@ function exportData() {
     .catch(error => { console.error(error); })
 }
 
-var payloadArr = []
-var rtStreamTimeArr = []
-var streamingTimeRaw = 0
-
-let payloadHandler =  (event) => {
-    const value = event.target.value
-    payloadArr.push(value)
-    let timestampArr = []
-    for (var i = 7; i < 11; i++){
-        timestampArr.push(value.getUint8(i, true))
-    }
-    var result = ((timestampArr[timestampArr.length - 24]) |
-                  (timestampArr[timestampArr.length - 2] << 16) |
-                  (timestampArr[timestampArr.length - 3] << 8) |
-                  (timestampArr[timestampArr.length - 4] << 1));
-
-    result = result / 1000
-    rtStreamTimeArr.push(result)
-    if(rtStreamTimeArr.length > 1){
-        if(rtStreamTimeArr[rtStreamTimeArr.length - 1] > rtStreamTimeArr[rtStreamTimeArr.length - 2]){
-            streamingTimeRaw += rtStreamTimeArr[rtStreamTimeArr.length - 1] - rtStreamTimeArr[rtStreamTimeArr.length - 2]
-        } else {
-            streamingTimeRaw += rtStreamTimeArr[rtStreamTimeArr.length - 2] - rtStreamTimeArr[rtStreamTimeArr.length - 1]
-        }
-    }
-    console.log("Time: " + (streamingTimeRaw / 1000).toFixed(2))
-}
-
-function startRTStream() {
-    console.log("Real time streaming started")
-    streamingTimeRaw = 0
-    // Set notifications for medium payload
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(payloadHandler, serviceEnum.measurement_service, serviceEnum.medium_payload_length)
-    .then(() => { // Set the normal message notification handler
-        return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    })
-    .then(() => {
-        let buffer = new ArrayBuffer(3)
-        let dataViewObject = new DataView(buffer)
-        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
-        dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
-        XsensDotSensor.verbose = false
-        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
-        return
-    })
-    .catch(error => { console.error(error);})
-}
-
-function stopRTStream() {
-    console.log("Real time streaming stopped")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let buffer = new ArrayBuffer(3)
-        let dataViewObject = new DataView(buffer)
-        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
-        dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
-        XsensDotSensor.verbose = false
-        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
-        return
-    })
-    .then(() => {
-        console.log(payloadArr)
-        return
-    })
-    .catch(error => { console.error(error);})
-}
-
 // Exports
 export { findBluetoothDevices };
 export { startRecording };
 export { stopRecording };
 export { exportData };
 export { XsensDotSensor };
-export { startRTStream, stopRTStream };

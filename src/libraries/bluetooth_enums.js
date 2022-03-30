@@ -63,10 +63,6 @@ export const recMsgAckEnum = Object.freeze({
     'success' : 0x00,                   // Control message write success
     'invalidCmd' : 0x02,                // Invalid command
     'flashProcessBusy' : 0x03,          // Flash is occupied by other process
-    'NotEnoughSample' : 0x05,           // Sync failed for not enough data samples
-    'SkewTooLarge' : 0x07,              // Sync failed for estimated skew too large
-    'StartingTimingError' : 0x08,       // Sync failed for start time error
-    'Unstarted' : 0x09,                 // Sync is not started
     'idleState' : 0x06,                 // Idle state
     'onErasing' : 0x30,                 // Erasing internal storage
     'onRecording' : 0x40,               // In recording state
