@@ -451,9 +451,79 @@ function exportData() {
     .catch(error => { console.error(error); })
 }
 
+var payloadArr = []
+var rtStreamTimeArr = []
+var streamingTimeRaw = 0
+
+let payloadHandler =  (event) => {
+    const value = event.target.value
+    payloadArr.push(value)
+    let timestampArr = []
+    for (var i = 7; i < 11; i++){
+        timestampArr.push(value.getUint8(i, true))
+    }
+    var result = ((timestampArr[timestampArr.length - 24]) |
+                  (timestampArr[timestampArr.length - 2] << 16) |
+                  (timestampArr[timestampArr.length - 3] << 8) |
+                  (timestampArr[timestampArr.length - 4] << 1));
+
+    result = result / 1000
+    rtStreamTimeArr.push(result)
+    if(rtStreamTimeArr.length > 1){
+        if(rtStreamTimeArr[rtStreamTimeArr.length - 1] > rtStreamTimeArr[rtStreamTimeArr.length - 2]){
+            streamingTimeRaw += rtStreamTimeArr[rtStreamTimeArr.length - 1] - rtStreamTimeArr[rtStreamTimeArr.length - 2]
+        } else {
+            streamingTimeRaw += rtStreamTimeArr[rtStreamTimeArr.length - 2] - rtStreamTimeArr[rtStreamTimeArr.length - 1]
+        }
+    }
+    console.log("Time: " + (streamingTimeRaw / 1000).toFixed(2))
+}
+
+function startRTStream() {
+    console.log("Real time streaming started")
+    streamingTimeRaw = 0
+    // Set notifications for medium payload
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(payloadHandler, serviceEnum.measurement_service, serviceEnum.medium_payload_length)
+    .then(() => { // Set the normal message notification handler
+        return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    })
+    .then(() => {
+        let buffer = new ArrayBuffer(3)
+        let dataViewObject = new DataView(buffer)
+        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+        dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
+        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
+        XsensDotSensor.verbose = false
+        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
+        return
+    })
+    .catch(error => { console.error(error);})
+}
+
+function stopRTStream() {
+    console.log("Real time streaming stopped")
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        let buffer = new ArrayBuffer(3)
+        let dataViewObject = new DataView(buffer)
+        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+        dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
+        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
+        XsensDotSensor.verbose = false
+        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
+        return
+    })
+    .then(() => {
+        console.log(payloadArr)
+        return
+    })
+    .catch(error => { console.error(error);})
+}
+
 // Exports
 export { findBluetoothDevices };
 export { startRecording };
 export { stopRecording };
 export { exportData };
 export { XsensDotSensor };
+export { startRTStream, stopRTStream };

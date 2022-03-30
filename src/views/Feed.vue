@@ -8,6 +8,8 @@ Register.vue - base vue
   <p><button @click="startRec()">start recording</button></p>
   <p><button @click="stopRec()">stop recording</button></p>
   <p><button @click="startDataExport()">Export data</button></p>
+  <p><button @click="streamData()">Start real time streaming</button></p>
+  <p><button @click="stopDataStream()">stop real time streaming</button></p>
 </template>
 
 <script>
@@ -16,6 +18,7 @@ import { XsensDotSensor } from "/src/libraries/bluetooth.js";
 import { startRecording } from "/src/libraries/bluetooth.js";
 import { stopRecording } from "/src/libraries/bluetooth.js";
 import { exportData } from "/src/libraries/bluetooth.js";
+import { startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
 export default {
   name: "regster",
   data() {
@@ -39,6 +42,12 @@ export default {
     },
     startDataExport() {
       exportData()
+    },
+    streamData() {
+      startRTStream()
+    },
+    stopDataStream() {
+      stopRTStream()
     }
   },
 };
