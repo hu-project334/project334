@@ -1,3 +1,5 @@
+// working on functions ofline
+
 const DB_NAME = "Fysio";
 const DB_VERSION = 1;
 let db = null;
