@@ -5,7 +5,8 @@
 
   <template v-for="patient in patients" :key="patient">
     <div @click="getExcersizeResults(patient)" class="patient">
-      <p>{{ patient.name }}</p>
+      <p>Name: {{ patient.name }}</p>
+      <p>Last name: {{ patient.surName }}</p>
     </div>
   </template>
 </template>
@@ -23,14 +24,17 @@ export default {
       patients: [
         {
           id: 1,
-          name: "Alexander de Graaff",
+          name: "Alexander",
+          surName: "de graaff",
           weight: 70,
           dateOfBirth: "22-06-2002",
           heightInM: 1.82,
         },
         {
           id: 2,
-          name: "Milo Belien",
+          name: "Milo",
+          surName: "Belien",
+
           weight: 70,
           dateOfBirth: "28-09-2002",
           heightInM: 1.83,
@@ -41,6 +45,7 @@ export default {
   methods: {
     getExcersizeResults(patient) {
       console.log(patient.id, patient.name);
+      this.$router.push({ path: "/excersises" });
     },
   },
 };
@@ -54,6 +59,10 @@ export default {
   margin-right: 25%;
   margin-left: 25%;
   width: 50%;
+}
+p {
+  /* margin-top: 3%; */
+  margin: 0;
 }
 
 .patient {

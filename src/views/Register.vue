@@ -3,14 +3,12 @@
   <div class="bg" @click="closeForm()" :style="blurrStyle()">
     <img class="logo" src="@/assets/logo.png" />
 
-    <h1 class="title">Sensor technology for the fysio</h1>
-
     <p class="main-text">Sensor technology for the fysio</p>
 
     <GoogleRegisterButton @click="RegisterWithGoogle()"></GoogleRegisterButton>
 
     <EmailRegisterButton @click="showRegisterForm"></EmailRegisterButton>
-    <p>
+    <p style="color: white">
       ALREADY HAVE AN ACCOUNT?<button @click="showLogForm" class="loginBTN">
         LOGIN
       </button>
@@ -168,17 +166,12 @@ export default {
 </script>
 
 <style scoped>
-/* .bg {
-  background: url("../assets/joggers.jpg") no-repeat center center fixed;
-  background-size: cover;
-  height: 100vh;
-  width: 100vw;
-} */
 .title {
   margin-top: 1em;
 }
 .main-text {
   color: white;
+  margin-top: 5px;
   font-size: 2em;
   padding: 5px;
 }
