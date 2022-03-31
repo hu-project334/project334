@@ -95,7 +95,7 @@ export default {
           console.log(user, "user");
           this.$store.commit("setUser", user);
 
-          this.$router.push({ path: "/feed" });
+          this.$router.push({ path: "/patients" });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -114,7 +114,7 @@ export default {
 
           this.$store.commit("setUser", user);
 
-          this.$router.push({ path: "/feed" });
+          this.$router.push({ path: "/patients" });
           // ...
         })
         .catch((error) => {
@@ -150,7 +150,7 @@ export default {
           this.$store.commit("setUser", user);
 
           console.log(accessToken, "token");
-          this.$router.push({ path: "/feed" });
+          this.$router.push({ path: "/patients" });
         })
         .catch((error) => {
           // Handle Errors here.

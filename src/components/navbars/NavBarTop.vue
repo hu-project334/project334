@@ -5,7 +5,7 @@
     <div class="container-fluid">
       <a class="navbar-brand mt-2 mt-lg-0" href="#">
         <img
-          src="@/assets/logo.png"
+          src="@/assets/oudeLogo.png"
           height="40"
           alt="duo-run Logo"
           loading="lazy"
