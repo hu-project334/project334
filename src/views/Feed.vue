@@ -10,6 +10,9 @@ Register.vue - base vue
   <p><button @click="startDataExport()">Export data</button></p>
   <p><button @click="streamData()">Start real time streaming</button></p>
   <p><button @click="stopDataStream()">stop real time streaming</button></p>
+  <h2>X: <p id="x-axis"> 0 </p></h2>
+  <h2>Y: <p id="y-axis"> 0 </p></h2>
+  <h2>Z: <p id="z-axis"> 0 </p></h2>
 </template>
 
 <script>

@@ -11,6 +11,7 @@ class XsensDot {
         this.device = null;
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
+        this.battery_level = 0;
     }
 
     /**
@@ -108,7 +109,6 @@ class XsensDot {
             for (let index = startOffset; index < (16 + startOffset); index++) {
                 res += String.fromCharCode(value.getUint8(index, true));
             }
-            console.log(res);
             return res;
         })
         .catch(error => { console.error(error); });
@@ -135,10 +135,10 @@ class XsensDot {
     /**
      * getBatteryLevel function returns the current battery level and prints it to the console
      */
-    getBatteryLevel() {
+    getInitialBatteryLevel() {
         return this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
-        .then(value => { console.log(`Battery percentage: ${value.getUint8(0, true)}`); return value.getUint8(0, true);})
-        .catch(error => { console.error(error); });
+        .then((value) => { return value.getUint8(0, true) })
+        .catch((error) => { console.error(error); });
     }
 
     /**
@@ -192,6 +192,16 @@ class XsensDot {
         }
         // Invert sum and get lower byte
         return (0x00FF & (-sum))
+    }
+
+    /**
+    * handleBatteryChanged is executed when the battery characteristic changes
+    */
+    handleBatteryChanged(event) {
+        const value = event.target.value
+        this.battery_level = value.getUint8(0, true)
+        let element = document.getElementById("batterylevel")
+        element.innerHTML = this.battery_level
     }
 }
 
@@ -257,16 +267,6 @@ function intToBytesArray(int) {
     return ByteArray
 }
 
-/**
- * handleBatteryChanged is executed when the battery characteristic changes
- */
-function handleBatteryChanged(event) {
-    const value = event.target.value
-    let element = document.getElementById("batterylevel")
-    element.innerHTML = value.getUint8(0, true)
-    console.log("Received new battery level: " + value.getUint8(0, true));
-}
-
 // =========================================================================
 //                            PUBLIC FUNCTIONS
 // =========================================================================
@@ -280,9 +280,9 @@ var recordingTimeRaw = 0
 function findBluetoothDevices() {
     XsensDotSensor.request()
     .then(() => { return XsensDotSensor.connect()})
-    .then(() => { XsensDotSensor.readDeviceName()})
-    .then(() => { XsensDotSensor.getBatteryLevel()})
-    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
+    .then(() => { return XsensDotSensor.readDeviceName().then((value) => {console.log(value)}) })
+    .then(() => { return XsensDotSensor.getInitialBatteryLevel().then((value) => {console.log("Battery Level: " + value)}) })
+    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(XsensDotSensor.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
 }
 
 function startRecording() {
@@ -388,7 +388,6 @@ function differenceStartEnd(begin, end) {
 
 function parseCompleteEulerData(event, adjust = 0) {
     const value = event.target.value
-    console.log(adjust)
     let timestampArr = []
     for (var i = 7 - adjust; i < 11 - adjust; i++){                       // Get the currect sensor time
         timestampArr.push(value.getUint8(i, true))
@@ -421,6 +420,9 @@ function parseCompleteEulerData(event, adjust = 0) {
         var c = parseInt("1"+axisString.substring(9), 2)
 
         result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
+        if (result > 180 || result < -180){
+            result = 0
+        }
         axis.push(result)
         axisString = ""
     }
@@ -482,7 +484,13 @@ function startRTStream() {
     let handlePayload = (event) => {
         // parseCompleteEulerData(event)
         let axis = parseCompleteEulerData(event, 7)
-        console.log("X: " + (axis[0] * 100).toFixed(2) + " Y: " + (axis[1] * 100).toFixed(2) + " Z: " + (axis[2] * 100).toFixed(2) + " Time: " + (axis[3] / 1000).toFixed(2))
+        let element = document.getElementById("x-axis")
+        element.innerHTML = (axis[0] * 100).toFixed(2)
+        element = document.getElementById("y-axis")
+        element.innerHTML = (axis[1] * 100).toFixed(2)
+        element = document.getElementById("z-axis")
+        element.innerHTML = (axis[2] * 100).toFixed(2)
+        // console.log("X: " + (axis[0] * 100).toFixed(2) + " Y: " + (axis[1] * 100).toFixed(2) + " Z: " + (axis[2] * 100).toFixed(2) + " Time: " + (axis[3] / 1000).toFixed(2))
     }
 
     // Set notifications for medium payload
