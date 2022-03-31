@@ -4,7 +4,7 @@
   <h1 class="title">excersises</h1>
 
   <template v-for="excersise in excersises" :key="excersise">
-    <div class="excersise">
+    <div @click="getExcersizeResults(excersise)" class="excersise">
       <p>Name: {{ excersise.name }}</p>
     </div>
   </template>
@@ -36,7 +36,12 @@ export default {
       ],
     };
   },
-  methods: {},
+  methods: {
+    getExcersizeResults(excersise) {
+      console.log(excersise.id, excersise.name);
+      this.$router.push({ path: "/feed" });
+    },
+  },
 };
 </script>
 
