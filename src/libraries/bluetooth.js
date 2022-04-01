@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
+import * as THREE from 'three';
 
 // =========================================================================
 //                            XSENS DOT BLE OBJECT
@@ -267,6 +268,25 @@ function intToBytesArray(int) {
     return ByteArray
 }
 
+function parseIEEE754(singleByteDataView){
+
+    let axisString = ""
+    for (let i = 0; i < 4; i++) {
+        let tmpValue = (singleByteDataView.getUint8(i, true) >>> 0).toString(2)
+        axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
+    }
+
+    let a = parseInt(axisString.charAt(0), 2)
+    let b = parseInt(axisString.substring(1,9), 2)
+    let c = parseInt("1"+axisString.substring(9), 2)
+
+    let result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
+    // if (result > 180 || result < -180){
+        // result = 0
+    // }
+    return result
+}
+
 // =========================================================================
 //                            PUBLIC FUNCTIONS
 // =========================================================================
@@ -483,18 +503,55 @@ function startRTStream() {
 
     let handlePayload = (event) => {
         // parseCompleteEulerData(event)
-        let axis = parseCompleteEulerData(event, 7)
+        let value = event.target.value;
+        let offset = 4
+        const buffer = new ArrayBuffer(4);
+        let w = new DataView(buffer);
+        for (let i = 0; i < 4; i++) {
+            w.setInt8(i, value.getUint8(i + offset, true))
+        }
+        w = parseIEEE754(w)
+        offset += 4
+
+        const buffer_x = new ArrayBuffer(4);
+        let x = new DataView(buffer_x);
+        for (let i = 0; i < 4; i++) {
+            x.setInt8(i, value.getUint8(i + offset, true))
+        }
+        x = parseIEEE754(x)
+        offset += 4
+
+        const buffer_y = new ArrayBuffer(4);
+        let y = new DataView(buffer_y);
+        for (let i = 0; i < 4; i++) {
+            y.setInt8(i, value.getUint8(i + offset, true))
+        }
+        y = parseIEEE754(y)
+        offset += 4
+
+        const buffer_z = new ArrayBuffer(4);
+        let z = new DataView(buffer_z);
+        for (let i = 0; i < 4; i++) {
+            z.setInt8(i, value.getUint8(i + offset, true))
+        }
+        z = parseIEEE754(z)
+
+        let quaternion = new THREE.Quaternion(x, y, z, w)
+        console.log(quaternion)
+        let rotation = new THREE.Euler().setFromQuaternion(quaternion, "XYZ")
+        console.log(rotation)
+
+        // let axis = parseCompleteEulerData(event, 7)
         let element = document.getElementById("x-axis")
-        element.innerHTML = (axis[0] * 100).toFixed(2)
+        element.innerHTML = rotation.x
         element = document.getElementById("y-axis")
-        element.innerHTML = (axis[1] * 100).toFixed(2)
+        element.innerHTML = rotation.y
         element = document.getElementById("z-axis")
-        element.innerHTML = (axis[2] * 100).toFixed(2)
-        // console.log("X: " + (axis[0] * 100).toFixed(2) + " Y: " + (axis[1] * 100).toFixed(2) + " Z: " + (axis[2] * 100).toFixed(2) + " Time: " + (axis[3] / 1000).toFixed(2))
+        element.innerHTML = rotation.z
     }
 
     // Set notifications for medium payload
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.medium_payload_length)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
     .then(() => { // Set the normal message notification handler
         return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     })
@@ -503,7 +560,7 @@ function startRTStream() {
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
         dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
+        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
         XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
         return
@@ -519,7 +576,7 @@ function stopRTStream() {
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
         dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
+        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
         XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
         return
