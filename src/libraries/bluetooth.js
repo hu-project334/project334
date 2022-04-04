@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
+import * as THREE from 'three';
 
 // =========================================================================
 //                            XSENS DOT BLE OBJECT
@@ -12,10 +13,8 @@ class XsensDot {
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
         this.battery_level = 0;
-        this.xyzArr = [0, 0, 0];
-        this.x = 0
-        this.y = 0
-        this.z = 0
+        this.rotation = new THREE.Euler(0, 0, 0, 'XYZ')
+        this.quaternion = new THREE.Quaternion(0, 0, 0, 0)
     }
 
     /**
@@ -271,6 +270,25 @@ function intToBytesArray(int) {
     return ByteArray
 }
 
+function parseIEEE754(singleByteDataView){
+
+    let axisString = ""
+    for (let i = 0; i < 4; i++) {
+        let tmpValue = (singleByteDataView.getUint8(i, true) >>> 0).toString(2)
+        axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
+    }
+
+    let a = parseInt(axisString.charAt(0), 2)
+    let b = parseInt(axisString.substring(1,9), 2)
+    let c = parseInt("1"+axisString.substring(9), 2)
+
+    let result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
+    // if (result > 180 || result < -180){
+        // result = 0
+    // }
+    return result
+}
+
 // =========================================================================
 //                            PUBLIC FUNCTIONS
 // =========================================================================
@@ -496,16 +514,89 @@ function startRTStream() {
     recordingTimeRaw = 0
 
     let handlePayload = (event) => {
-        XsensDotSensor.xyzArr = parseCompleteEulerData(event, 7)
-        XsensDotSensor.x = XsensDotSensor.xyzArr[0]
-        XsensDotSensor.y = XsensDotSensor.xyzArr[1]
-        XsensDotSensor.z = XsensDotSensor.xyzArr[2]
+        // parseCompleteEulerData(event)
+        let normalize = (val, max, min) => { return (val - min) / (max - min); }
+        let value = event.target.value;
+
+        let timestampArr = []
+        for (var i = 0; i < 4; i++){
+            timestampArr.push(value.getUint8(i, true))
+        }
+        var result = ((timestampArr[timestampArr.length - 24]) |
+                        (timestampArr[timestampArr.length - 2] << 16) |
+                        (timestampArr[timestampArr.length - 3] << 8) |
+                        (timestampArr[timestampArr.length - 4] << 1));
+
+        result = result / 1000
+        timeDataArr.push(result)
+        if(timeDataArr.length > 1){
+            if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
+            } else {
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
+            }
+        }
+
+        let offset = 4
+        const buffer = new ArrayBuffer(4);
+        let w = new DataView(buffer);
+        for (let i = 0; i < 4; i++) {
+            w.setInt8(i, value.getUint8(i + offset, true))
+        }
+        w = normalize(parseIEEE754(w), 1, 0)
+        offset += 4
+
+        const buffer_x = new ArrayBuffer(4);
+        let x = new DataView(buffer_x);
+        for (let i = 0; i < 4; i++) {
+            x.setInt8(i, value.getUint8(i + offset, true))
+        }
+        x = normalize(parseIEEE754(x), 1, 0)
+        offset += 4
+
+        const buffer_y = new ArrayBuffer(4);
+        let y = new DataView(buffer_y);
+        for (let i = 0; i < 4; i++) {
+            y.setInt8(i, value.getUint8(i + offset, true))
+        }
+        y = normalize(parseIEEE754(y), 1, 0)
+        offset += 4
+
+        const buffer_z = new ArrayBuffer(4);
+        let z = new DataView(buffer_z);
+        for (let i = 0; i < 4; i++) {
+            z.setInt8(i, value.getUint8(i + offset, true))
+        }
+        z = normalize(parseIEEE754(z), 1, 0)
+
+        XsensDotSensor.quaternion = new THREE.Quaternion(x, y, z, w)
+        let prevRotation = XsensDotSensor.rotation
+        XsensDotSensor.rotation = new THREE.Euler().setFromQuaternion(XsensDotSensor.quaternion, "XYZ")
+        if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
+            XsensDotSensor.rotation.x = prevRotation.x
+
+        }
+        if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
+            XsensDotSensor.rotation.y = prevRotation.y
+
+        }
+        if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
+            XsensDotSensor.rotation.z = prevRotation.z
+
+        }
+        let tmpArr = [(XsensDotSensor.rotation.x*57.2957795).toFixed(2),
+                      (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
+                      (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
+                      (recordingTimeRaw / 1000).toFixed(2)]
+        eulerDataArr.push(tmpArr)
+
+        // let axis = parseCompleteEulerData(event, 7)
         let element = document.getElementById("x-axis")
-        element.innerHTML = XsensDotSensor.x
+        element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
         element = document.getElementById("y-axis")
-        element.innerHTML = XsensDotSensor.y
+        element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
         element = document.getElementById("z-axis")
-        element.innerHTML = XsensDotSensor.z
+        element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
     }
 
     // Set notifications for medium payload
@@ -518,7 +609,7 @@ function startRTStream() {
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
         dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x04) // Set payload mode 16: complete euler
+        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
         XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
         return
@@ -534,7 +625,7 @@ function stopRTStream() {
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
         dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x04) // Set payload mode 16: complete euler
+        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
         XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
         return
@@ -556,10 +647,52 @@ function stopRTStream() {
     .catch(error => { console.error(error);})
 }
 
+
+function exportDataToCSV() {
+    let csvContent = "data:text/csv;charset=utf-8," 
+
+    let downloadArray = [['X','      Y','      Z', '      T']].concat(eulerDataArr)
+
+    downloadArray.forEach(function(rowArray) {
+        let row = rowArray.join(", ");
+        csvContent += row + "\r\n";
+    });
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "XsensUserData.csv");
+    document.body.appendChild(link);
+
+    link.click();
+}
+
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+var geometry = new THREE.BoxGeometry( 1.5, 1, 0.5 );
+var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 3;
+
+var animate = function () {
+	requestAnimationFrame( animate );
+    cube.setRotationFromEuler(XsensDotSensor.rotation);
+	renderer.render( scene, camera );
+};
+
+animate();
+
 // Exports
 export { findBluetoothDevices };
 export { startRecording };
 export { stopRecording };
-export { exportData };
+export { exportDataToCSV };
 export { XsensDotSensor };
 export { startRTStream, stopRTStream };
