@@ -503,6 +503,7 @@ function startRTStream() {
 
     let handlePayload = (event) => {
         // parseCompleteEulerData(event)
+        let normalize = (val, max, min) => { return (val - min) / (max - min); }
         let value = event.target.value;
         let offset = 4
         const buffer = new ArrayBuffer(4);
@@ -510,7 +511,7 @@ function startRTStream() {
         for (let i = 0; i < 4; i++) {
             w.setInt8(i, value.getUint8(i + offset, true))
         }
-        w = parseIEEE754(w)
+        w = normalize(parseIEEE754(w), 1, 0)
         offset += 4
 
         const buffer_x = new ArrayBuffer(4);
@@ -518,7 +519,7 @@ function startRTStream() {
         for (let i = 0; i < 4; i++) {
             x.setInt8(i, value.getUint8(i + offset, true))
         }
-        x = parseIEEE754(x)
+        x = normalize(parseIEEE754(x), 1, 0)
         offset += 4
 
         const buffer_y = new ArrayBuffer(4);
@@ -526,7 +527,7 @@ function startRTStream() {
         for (let i = 0; i < 4; i++) {
             y.setInt8(i, value.getUint8(i + offset, true))
         }
-        y = parseIEEE754(y)
+        y = normalize(parseIEEE754(y), 1, 0)
         offset += 4
 
         const buffer_z = new ArrayBuffer(4);
@@ -534,20 +535,20 @@ function startRTStream() {
         for (let i = 0; i < 4; i++) {
             z.setInt8(i, value.getUint8(i + offset, true))
         }
-        z = parseIEEE754(z)
+        z = normalize(parseIEEE754(z), 1, 0)
 
         let quaternion = new THREE.Quaternion(x, y, z, w)
-        console.log(quaternion)
+        // console.log(quaternion)
         let rotation = new THREE.Euler().setFromQuaternion(quaternion, "XYZ")
         console.log(rotation)
 
         // let axis = parseCompleteEulerData(event, 7)
         let element = document.getElementById("x-axis")
-        element.innerHTML = rotation.x
+        element.innerHTML = (rotation.x * 57.2957795).toFixed(2)
         element = document.getElementById("y-axis")
-        element.innerHTML = rotation.y
+        element.innerHTML = (rotation.y * 57.2957795).toFixed(2)
         element = document.getElementById("z-axis")
-        element.innerHTML = rotation.z
+        element.innerHTML = (rotation.z * 57.2957795).toFixed(2)
     }
 
     // Set notifications for medium payload
