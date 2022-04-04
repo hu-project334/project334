@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import store from "@/store.js";
+import store from "../store/userStore";
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
@@ -20,16 +20,24 @@ const router = createRouter({
       component: () => import("../views/Patients.vue"),
     },
     {
-      path: "/excersises",
-      name: "excersises",
-      component: () => import("../views/Excerises.vue"),
+      path: "/excersiseResults/:id",
+      name: "excersiseResults",
+      component: () => import("../views/ExceriseResults.vue"),
+    },
+    {
+      path: "/patient/:id",
+      name: "patient",
+      component: () => import("../views/Patient.vue"),
+    },
+    {
+      path: "/newPatient",
+      name: "patientCreator",
+      component: () => import("../views/PatientCreator.vue"),
     },
   ],
 });
 
 router.beforeEach(async (to) => {
-  console.log(store.getters.isLogedIn);
-
   if (to.name !== "Register" && !store.getters.isLogedIn)
     return { name: "Register" };
 });

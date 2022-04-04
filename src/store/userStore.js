@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import Vuex from "vuex";
-import App from "./App.vue";
+import App from "@/App.vue";
 
 createApp(App).use(Vuex);
 export default new Vuex.Store({

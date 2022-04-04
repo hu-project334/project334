@@ -89,10 +89,14 @@ export default {
     getProfileImage() {
       try {
         let photoURL = this.$store.getters.getUser.photoURL;
+        photoURL;
         if (typeof photoURL === "undefined") {
           let image = require("@/assets/" + "blackImage.jpg");
+          console.log("komt niet hier");
           return image;
         } else {
+          console.log("komt niet hier");
+
           return photoURL;
         }
       } catch {
@@ -145,5 +149,10 @@ export default {
   margin-right: 10px;
   margin-top: 10px;
   color: red;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
 }
 </style>

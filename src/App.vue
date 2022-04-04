@@ -21,8 +21,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  width: 100vw;
-  height: 100vh;
+
   background: #00a1e1;
 }
 </style>

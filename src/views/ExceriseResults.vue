@@ -2,7 +2,6 @@
   <NavBarTop></NavBarTop>
 
   <h1 class="title">excersises</h1>
-
   <template v-for="excersise in excersises" :key="excersise">
     <div @click="getExcersizeResults(excersise)" class="excersise">
       <p>Name: {{ excersise.name }}</p>

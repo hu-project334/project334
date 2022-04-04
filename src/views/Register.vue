@@ -1,6 +1,6 @@
 // Register.vue - base vue
 <template>
-  <div class="bg" @click="closeForm()" :style="blurrStyle()">
+  <div class="container" @click="closeForm()" :style="blurrStyle()">
     <img class="logo" src="@/assets/logo.png" />
 
     <p class="main-text">Sensor technology for the fysio</p>
@@ -90,7 +90,6 @@ export default {
           // Signed in
 
           let user = userCredential.user;
-          console.log(user, "user");
           this.$store.commit("setUser", user);
 
           this.$router.push({ path: "/patients" });
@@ -166,6 +165,8 @@ export default {
 </script>
 
 <style scoped>
+/* include bg in every file */
+
 .title {
   margin-top: 1em;
 }
