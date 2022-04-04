@@ -13,6 +13,8 @@ class XsensDot {
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
         this.battery_level = 0;
+        this.rotation = new THREE.Euler(0, 0, 0, 'XYZ')
+        this.quaternion = new THREE.Quaternion(0, 0, 0, 0)
     }
 
     /**
@@ -505,6 +507,26 @@ function startRTStream() {
         // parseCompleteEulerData(event)
         let normalize = (val, max, min) => { return (val - min) / (max - min); }
         let value = event.target.value;
+
+        let timestampArr = []
+        for (var i = 0; i < 4; i++){
+            timestampArr.push(value.getUint8(i, true))
+        }
+        var result = ((timestampArr[timestampArr.length - 24]) |
+                        (timestampArr[timestampArr.length - 2] << 16) |
+                        (timestampArr[timestampArr.length - 3] << 8) |
+                        (timestampArr[timestampArr.length - 4] << 1));
+
+        result = result / 1000
+        timeDataArr.push(result)
+        if(timeDataArr.length > 1){
+            if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
+            } else {
+                recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
+            }
+        }
+
         let offset = 4
         const buffer = new ArrayBuffer(4);
         let w = new DataView(buffer);
@@ -537,18 +559,34 @@ function startRTStream() {
         }
         z = normalize(parseIEEE754(z), 1, 0)
 
-        let quaternion = new THREE.Quaternion(x, y, z, w)
-        // console.log(quaternion)
-        let rotation = new THREE.Euler().setFromQuaternion(quaternion, "XYZ")
-        console.log(rotation)
+        XsensDotSensor.quaternion = new THREE.Quaternion(x, y, z, w)
+        let prevRotation = XsensDotSensor.rotation
+        XsensDotSensor.rotation = new THREE.Euler().setFromQuaternion(XsensDotSensor.quaternion, "XYZ")
+        if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
+            XsensDotSensor.rotation.x = prevRotation.x
+
+        }
+        if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
+            XsensDotSensor.rotation.y = prevRotation.y
+
+        }
+        if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
+            XsensDotSensor.rotation.z = prevRotation.z
+
+        }
+        let tmpArr = [(XsensDotSensor.rotation.x*57.2957795).toFixed(2),
+                      (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
+                      (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
+                      (recordingTimeRaw / 1000).toFixed(2)]
+        eulerDataArr.push(tmpArr)
 
         // let axis = parseCompleteEulerData(event, 7)
         let element = document.getElementById("x-axis")
-        element.innerHTML = (rotation.x * 57.2957795).toFixed(2)
+        element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
         element = document.getElementById("y-axis")
-        element.innerHTML = (rotation.y * 57.2957795).toFixed(2)
+        element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
         element = document.getElementById("z-axis")
-        element.innerHTML = (rotation.z * 57.2957795).toFixed(2)
+        element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
     }
 
     // Set notifications for medium payload
@@ -599,10 +637,52 @@ function stopRTStream() {
     .catch(error => { console.error(error);})
 }
 
+
+function exportDataToCSV() {
+    let csvContent = "data:text/csv;charset=utf-8," 
+
+    let downloadArray = [['X','      Y','      Z', '      T']].concat(eulerDataArr)
+
+    downloadArray.forEach(function(rowArray) {
+        let row = rowArray.join(", ");
+        csvContent += row + "\r\n";
+    });
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "XsensUserData.csv");
+    document.body.appendChild(link);
+
+    link.click();
+}
+
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+var geometry = new THREE.BoxGeometry( 1, 1.5, 0.5 );
+var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 3;
+
+var animate = function () {
+	requestAnimationFrame( animate );
+    cube.setRotationFromEuler(XsensDotSensor.rotation);
+	renderer.render( scene, camera );
+};
+
+animate();
+
 // Exports
 export { findBluetoothDevices };
 export { startRecording };
 export { stopRecording };
-export { exportData };
+export { exportDataToCSV };
 export { XsensDotSensor };
 export { startRTStream, stopRTStream };
