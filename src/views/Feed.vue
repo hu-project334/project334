@@ -20,7 +20,7 @@ import { findBluetoothDevices } from "/src/libraries/bluetooth.js";
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
 // import { startRecording } from "/src/libraries/bluetooth.js";
 // import { stopRecording } from "/src/libraries/bluetooth.js";
-import { exportDataToCSV } from "/src/libraries/bluetooth.js";
+// import { exportDataToCSV } from "/src/libraries/bluetooth.js";
 import { startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
 export default {
   name: "regster",
@@ -44,7 +44,7 @@ export default {
     //   stopRecording()
     // },
     startDataExport() {
-      exportDataToCSV()
+      XsensDotSensor.downloadDataToCSV()
     },
     streamData() {
       startRTStream()
