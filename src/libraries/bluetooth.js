@@ -12,6 +12,10 @@ class XsensDot {
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
         this.battery_level = 0;
+        this.xyzArr = [0, 0, 0];
+        this.x = 0
+        this.y = 0
+        this.z = 0
     }
 
     /**
@@ -42,7 +46,7 @@ class XsensDot {
         if (!this.device) {
             return Promise.reject('Device is not connected.');
         }
-        return this.device.gatt.connect();
+        return this.device.gatt.connect()
     }
 
     /**
@@ -280,8 +284,18 @@ var recordingTimeRaw = 0
 function findBluetoothDevices() {
     XsensDotSensor.request()
     .then(() => { return XsensDotSensor.connect()})
-    .then(() => { return XsensDotSensor.readDeviceName().then((value) => {console.log(value)}) })
-    .then(() => { return XsensDotSensor.getInitialBatteryLevel().then((value) => {console.log("Battery Level: " + value)}) })
+    .then(() => { return XsensDotSensor.readDeviceName()
+        .then((value) => {
+            XsensDotSensor.name = value
+            console.log(XsensDotSensor.name)
+        })
+    })
+    .then(() => { return XsensDotSensor.getInitialBatteryLevel()
+        .then((value) => {
+            XsensDotSensor.battery_level = value;
+            console.log("Battery Level: " + XsensDotSensor.battery_level)
+        })
+    })
     .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(XsensDotSensor.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
 }
 
@@ -406,18 +420,18 @@ function parseCompleteEulerData(event, adjust = 0) {
             recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
         }
     }
-    var axis = []
+    let axis = []
 
     let axisString = ""
-    for (var j = 0; j < 3; j++){                        // Get the Euler Angle data
-        for (var k = 11 + (4*j) - adjust; k < 15 + (4*j) - adjust; k++){
-            var tmpValue = (value.getUint8(k, true) >>> 0).toString(2)
+    for (let j = 0; j < 3; j++){                        // Get the Euler Angle data
+        for (let k = 11 + (4*j) - adjust; k < 15 + (4*j) - adjust; k++){
+            let tmpValue = (value.getUint8(k, true) >>> 0).toString(2)
             axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
         }
 
-        var a = parseInt(axisString.charAt(0), 2)
-        var b = parseInt(axisString.substring(1,9), 2)
-        var c = parseInt("1"+axisString.substring(9), 2)
+        let a = parseInt(axisString.charAt(0), 2)
+        let b = parseInt(axisString.substring(1,9), 2)
+        let c = parseInt("1"+axisString.substring(9), 2)
 
         result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
         if (result > 180 || result < -180){
@@ -482,19 +496,20 @@ function startRTStream() {
     recordingTimeRaw = 0
 
     let handlePayload = (event) => {
-        // parseCompleteEulerData(event)
-        let axis = parseCompleteEulerData(event, 7)
+        XsensDotSensor.xyzArr = parseCompleteEulerData(event, 7)
+        XsensDotSensor.x = XsensDotSensor.xyzArr[0]
+        XsensDotSensor.y = XsensDotSensor.xyzArr[1]
+        XsensDotSensor.z = XsensDotSensor.xyzArr[2]
         let element = document.getElementById("x-axis")
-        element.innerHTML = (axis[0] * 100).toFixed(2)
+        element.innerHTML = XsensDotSensor.x
         element = document.getElementById("y-axis")
-        element.innerHTML = (axis[1] * 100).toFixed(2)
+        element.innerHTML = XsensDotSensor.y
         element = document.getElementById("z-axis")
-        element.innerHTML = (axis[2] * 100).toFixed(2)
-        // console.log("X: " + (axis[0] * 100).toFixed(2) + " Y: " + (axis[1] * 100).toFixed(2) + " Z: " + (axis[2] * 100).toFixed(2) + " Time: " + (axis[3] / 1000).toFixed(2))
+        element.innerHTML = XsensDotSensor.z
     }
 
     // Set notifications for medium payload
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.medium_payload_length)
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
     .then(() => { // Set the normal message notification handler
         return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     })
@@ -503,7 +518,7 @@ function startRTStream() {
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
         dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
+        dataViewObject.setUint8(2, 0x04) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
         XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
         return
@@ -519,7 +534,7 @@ function stopRTStream() {
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
         dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x0F) // Set payload mode 16: complete euler
+        dataViewObject.setUint8(2, 0x04) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
         XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
         return
