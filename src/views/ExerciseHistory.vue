@@ -49,7 +49,7 @@ import LinkButton from "../components/btns/LinkButton.vue";
 import _ from "lodash";
 
 export default {
-  name: "exercises",
+  name: "exercise history",
   components: {
     NavBarTop,
     LinkButton,
