@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
+import * as THREE from 'three';
 
 // =========================================================================
 //                            XSENS DOT BLE OBJECT
@@ -11,6 +12,14 @@ class XsensDot {
         this.device = null;
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
+        this.battery_level = 0;
+        this.rotation = new THREE.Euler(0, 0, 0, 'XYZ')
+        this.quaternion = new THREE.Quaternion(0, 0, 0, 0)
+        this.data = []
+        this.timeArr = []
+        this.rawTime = 0
+        this.min = Infinity
+        this.max = -Infinity
     }
 
     /**
@@ -41,7 +50,7 @@ class XsensDot {
         if (!this.device) {
             return Promise.reject('Device is not connected.');
         }
-        return this.device.gatt.connect();
+        return this.device.gatt.connect()
     }
 
     /**
@@ -108,7 +117,6 @@ class XsensDot {
             for (let index = startOffset; index < (16 + startOffset); index++) {
                 res += String.fromCharCode(value.getUint8(index, true));
             }
-            console.log(res);
             return res;
         })
         .catch(error => { console.error(error); });
@@ -135,10 +143,10 @@ class XsensDot {
     /**
      * getBatteryLevel function returns the current battery level and prints it to the console
      */
-    getBatteryLevel() {
+    getInitialBatteryLevel() {
         return this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
-        .then(value => { console.log(`Battery percentage: ${value.getUint8(0, true)}`); return value.getUint8(0, true);})
-        .catch(error => { console.error(error); });
+        .then((value) => { return value.getUint8(0, true) })
+        .catch((error) => { console.error(error); });
     }
 
     /**
@@ -193,6 +201,38 @@ class XsensDot {
         // Invert sum and get lower byte
         return (0x00FF & (-sum))
     }
+
+    /**
+     * downloadDataToCSV writes the internal data array to a csv file and downloads it to the filesystem
+     */
+    downloadDataToCSV(){
+        let csvContent = "data:text/csv;charset=utf-8,"
+
+        let downloadArray = [['X','      Y','      Z', '      T']].concat(this.data)
+
+        downloadArray.forEach(function(rowArray) {
+            let row = rowArray.join(", ");
+            csvContent += row + "\r\n";
+        });
+
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "XsensUserData.csv");
+        document.body.appendChild(link);
+
+        link.click();
+    }
+
+    /**
+    * handleBatteryChanged is executed when the battery characteristic changes
+    */
+    handleBatteryChanged(event) {
+        const value = event.target.value
+        this.battery_level = value.getUint8(0, true)
+        let element = document.getElementById("batterylevel")
+        element.innerHTML = this.battery_level
+    }
 }
 
 // =========================================================================
@@ -242,29 +282,23 @@ class notification_handler {
 //                            HELPER FUNCTIONS
 // =========================================================================
 
-/**
- * intToBytesArray takes an int and converts it to a 4 bytes array
- */
-function intToBytesArray(int) {
-    let ByteArray = new Array(4);
+function parseIEEE754(singleByteDataView){
 
-    for (let i = 0; i < ByteArray.length; i++) {
-        let byte = int & 0xff
-        ByteArray[i] = byte
-        int = (int - byte) / 256
+    let axisString = ""
+    for (let i = 0; i < 4; i++) {
+        let tmpValue = (singleByteDataView.getUint8(i, true) >>> 0).toString(2)
+        axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
     }
 
-    return ByteArray
-}
+    let a = parseInt(axisString.charAt(0), 2)
+    let b = parseInt(axisString.substring(1,9), 2)
+    let c = parseInt("1"+axisString.substring(9), 2)
 
-/**
- * handleBatteryChanged is executed when the battery characteristic changes
- */
-function handleBatteryChanged(event) {
-    const value = event.target.value
-    let element = document.getElementById("batterylevel")
-    element.innerHTML = value.getUint8(0, true)
-    console.log("Received new battery level: " + value.getUint8(0, true));
+    let result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
+    // if (result > 180 || result < -180){
+        // result = 0
+    // }
+    return result
 }
 
 // =========================================================================
@@ -273,187 +307,213 @@ function handleBatteryChanged(event) {
 
 let XsensDotSensor = new XsensDot();
 let NotificationHandler = new notification_handler();
-var timeDataArr = [];
-var eulerDataArr = [];
-var recordingTimeRaw = 0
 
 function findBluetoothDevices() {
     XsensDotSensor.request()
     .then(() => { return XsensDotSensor.connect()})
-    .then(() => { XsensDotSensor.readDeviceName()})
-    .then(() => { XsensDotSensor.getBatteryLevel()})
-    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
+    .then(() => { return XsensDotSensor.readDeviceName()
+        .then((value) => {
+            XsensDotSensor.name = value
+            console.log(XsensDotSensor.name)
+        })
+    })
+    .then(() => { return XsensDotSensor.getInitialBatteryLevel()
+        .then((value) => {
+            XsensDotSensor.battery_level = value;
+            console.log("Battery Level: " + XsensDotSensor.battery_level)
+        })
+    })
+    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(XsensDotSensor.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
 }
 
-function startRecording() {
-
-    NotificationHandler.setCallback(recMsgNotEnum.storeFlashInfoDone1, startRecording2)
-
-    console.log("")
-    recordingTimeRaw = 0
-    console.log("=====================startRecording=====================")
-    // Enable notifications
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        // Erase flash
-        let res = intToBytesArray(Math.floor(Date.now() / 1000))
-        let ReData = new Array(3)
-        for (let i = 0; i < res.length; i++) {
-            ReData[i] = res[i]
-        }
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 4, recMsgEnum.eraseFlash, ReData)
-        console.log("Erase flash")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .catch(error => { console.error(error); })
+function differenceStartEnd(begin, end) {
+    if (begin < 0){
+        begin = 360 + parseFloat(begin)
+    }
+    if (end < 0){
+        end = 360 + parseFloat(end)
+    }
+    return Math.abs(begin - end).toFixed(2)
 }
 
-export function startRecording2() {
+function startRTStream() {
+    console.log("Real time streaming started")
+    XsensDotSensor.rawTime = 0 // Clear the rawTime
 
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        // Request flash info
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.requestFlashInfo, [])
-        console.log("Request flash info")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        // Start recording
-        let res = intToBytesArray(Math.floor(Date.now() / 1000))
-        let ReData = new Array(5)
-        for (let i = 0; i < res.length; i++) {
-            ReData[i] = res[i]
-        }
-        ReData[4] = 0xFF
-        ReData[5] = 0xFF
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 6, recMsgEnum.startRecording, ReData)
-        console.log("Start recording")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        console.log("=======================================================")
-        return
-    })
-    .catch(error => { console.error(error); })
-}
+    let handlePayload = (event) => {
+        // parseCompleteEulerData(event)
+        let normalize = (val, max, min) => { return (val - min) / (max - min); }
+        let value = event.target.value;
 
-function stopRecording() {
-    console.log("")
-    console.log("=====================stopRecording=====================")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.getState, [])
-        console.log("Request sensor state")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        // Request recording time
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.requestRecordingTime, [])
-        console.log("Request recording time")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.stopRecording, [])
-        console.log("Stop recording")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 0, recMsgEnum.getState, [])
-        console.log("Request sensor state")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        console.log("=======================================================")
-        return
-    })
-    .catch(error => { console.error(error); })
-}
-
-function exportData() {
-
-    NotificationHandler.setCallback(recMsgNotEnum.exportFileDataDone, () => {
-        console.log("EXPORT FILE DATA DONE")
-        console.log("Recording duurde:", (recordingTimeRaw / 1000).toFixed(2), "seconden")
-        console.log("Euler data:")
-        console.log(eulerDataArr)
-    })
-
-    NotificationHandler.setCallback(recMsgNotEnum.exportFileData, (event) => {
-        const value = event.target.value
+        // The first element from the event is 4 bits worth of time
         let timestampArr = []
-        for (var i = 7; i < 11; i++){
+        for (var i = 0; i < 4; i++){
             timestampArr.push(value.getUint8(i, true))
         }
         var result = ((timestampArr[timestampArr.length - 24]) |
-                      (timestampArr[timestampArr.length - 2] << 16) |
-                      (timestampArr[timestampArr.length - 3] << 8) |
-                      (timestampArr[timestampArr.length - 4] << 1));
-                      
+                        (timestampArr[timestampArr.length - 2] << 16) |
+                        (timestampArr[timestampArr.length - 3] << 8) |
+                        (timestampArr[timestampArr.length - 4] << 1));
+
         result = result / 1000
-        timeDataArr.push(result)
-        if(timeDataArr.length > 1){
-            if(timeDataArr[timeDataArr.length - 1] > timeDataArr[timeDataArr.length - 2]){
-                recordingTimeRaw += timeDataArr[timeDataArr.length - 1] - timeDataArr[timeDataArr.length - 2]
+        XsensDotSensor.timeArr.push(result)
+        if(XsensDotSensor.timeArr.length > 1){
+            if(XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1] > XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2]){
+                XsensDotSensor.rawTime += XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1] - XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2]
             } else {
-                recordingTimeRaw += timeDataArr[timeDataArr.length - 2] - timeDataArr[timeDataArr.length - 1]
+                XsensDotSensor.rawTime += XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2] - XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1]
             }
         }
-        var axis = []
 
-        let axisArray = []
-        for (var j = 0; j < 3; j++){
-            for (var k = 11 + (4*j); k < 15 + (4*j); k++){
-                axisArray.push(value.getUint8(k, true))
-            }
-            result = ((axisArray[axisArray.length - 24]) |
-                        (axisArray[axisArray.length - 2] << 16) |
-                        (axisArray[axisArray.length - 3] << 8) |
-                        (axisArray[axisArray.length - 4] << 1));
-            axisArray = []
-            axis.push(result)
+        // Parse quaternion values
+        // Parse w
+        let offset = 4
+        const buffer = new ArrayBuffer(4);
+        let w = new DataView(buffer);
+        for (let i = 0; i < 4; i++) {
+            w.setInt8(i, value.getUint8(i + offset, true))
         }
-        axis.push(timeDataArr[timeDataArr.length - 1])
-        eulerDataArr.push(axis)
-    })
+        w = normalize(parseIEEE754(w), 1, 0)
+        offset += 4
 
-    console.log("")
-    console.log("======================requestData======================")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 2, recMsgEnum.selectExportData, [0x00, 0x04]) //0x04 = Euler Angles
-        console.log("Select export data")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    }) // Select export data
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileInfo, [0x01])
-        console.log("Request file info")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    }) // Request file info
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.recording_message, 1, recMsgEnum.requestFileData, [0x01])
-        console.log("Request file data")
-        console.log(dataViewObject)
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+        // Parse x
+        const buffer_x = new ArrayBuffer(4);
+        let x = new DataView(buffer_x);
+        for (let i = 0; i < 4; i++) {
+            x.setInt8(i, value.getUint8(i + offset, true))
+        }
+        x = normalize(parseIEEE754(x), 1, 0)
+        offset += 4
+
+        // Parse y
+        const buffer_y = new ArrayBuffer(4);
+        let y = new DataView(buffer_y);
+        for (let i = 0; i < 4; i++) {
+            y.setInt8(i, value.getUint8(i + offset, true))
+        }
+        y = normalize(parseIEEE754(y), 1, 0)
+        offset += 4
+
+        // Parse z
+        const buffer_z = new ArrayBuffer(4);
+        let z = new DataView(buffer_z);
+        for (let i = 0; i < 4; i++) {
+            z.setInt8(i, value.getUint8(i + offset, true))
+        }
+        z = normalize(parseIEEE754(z), 1, 0)
+
+        // Filter data and store it in the member variables
+        XsensDotSensor.quaternion = new THREE.Quaternion(x, y, z, w)
+        let prevRotation = XsensDotSensor.rotation
+        XsensDotSensor.rotation = new THREE.Euler().setFromQuaternion(XsensDotSensor.quaternion, "XYZ")
+        if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
+            XsensDotSensor.rotation.x = prevRotation.x
+
+        }
+        if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
+            XsensDotSensor.rotation.y = prevRotation.y
+
+        }
+        if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
+            XsensDotSensor.rotation.z = prevRotation.z
+
+        }
+        // Set min Y
+        if(XsensDotSensor.min > (XsensDotSensor.rotation.x * 57.2957795)){
+            XsensDotSensor.min = (XsensDotSensor.rotation.x * 57.2957795)
+        }
+        // Set max Y
+        if(XsensDotSensor.max < (XsensDotSensor.rotation.x * 57.2957795)){
+            XsensDotSensor.max = (XsensDotSensor.rotation.x * 57.2957795)
+        }
+        let tmpArr = [(XsensDotSensor.rotation.x*57.2957795).toFixed(2),
+                      (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
+                      (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
+                      (XsensDotSensor.rawTime / 1000).toFixed(2)]
+        XsensDotSensor.data.push(tmpArr)
+
+        // Display the data, in the future this will be done in a different way
+        let element = document.getElementById("x-axis")
+        element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
+        element = document.getElementById("y-axis")
+        element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
+        element = document.getElementById("z-axis")
+        element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
+    }
+
+    // Set notifications for short payload
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
+    .then(() => { // Set the normal message notification handler
+        return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     })
     .then(() => {
-        console.log("=======================================================")
+        let buffer = new ArrayBuffer(3)
+        let dataViewObject = new DataView(buffer)
+        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+        dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
+        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
+        XsensDotSensor.verbose = false
+        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
         return
     })
-    .catch(error => { console.error(error); })
+    .catch(error => { console.error(error);})
 }
+
+function stopRTStream() {
+    console.log("Real time streaming stopped")
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        let buffer = new ArrayBuffer(3)
+        let dataViewObject = new DataView(buffer)
+        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+        dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
+        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
+        XsensDotSensor.verbose = false
+        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
+        return
+    })
+    .then(() => {
+        // console.log("EXPORT FILE DATA DONE")
+        // console.log("Euler data:")
+        // console.log(XsensDotSensor.data)
+        console.log("Euler data difference y:")
+        console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
+        console.log(`Angle: ${XsensDotSensor.max + Math.abs(XsensDotSensor.min)}`)
+        // console.log("Aan het begin: ", XsensDotSensor.data[0][0]," X, ", XsensDotSensor.data[0][1]," Y, ", XsensDotSensor.data[0][2]," Z")
+        // console.log("Aan het eind:  ", XsensDotSensor.data[XsensDotSensor.data.length-1][0]," X, ", XsensDotSensor.data[XsensDotSensor.data.length-1][1]," Y, ", XsensDotSensor.data[XsensDotSensor.data.length-1][2]," Z")
+        // var diffX = differenceStartEnd(XsensDotSensor.data[0][0], XsensDotSensor.data[XsensDotSensor.data.length-1][0])
+        // var diffY = differenceStartEnd(XsensDotSensor.data[0][1], XsensDotSensor.data[XsensDotSensor.data.length-1][1])
+        // var diffZ = differenceStartEnd(XsensDotSensor.data[0][2], XsensDotSensor.data[XsensDotSensor.data.length-1][2])
+        // console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
+        console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
+        return
+    })
+    .catch(error => { console.error(error);})
+}
+
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+var geometry = new THREE.BoxGeometry( 1.5, 1, 0.5 );
+var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+camera.position.z = 3;
+
+var animate = function () {
+	requestAnimationFrame( animate );
+    cube.setRotationFromEuler(XsensDotSensor.rotation);
+	renderer.render( scene, camera );
+};
+
+animate();
 
 // Exports
 export { findBluetoothDevices };
-export { startRecording };
-export { stopRecording };
-export { exportData };
 export { XsensDotSensor };
+export { startRTStream, stopRTStream };
