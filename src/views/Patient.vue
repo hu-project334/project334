@@ -61,7 +61,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .title {
   color: white;
   margin-bottom: 3%;

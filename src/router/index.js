@@ -19,6 +19,7 @@ const router = createRouter({
       name: "patients",
       component: () => import("../views/Patients.vue"),
     },
+    // nu mee bezig
     {
       path: "/excersiseResults/:id",
       name: "excersiseResults",
@@ -34,6 +35,11 @@ const router = createRouter({
       name: "patientCreator",
       component: () => import("../views/PatientCreator.vue"),
     },
+    // {
+    //   path: "/newExercise",
+    //   name: "exerciseCreator",
+    //   component: () => import("../views/ExerciseCreator.vue"),
+    // },
   ],
 });
 

@@ -171,8 +171,9 @@ export default {
 </script>
 
 <style scoped>
-/* include bg in every file */
-
+.container {
+  text-align: center;
+}
 .title {
   margin-top: 1em;
 }

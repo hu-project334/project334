@@ -42,7 +42,7 @@
             aria-expanded="false"
           >
             <img
-              :src="getProfileImage()"
+              :src="getProfileImage"
               class="rounded-circle"
               height="30"
               alt="profile picture"
@@ -85,23 +85,30 @@ export default {
       user: {},
     };
   },
-  methods: {
+  computed: {
     getProfileImage() {
-      try {
-        console.log(this.$store.getters.getUser);
-        let photoURL = this.$store.getters.getUser.photoURL;
-        photoURL = this.$store.getters.getUser.photoURL;
-        if (typeof photoURL === "undefined") {
-          let image = require("@/assets/" + "blackImage.jpg");
-          return image;
-        } else {
-          return photoURL;
-        }
-      } catch {
-        let image = require("@/assets/" + "blackImage.jpg");
-        return image;
-      }
+      console.log(this.$store.getters.getUser.photoURL);
+      return this.$store.getters.getUser.photoURL || "@/assets/blackImage.jpg";
     },
+  },
+  methods: {
+    // getProfileImage() {
+    //   try {
+    //     // console.log(this.$store.getters.getUser);
+
+    //     let photoURL = this.$store.getters.getUser.photoURL;
+    //     photoURL = this.$store.getters.getUser.photoURL;
+    //     if (!photoURL) throw "error";
+    //     return photoURL;
+
+    //     // return photoURL;
+    //     // }
+    //   } catch {
+    //     let image = require("@/assets/" + "blackImage.jpg");
+    //     console.log("catch");
+    //     return image;
+    //   }
+    // },
     logOut() {
       const auth = getAuth();
       signOut(auth)

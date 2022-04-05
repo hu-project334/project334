@@ -38,7 +38,7 @@
       </icon-button>
 
       <button class="seeResultsButton" @click="getExcersizeResults(patient.id)">
-        excersise results
+        Exercise history
       </button>
     </div>
   </template>
@@ -86,7 +86,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .title {
   color: white;
   margin-bottom: 3%;
@@ -95,6 +95,7 @@ export default {
   margin-left: 25%;
   font-size: 3em;
   width: 50%;
+  text-align: center;
 }
 p {
   margin: 0;
@@ -130,16 +131,14 @@ p {
   background: #0275d8;
   color: white;
   border: none;
-  display: grid;
-  justify-content: center;
-  align-items: center;
   padding: 0.5em;
   transition: all 0.2s ease-in-out;
 }
-button:focus,
-button:focus-within,
-button:hover {
-  transform: scale(105%);
+
+.seeResultsButton:focus,
+.seeResultsButton:focus-within,
+.seeResultsButton:hover {
+  background: blue;
   border: none;
 }
 
