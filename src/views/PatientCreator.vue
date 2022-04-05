@@ -1,6 +1,6 @@
 <template>
-  <nav-bar-top />
-  <Form @submit="addClient" style="margin-top: 4%" :validation-schema="schema">
+  <nav-bar-top></nav-bar-top>
+  <Form @submit="addClient" style="margin-top: 3%" :validation-schema="schema">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-8">
@@ -69,16 +69,16 @@
 
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
-import NavBarTop from "@/components/navbars/NavBarTop.vue";
 import * as yup from "yup";
+import NavBarTop from "../components/navbars/NavBarTop.vue";
 
 export default {
   name: "patients",
   components: {
-    NavBarTop,
     Form,
     Field,
     ErrorMessage,
+    NavBarTop,
   },
   data() {
     const schema = yup.object().shape({
@@ -94,8 +94,8 @@ export default {
     };
   },
   methods: {
-    addClient(client) {
-      console.log(client);
+    submitForm(patient) {
+      console.log(patient);
     },
   },
 };

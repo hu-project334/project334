@@ -1,6 +1,14 @@
 <template>
   <NavBarTop></NavBarTop>
 
+  <link-button
+    icon="bi bi-person-plus-fill"
+    name="Create patient"
+    navigate-to="/newPatient"
+    class="addPatientBtn"
+    color="#0275d8"
+  />
+
   <h1 class="title">excersises</h1>
   <template v-for="excersise in excersises" :key="excersise">
     <div @click="getExcersizeResults(excersise)" class="excersise">
@@ -11,11 +19,13 @@
 
 <script>
 import NavBarTop from "@/components/navbars/NavBarTop.vue";
+import LinkButton from "../components/btns/LinkButton.vue";
 
 export default {
   name: "excersises",
   components: {
     NavBarTop,
+    LinkButton,
   },
   data() {
     return {

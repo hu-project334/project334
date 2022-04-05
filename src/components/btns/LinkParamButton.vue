@@ -54,17 +54,4 @@ button:hover {
   /* transition: all 1.2s ease-in-out; */
   border: none;
 }
-
-/*Any Mobile Device*/
-/* @media only screen and (max-width: 767px) {
-  button > i {
-    font-size: 2em;
-  }
-} */
-
-/* @media (min-width: 1281px) {
-  button > i {
-    font-size: 4em;
-  }
-} */
 </style>

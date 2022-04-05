@@ -1,10 +1,8 @@
-// dogukan
 import {
   getFirestore,
   collection,
   addDoc,
   getDocs,
-  where,
   updateDoc,
   doc,
   deleteDoc,
@@ -12,6 +10,14 @@ import {
 
 const db = getFirestore();
 
+// users
+export async function createUser(uid) {
+  await addDoc(collection(db, "users"), {
+    uid,
+  });
+}
+
+// exercisese
 export async function updateExerciseScheme(
   schemeId,
   exercises,
@@ -46,3 +52,5 @@ export async function getMyExercises() {
     return { id: doc.id, ...doc.data() };
   });
 }
+
+// patients

@@ -37,16 +37,4 @@ button:hover {
   /* transition: all 1.2s ease-in-out; */
   border: none;
 }
-
-/* @media only screen and (max-width: 767px) {
-  button > i {
-    font-size: 3em;
-  }
-}
-
-@media (min-width: 1281px) {
-  button > i {
-    font-size: 4em;
-  }
-} */
 </style>

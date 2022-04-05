@@ -88,15 +88,13 @@ export default {
   methods: {
     getProfileImage() {
       try {
+        console.log(this.$store.getters.getUser);
         let photoURL = this.$store.getters.getUser.photoURL;
-        photoURL;
+        photoURL = this.$store.getters.getUser.photoURL;
         if (typeof photoURL === "undefined") {
           let image = require("@/assets/" + "blackImage.jpg");
-          console.log("komt niet hier");
           return image;
         } else {
-          console.log("komt niet hier");
-
           return photoURL;
         }
       } catch {

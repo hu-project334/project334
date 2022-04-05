@@ -20,7 +20,7 @@
 <script>
 import NavBarTop from "@/components/navbars/NavBarTop.vue";
 import _ from "lodash";
-// import LinkButton from "@/components/btns/LinkButton.vue";
+import patients from "@/db/patients.json";
 
 export default {
   name: "patients",
@@ -36,47 +36,12 @@ export default {
       dateOfBirth: "",
       heightInM: null,
 
-      patients: [
-        {
-          id: 1,
-          name: "Alexander",
-          surName: "de graaff",
-          weight: 70,
-          dateOfBirth: "22-06-2002",
-          heightInM: 1.82,
-        },
-        {
-          id: 2,
-          name: "Milo",
-          surName: "Belien",
-
-          weight: 70,
-          dateOfBirth: "28-09-2002",
-          heightInM: 1.83,
-        },
-        {
-          id: 3,
-          name: "Jayh",
-          surName: "de Cuba",
-
-          weight: 65,
-          dateOfBirth: "24-11-1998",
-          heightInM: 1.71,
-        },
-        {
-          id: 4,
-          name: "Twan",
-          surName: "van de Bor",
-
-          weight: 65,
-          dateOfBirth: "28-09-1997",
-          heightInM: 1.78,
-        },
-      ],
+      patients: null,
     };
   },
 
   mounted() {
+    this.patients = patients;
     this.patientID = this.$route.params.id;
     console.log(this.patientID);
     this.getPatientData();

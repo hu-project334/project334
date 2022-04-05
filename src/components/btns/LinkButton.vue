@@ -47,9 +47,9 @@ button:hover {
   border: none;
 }
 
-button > i {
+/* button > i {
   font-size: 4em;
-}
+} */
 
 /*Any Mobile Device*/
 </style>

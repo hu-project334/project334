@@ -1,14 +1,12 @@
 <template>
   <NavBarTop></NavBarTop>
 
-  <!-- <button class="addPatientBtn"><i class="bi bi-person-plus-fill"></i></button> -->
-
   <h1 class="title">Patients</h1>
 
   <link-button
     icon="bi bi-person-plus-fill"
     name="Create patient"
-    navigate-to="patientCreator"
+    navigate-to="/newPatient"
     class="addPatientBtn"
     color="#0275d8"
   />
@@ -51,7 +49,7 @@ import NavBarTop from "@/components/navbars/NavBarTop.vue";
 import IconButton from "@/components/btns/IconButton.vue";
 import _ from "lodash";
 import LinkParamButton from "../components/btns/LinkParamButton.vue";
-import LinkButton from "../components/btns/LinkParamButton.vue";
+import LinkButton from "../components/btns/LinkButton.vue";
 
 // json file;
 import patients from "@/db/patients.json";
@@ -67,6 +65,7 @@ export default {
   data() {
     return {
       patients: null,
+      newPatientForm: false,
     };
   },
   mounted() {
@@ -79,6 +78,9 @@ export default {
     deletePatient(id) {
       let index = _.findIndex(this.patients, { id: id });
       this.patients.splice(index, 1);
+    },
+    addNewPatient(value) {
+      console.log(value);
     },
   },
 };
@@ -96,10 +98,11 @@ export default {
 }
 p {
   margin: 0;
+  color: black;
 }
 .patient {
   cursor: pointer;
-  background: #e6302b;
+  background: white;
 
   margin-right: 5%;
   margin-left: 5%;
@@ -131,7 +134,6 @@ p {
   justify-content: center;
   align-items: center;
   padding: 0.5em;
-
   transition: all 0.2s ease-in-out;
 }
 button:focus,
@@ -181,7 +183,7 @@ button:hover {
     font-size: 1.3em;
   }
   .addPatientBtn {
-    left: calc(100vw - 5em);
+    left: calc(100vw - 4em);
     top: calc(100vh - 4em);
     font-size: 3em;
   }
@@ -199,7 +201,7 @@ button:hover {
   .addPatientBtn {
     left: calc(100vw - 3em);
     top: calc(100vh - 3em);
-    font-size: 3em;
+    font-size: 4em;
   }
   .link-param-button {
     font-size: 4em;
@@ -218,9 +220,11 @@ button:hover {
   justify-content: center;
   align-items: center;
   border-radius: 75%;
+  border: 1px solid #707070;
+  z-index: 1;
 }
 
-.addPatientBtn > button {
+/* .addPatientBtn > button {
   bottom: 6em;
-}
+} */
 </style>

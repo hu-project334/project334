@@ -39,6 +39,8 @@ import EmailRegisterButton from "../components/registerBtns/emailRegisterBtn.vue
 import RegisterForm from "../components/forms/RegisterForm.vue";
 import LoginForm from "../components/forms/LogInForm.vue";
 
+import { createUser } from "../db/fdb";
+
 export default {
   name: "register",
   components: {
@@ -90,6 +92,7 @@ export default {
           // Signed in
 
           let user = userCredential.user;
+          createUser;
           this.$store.commit("setUser", user);
 
           this.$router.push({ path: "/patients" });
@@ -141,12 +144,15 @@ export default {
         .then((result) => {
           // user info
           const user = result.user;
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          const accessToken = credential.accessToken;
+          // const credential = GoogleAuthProvider.credentialFromResult(result);
+          // const accessToken = credential.accessToken;
+
+          // firestore uid storage
+          createUser(user.uid);
 
           this.$store.commit("setUser", user);
 
-          console.log(accessToken, "token");
+          // console.log(accessToken, "token");
           this.$router.push({ path: "/patients" });
         })
         .catch((error) => {
