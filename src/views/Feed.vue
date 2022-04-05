@@ -1,5 +1,6 @@
 Register.vue - base vue
 <template>
+<nav-bar-top></nav-bar-top>
   <h1>XsensDotSensor Development</h1>
 
   <p><button @click="getData()">connect</button></p>
@@ -14,13 +15,13 @@ Register.vue - base vue
 </template>
 
 <script>
-import NavbarTop from "@/components/navbars/NavBarTop.vue";
+import NavBarTop from '../components/navbars/NavBarTop.vue';
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
 import { findBluetoothDevices, startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
 export default {
   name: "Feed",
   components: {
-    NavbarTop,
+    NavBarTop
   },
   data() {
     return {
