@@ -1,12 +1,11 @@
+// vue.config.js file to be place in the root of your repository
+
 module.exports = {
   // ...Other Vue config options here, possibly
-  publicPath:
-    process.env.NODE_ENV === "production"
-      ? "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/"
-      : "/",
+  publicPath: "/project334/",
 
   pwa: {
-    name: "sensortechnology voor de fysiotherapeut",
-    themeColor: "#e96851",
+    name: "project",
+    themeColor: "#d8222a",
   },
 };

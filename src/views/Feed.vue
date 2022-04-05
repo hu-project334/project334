@@ -14,10 +14,14 @@ Register.vue - base vue
 </template>
 
 <script>
+import NavbarTop from "@/components/navbars/NavBarTop.vue";
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
 import { findBluetoothDevices, startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
 export default {
-  name: "regster",
+  name: "Feed",
+  components: {
+    NavbarTop,
+  },
   data() {
     return {
       x: 0,
@@ -26,10 +30,10 @@ export default {
   },
   methods: {
     getData() {
-      findBluetoothDevices()
+      findBluetoothDevices();
     },
     identify() {
-      XsensDotSensor.blinkDeviceLED()
+      XsensDotSensor.blinkDeviceLED();
     },
     startDataExport() {
       XsensDotSensor.downloadDataToCSV()

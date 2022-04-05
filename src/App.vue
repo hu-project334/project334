@@ -1,19 +1,8 @@
 <template>
   <div>
-    <nav>
-      <router-link to="/"> Home </router-link> |
-      <router-link to="/feed"> Feed </router-link> |
-      <router-link to="/register"> Register </router-link> |
-      <router-link to="/sign-in"> Login </router-link> |
-
-      <localized-link :to="{ path: '/register' }"></localized-link>
-    </nav>
-
     <router-view />
     <PWAPrompt></PWAPrompt>
   </div>
-
-  <img alt="Vue logo" src="./assets/logo.png" />
 </template>
 
 <script>
@@ -33,6 +22,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
