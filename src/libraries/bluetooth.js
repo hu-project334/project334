@@ -18,6 +18,8 @@ class XsensDot {
         this.data = []
         this.timeArr = []
         this.rawTime = 0
+        this.min = Infinity
+        this.max = -Infinity
     }
 
     /**
@@ -416,6 +418,14 @@ function startRTStream() {
             XsensDotSensor.rotation.z = prevRotation.z
 
         }
+        // Set min Y
+        if(XsensDotSensor.min > (XsensDotSensor.rotation.x * 57.2957795)){
+            XsensDotSensor.min = (XsensDotSensor.rotation.x * 57.2957795)
+        }
+        // Set max Y
+        if(XsensDotSensor.max < (XsensDotSensor.rotation.x * 57.2957795)){
+            XsensDotSensor.max = (XsensDotSensor.rotation.x * 57.2957795)
+        }
         let tmpArr = [(XsensDotSensor.rotation.x*57.2957795).toFixed(2),
                       (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
                       (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
@@ -463,16 +473,18 @@ function stopRTStream() {
         return
     })
     .then(() => {
-        console.log("EXPORT FILE DATA DONE")
-        console.log("Euler data:")
-        console.log(XsensDotSensor.data)
-        console.log("Euler data difference:")
-        console.log("Aan het begin: ", XsensDotSensor.data[0][0]," X, ", XsensDotSensor.data[0][1]," Y, ", XsensDotSensor.data[0][2]," Z")
-        console.log("Aan het eind:  ", XsensDotSensor.data[XsensDotSensor.data.length-1][0]," X, ", XsensDotSensor.data[XsensDotSensor.data.length-1][1]," Y, ", XsensDotSensor.data[XsensDotSensor.data.length-1][2]," Z")
-        var diffX = differenceStartEnd(XsensDotSensor.data[0][0], XsensDotSensor.data[XsensDotSensor.data.length-1][0])
-        var diffY = differenceStartEnd(XsensDotSensor.data[0][1], XsensDotSensor.data[XsensDotSensor.data.length-1][1])
-        var diffZ = differenceStartEnd(XsensDotSensor.data[0][2], XsensDotSensor.data[XsensDotSensor.data.length-1][2])
-        console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
+        // console.log("EXPORT FILE DATA DONE")
+        // console.log("Euler data:")
+        // console.log(XsensDotSensor.data)
+        console.log("Euler data difference y:")
+        console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
+        console.log(`Angle: ${XsensDotSensor.max + Math.abs(XsensDotSensor.min)}`)
+        // console.log("Aan het begin: ", XsensDotSensor.data[0][0]," X, ", XsensDotSensor.data[0][1]," Y, ", XsensDotSensor.data[0][2]," Z")
+        // console.log("Aan het eind:  ", XsensDotSensor.data[XsensDotSensor.data.length-1][0]," X, ", XsensDotSensor.data[XsensDotSensor.data.length-1][1]," Y, ", XsensDotSensor.data[XsensDotSensor.data.length-1][2]," Z")
+        // var diffX = differenceStartEnd(XsensDotSensor.data[0][0], XsensDotSensor.data[XsensDotSensor.data.length-1][0])
+        // var diffY = differenceStartEnd(XsensDotSensor.data[0][1], XsensDotSensor.data[XsensDotSensor.data.length-1][1])
+        // var diffZ = differenceStartEnd(XsensDotSensor.data[0][2], XsensDotSensor.data[XsensDotSensor.data.length-1][2])
+        // console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
         return
     })
