@@ -1,16 +1,14 @@
 // Register.vue - base vue
 <template>
-  <div class="bg" @click="closeForm()" :style="blurrStyle()">
+  <div class="container" @click="closeForm()" :style="blurrStyle()">
     <img class="logo" src="@/assets/logo.png" />
-
-    <h1 class="title">Sensor technology for the fysio</h1>
 
     <p class="main-text">Sensor technology for the fysio</p>
 
     <GoogleRegisterButton @click="RegisterWithGoogle()"></GoogleRegisterButton>
 
     <EmailRegisterButton @click="showRegisterForm"></EmailRegisterButton>
-    <p>
+    <p style="color: white">
       ALREADY HAVE AN ACCOUNT?<button @click="showLogForm" class="loginBTN">
         LOGIN
       </button>
@@ -40,6 +38,8 @@ import GoogleRegisterButton from "../components/registerBtns/googleRegisterBtn.v
 import EmailRegisterButton from "../components/registerBtns/emailRegisterBtn.vue";
 import RegisterForm from "../components/forms/RegisterForm.vue";
 import LoginForm from "../components/forms/LogInForm.vue";
+
+import { createUser } from "../db/fdb";
 
 export default {
   name: "register",
@@ -92,10 +92,10 @@ export default {
           // Signed in
 
           let user = userCredential.user;
-          console.log(user, "user");
+          createUser;
           this.$store.commit("setUser", user);
 
-          this.$router.push({ path: "/feed" });
+          this.$router.push({ path: "/patients" });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -114,7 +114,7 @@ export default {
 
           this.$store.commit("setUser", user);
 
-          this.$router.push({ path: "/feed" });
+          this.$router.push({ path: "/patients" });
           // ...
         })
         .catch((error) => {
@@ -144,13 +144,16 @@ export default {
         .then((result) => {
           // user info
           const user = result.user;
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          const accessToken = credential.accessToken;
+          // const credential = GoogleAuthProvider.credentialFromResult(result);
+          // const accessToken = credential.accessToken;
+
+          // firestore uid storage
+          createUser(user.uid);
 
           this.$store.commit("setUser", user);
 
-          console.log(accessToken, "token");
-          this.$router.push({ path: "/feed" });
+          // console.log(accessToken, "token");
+          this.$router.push({ path: "/patients" });
         })
         .catch((error) => {
           // Handle Errors here.
@@ -168,17 +171,14 @@ export default {
 </script>
 
 <style scoped>
-/* .bg {
-  background: url("../assets/joggers.jpg") no-repeat center center fixed;
-  background-size: cover;
-  height: 100vh;
-  width: 100vw;
-} */
+/* include bg in every file */
+
 .title {
   margin-top: 1em;
 }
 .main-text {
   color: white;
+  margin-top: 5px;
   font-size: 2em;
   padding: 5px;
 }

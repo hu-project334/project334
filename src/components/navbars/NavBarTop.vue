@@ -5,7 +5,7 @@
     <div class="container-fluid">
       <a class="navbar-brand mt-2 mt-lg-0" href="#">
         <img
-          src="@/assets/logo.png"
+          src="@/assets/beeldmerk.png"
           height="40"
           alt="duo-run Logo"
           loading="lazy"
@@ -44,7 +44,7 @@
             <img
               :src="getProfileImage()"
               class="rounded-circle"
-              height="40"
+              height="30"
               alt="profile picture"
               loading="lazy"
             />
@@ -88,8 +88,9 @@ export default {
   methods: {
     getProfileImage() {
       try {
+        console.log(this.$store.getters.getUser);
         let photoURL = this.$store.getters.getUser.photoURL;
-        console.log(photoURL);
+        photoURL = this.$store.getters.getUser.photoURL;
         if (typeof photoURL === "undefined") {
           let image = require("@/assets/" + "blackImage.jpg");
           return image;
@@ -97,7 +98,6 @@ export default {
           return photoURL;
         }
       } catch {
-        console.log("image");
         let image = require("@/assets/" + "blackImage.jpg");
         return image;
       }
@@ -118,7 +118,6 @@ export default {
       let email = this.$store.getters.getUser.email;
       let displayName = this.$store.getters.getUser.displayName;
       if (typeof displayName === "undefined") {
-        console.log("komt die heir");
         return email;
       } else {
         return displayName;
@@ -148,5 +147,10 @@ export default {
   margin-right: 10px;
   margin-top: 10px;
   color: red;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
 }
 </style>
