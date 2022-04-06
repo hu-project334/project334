@@ -77,9 +77,7 @@ import { getAuth, signOut } from "firebase/auth";
 
 export default {
   name: "NavBarTop",
-  props: {
-    debt: String,
-  },
+
   data() {
     return {
       user: {},
