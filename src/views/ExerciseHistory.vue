@@ -23,14 +23,12 @@
         <icon-button
           name="delete exercise"
           icon="bi bi-trash icon"
-          color="text-primary"
           type="button"
+          color="text-primary"
           aria-label="deleteExercise"
           class="deleteExerciseBtn"
           @click="deleteExercise(exercise.id)"
-        >
-          <i class="bi bi-trash3 icons"></i>
-        </icon-button>
+        />
       </div>
 
       <button
@@ -47,12 +45,14 @@
 import NavBarTop from "@/components/navbars/NavBarTop.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import _ from "lodash";
+import IconButton from "../components/btns/IconButton.vue";
 
 export default {
   name: "exercise history",
   components: {
     NavBarTop,
     LinkButton,
+    IconButton,
   },
   data() {
     return {
@@ -125,9 +125,9 @@ p {
 .seeResultsButton {
   border: none;
   background: #0275d8;
-  margin-left: 10%;
-  margin-right: 10%;
-  width: 80%;
+  margin-left: 5%;
+  margin-right: 5%;
+  width: 90%;
   color: white;
   border: none;
 

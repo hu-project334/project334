@@ -33,9 +33,7 @@
         aria-label="deletePatient"
         class="icon-button"
         @click="deletePatient(patient.id)"
-      >
-        <i class="bi bi-trash3 icons"></i>
-      </icon-button>
+      />
 
       <button class="seeResultsButton" @click="getExcersizeResults(patient.id)">
         Exercise history
