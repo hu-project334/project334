@@ -114,6 +114,13 @@ export const syncMsgNotEnum = Object.freeze({
     'syncStatus' : 0x51      // The sync status of the sensor. 0x04 = synced, 0x09 = un-synced
 });
 
+/**
+ * getKeyByValue function takes an Enum object where it searches for
+ * the given value and returns the found key name
+ * @param {*} object Enum object to search for the key
+ * @param {*} value Value which is held by the key
+ * @returns key which matches the given value in the given enum
+ */
 export function getKeyByValue(object, value) {
     return Object.keys(object).find(key => object[key] === value);
 }
