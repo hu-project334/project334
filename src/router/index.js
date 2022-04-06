@@ -19,10 +19,11 @@ const router = createRouter({
       name: "patients",
       component: () => import("../views/Patients.vue"),
     },
+    // nu mee bezig
     {
-      path: "/excersiseResults/:id",
+      path: "/excersiseHistory/:id",
       name: "excersiseResults",
-      component: () => import("../views/ExceriseResults.vue"),
+      component: () => import("../views/ExerciseHistory.vue"),
     },
     {
       path: "/patient/:id",
@@ -33,6 +34,11 @@ const router = createRouter({
       path: "/newPatient",
       name: "patientCreator",
       component: () => import("../views/PatientCreator.vue"),
+    },
+    {
+      path: "/exerciseResults",
+      name: "exerciseResults",
+      component: () => import("../views/ExerciseResults.vue"),
     },
   ],
 });

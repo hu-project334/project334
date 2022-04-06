@@ -1,6 +1,6 @@
 <template>
   <nav-bar-top></nav-bar-top>
-  <Form @submit="addClient" style="margin-top: 3%" :validation-schema="schema">
+  <Form @submit="addClient" class="form" :validation-schema="schema">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-8">
@@ -119,5 +119,10 @@ button {
   font-size: 18px;
   font-weight: bold;
   padding: 16px 16px 18px 16px;
+}
+
+.form {
+  margin-top: 3%;
+  text-align: center;
 }
 </style>
