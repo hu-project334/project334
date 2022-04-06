@@ -118,7 +118,6 @@ export default {
       let email = this.$store.getters.getUser.email;
       let displayName = this.$store.getters.getUser.displayName;
       if (typeof displayName === "undefined") {
-        console.log("komt die heir");
         return email;
       } else {
         return displayName;
