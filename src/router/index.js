@@ -40,6 +40,11 @@ const router = createRouter({
     //   name: "exerciseCreator",
     //   component: () => import("../views/ExerciseCreator.vue"),
     // },
+    {
+      path: "/exerciseResults",
+      name: "exerciseResults",
+      component: () => import("../views/exerciseResults.vue"),
+    },
   ],
 });
 
