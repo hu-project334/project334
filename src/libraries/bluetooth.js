@@ -20,6 +20,8 @@ class XsensDot {
         this.rawTime = 0
         this.min = Infinity
         this.max = -Infinity
+        this.minQuat = undefined
+        this.maxQuat = undefined
     }
 
     /**
@@ -336,6 +338,13 @@ function differenceStartEnd(begin, end) {
     return Math.abs(begin - end).toFixed(2)
 }
 
+// calculate angle between two quaternions
+function angleQuaternion(start, end) {
+    let z = start.multiply(end.conjugate())
+    let angleDifference = new THREE.Euler().setFromQuaternion(z)
+    return [Math.abs(angleDifference.x * 57.2957795).toFixed(2), Math.abs(angleDifference.y * 57.2957795).toFixed(2), Math.abs(angleDifference.z * 57.2957795).toFixed(2)]
+}
+
 function startRTStream() {
     console.log("Real time streaming started")
     XsensDotSensor.rawTime = 0 // Clear the rawTime
@@ -403,28 +412,34 @@ function startRTStream() {
         z = normalize(parseIEEE754(z), 1, 0)
 
         // Filter data and store it in the member variables
+        let prevQuaternion = XsensDotSensor.quaternion
         XsensDotSensor.quaternion = new THREE.Quaternion(x, y, z, w)
         let prevRotation = XsensDotSensor.rotation
         XsensDotSensor.rotation = new THREE.Euler().setFromQuaternion(XsensDotSensor.quaternion, "XYZ")
         if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
             XsensDotSensor.rotation.x = prevRotation.x
+            XsensDotSensor.quaternion = prevQuaternion
 
         }
         if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
             XsensDotSensor.rotation.y = prevRotation.y
+            XsensDotSensor.quaternion = prevQuaternion
 
         }
         if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
             XsensDotSensor.rotation.z = prevRotation.z
+            XsensDotSensor.quaternion = prevQuaternion
 
         }
         // Set min Y
         if(XsensDotSensor.min > (XsensDotSensor.rotation.x * 57.2957795)){
             XsensDotSensor.min = (XsensDotSensor.rotation.x * 57.2957795)
+            XsensDotSensor.minQuat = XsensDotSensor.quaternion
         }
         // Set max Y
         if(XsensDotSensor.max < (XsensDotSensor.rotation.x * 57.2957795)){
             XsensDotSensor.max = (XsensDotSensor.rotation.x * 57.2957795)
+            XsensDotSensor.maxQuat = XsensDotSensor.quaternion
         }
         let tmpArr = [(XsensDotSensor.rotation.x*57.2957795).toFixed(2),
                       (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
@@ -479,6 +494,7 @@ function stopRTStream() {
         console.log("Euler data difference y:")
         console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
         console.log(`Angle: ${XsensDotSensor.max + Math.abs(XsensDotSensor.min)}`)
+        console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.minQuat, XsensDotSensor.maxQuat)}`)
         // console.log("Aan het begin: ", XsensDotSensor.data[0][0]," X, ", XsensDotSensor.data[0][1]," Y, ", XsensDotSensor.data[0][2]," Z")
         // console.log("Aan het eind:  ", XsensDotSensor.data[XsensDotSensor.data.length-1][0]," X, ", XsensDotSensor.data[XsensDotSensor.data.length-1][1]," Y, ", XsensDotSensor.data[XsensDotSensor.data.length-1][2]," Z")
         // var diffX = differenceStartEnd(XsensDotSensor.data[0][0], XsensDotSensor.data[XsensDotSensor.data.length-1][0])
@@ -486,6 +502,14 @@ function stopRTStream() {
         // var diffZ = differenceStartEnd(XsensDotSensor.data[0][2], XsensDotSensor.data[XsensDotSensor.data.length-1][2])
         // console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
+
+        // Reset member variables
+        XsensDotSensor.min = Infinity
+        XsensDotSensor.max = -Infinity
+        XsensDotSensor.data = []
+        XsensDotSensor.timeArr = []
+        XsensDotSensor.rawTime = 0
+
         return
     })
     .catch(error => { console.error(error);})
@@ -512,6 +536,8 @@ var animate = function () {
 };
 
 animate();
+
+// calculate angle between two quaternions
 
 // Exports
 export { findBluetoothDevices };
