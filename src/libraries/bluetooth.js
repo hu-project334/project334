@@ -50,6 +50,7 @@ class XsensDot {
      */
     connect() {
         if (!this.device) {
+            this.changeSensorStatus("disconnected")
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.connect()
@@ -60,6 +61,7 @@ class XsensDot {
      */
     disconnect() {
         if (!this.device) {
+            this.changeSensorStatus("disconnected")
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.disconnect();
@@ -69,6 +71,7 @@ class XsensDot {
      * onDisonnected is executed when the connected device disconnects
      */
     onDisconnected() {
+        this.changeSensorStatus("disconnected")
         console.log('Device is disconnected.');
     }
 
@@ -121,7 +124,10 @@ class XsensDot {
             }
             return res;
         })
-        .catch(error => { console.error(error); });
+        .catch(error => { 
+            XsensDotSensor.changeSensorStatus("connection error")
+            console.error(error); 
+        });
     }
 
     /**
@@ -139,7 +145,10 @@ class XsensDot {
             return characteristic.writeValue(dataViewObject); // Write the full object back to the sensor
         })
         .then(() => { console.log('Identifying sensor'); })
-        .catch(error => { console.error(error); });
+        .catch(error => { 
+            XsensDotSensor.changeSensorStatus("connection error")
+            console.error(error); 
+        });
     }
 
     /**
@@ -148,7 +157,10 @@ class XsensDot {
     getInitialBatteryLevel() {
         return this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
         .then((value) => { return value.getUint8(0, true) })
-        .catch((error) => { console.error(error); });
+        .catch((error) => { 
+            XsensDotSensor.changeSensorStatus("connection error")
+            console.error(error); 
+        });
     }
 
     /**
@@ -235,6 +247,11 @@ class XsensDot {
         let element = document.getElementById("batterylevel")
         element.innerHTML = this.battery_level
     }
+
+    changeSensorStatus(status) {
+        let element = document.getElementById("sensorStatus")
+        element.innerHTML = status
+    }
 }
 
 // =========================================================================
@@ -313,8 +330,10 @@ let NotificationHandler = new notification_handler();
 function findBluetoothDevices() {
     XsensDotSensor.request()
     .then(() => { return XsensDotSensor.connect()})
-    .then(() => { return XsensDotSensor.readDeviceName()
+    .then(() => { 
+        return XsensDotSensor.readDeviceName()
         .then((value) => {
+            XsensDotSensor.changeSensorStatus("online")
             XsensDotSensor.name = value
             console.log(XsensDotSensor.name)
         })
@@ -326,16 +345,6 @@ function findBluetoothDevices() {
         })
     })
     .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(XsensDotSensor.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
-}
-
-function differenceStartEnd(begin, end) {
-    if (begin < 0){
-        begin = 360 + parseFloat(begin)
-    }
-    if (end < 0){
-        end = 360 + parseFloat(end)
-    }
-    return Math.abs(begin - end).toFixed(2)
 }
 
 // calculate angle between two quaternions
@@ -488,19 +497,10 @@ function stopRTStream() {
         return
     })
     .then(() => {
-        // console.log("EXPORT FILE DATA DONE")
-        // console.log("Euler data:")
-        // console.log(XsensDotSensor.data)
         console.log("Euler data difference y:")
         console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
         console.log(`Angle: ${XsensDotSensor.max + Math.abs(XsensDotSensor.min)}`)
         console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.minQuat, XsensDotSensor.maxQuat)}`)
-        // console.log("Aan het begin: ", XsensDotSensor.data[0][0]," X, ", XsensDotSensor.data[0][1]," Y, ", XsensDotSensor.data[0][2]," Z")
-        // console.log("Aan het eind:  ", XsensDotSensor.data[XsensDotSensor.data.length-1][0]," X, ", XsensDotSensor.data[XsensDotSensor.data.length-1][1]," Y, ", XsensDotSensor.data[XsensDotSensor.data.length-1][2]," Z")
-        // var diffX = differenceStartEnd(XsensDotSensor.data[0][0], XsensDotSensor.data[XsensDotSensor.data.length-1][0])
-        // var diffY = differenceStartEnd(XsensDotSensor.data[0][1], XsensDotSensor.data[XsensDotSensor.data.length-1][1])
-        // var diffZ = differenceStartEnd(XsensDotSensor.data[0][2], XsensDotSensor.data[XsensDotSensor.data.length-1][2])
-        // console.log(diffX," X, ", diffY," Y, ", diffZ," Z")
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
 
         // Reset member variables
@@ -536,8 +536,6 @@ var animate = function () {
 };
 
 animate();
-
-// calculate angle between two quaternions
 
 // Exports
 export { findBluetoothDevices };

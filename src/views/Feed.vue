@@ -6,6 +6,7 @@ Register.vue - base vue
   <p><button @click="getData()">connect</button></p>
   <p><button @click="identify()">identify device</button></p>
   <h2>Battery level: <p id="batterylevel">0</p></h2>
+  <h2>Sensor status: <p id="sensorStatus">offline</p></h2>
   <p><button @click="startDataExport()">Export data</button></p>
   <p><button @click="streamData()">Start real time streaming</button></p>
   <p><button @click="stopDataStream()">stop real time streaming</button></p>
@@ -29,12 +30,15 @@ export default {
       y: 0,
     };
   },
+  created() {
+    window.addEventListener('beforeunload', this.handler)
+  },
   methods: {
     getData() {
-      findBluetoothDevices();
+      findBluetoothDevices()
     },
     identify() {
-      XsensDotSensor.blinkDeviceLED();
+      XsensDotSensor.blinkDeviceLED()
     },
     startDataExport() {
       XsensDotSensor.downloadDataToCSV()
@@ -43,6 +47,9 @@ export default {
       startRTStream()
     },
     stopDataStream() {
+      stopRTStream()
+    },
+    handler: function handler() {
       stopRTStream()
     }
   },
