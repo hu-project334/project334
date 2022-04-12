@@ -29,7 +29,7 @@
           class="deleteExerciseBtn"
           @click="deleteExercise(exercise.id)"
         >
-          <i class="bi bi-trash3 icons"></i>
+          <i class="bi bi-trash3"></i>
         </icon-button>
       </div>
 
@@ -46,6 +46,7 @@
 <script>
 import NavBarTop from "@/components/navbars/NavBarTop.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
+import IconButton from "@/components/btns/IconButton.vue";
 import _ from "lodash";
 
 export default {
@@ -53,6 +54,7 @@ export default {
   components: {
     NavBarTop,
     LinkButton,
+    IconButton,
   },
   data() {
     return {
@@ -128,9 +130,7 @@ p {
 .seeResultsButton {
   border: none;
   background: #0275d8;
-  margin-left: 10%;
-  margin-right: 10%;
-  width: 80%;
+  width: 100%;
   color: white;
   border: none;
 

@@ -12,11 +12,11 @@
         />
       </a>
       <!-- Left links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <!-- <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link" href="#">{{ debt }}</a>
         </li>
-      </ul>
+      </ul> -->
       <!-- Left links -->
       <!-- </div> -->
       <!-- Collapsible wrapper -->
@@ -86,7 +86,11 @@ export default {
   computed: {
     getProfileImage() {
       console.log(this.$store.getters.getUser.photoURL);
-      return this.$store.getters.getUser.photoURL || "@/assets/blackImage.jpg";
+      if (typeof this.$store.getters.getUser.photoURL === "undefined") {
+        return require("@/assets/" + "blackImage.jpg");
+      } else {
+        return this.$store.getters.getUser.photoURL;
+      }
     },
   },
   methods: {
