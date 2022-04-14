@@ -157,7 +157,7 @@ label {
   margin-top: 40px;
 }
 
-#submit_btn_cover button {
+button {
   display: block;
   width: 100%;
   color: #fff;

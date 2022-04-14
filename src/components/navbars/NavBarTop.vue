@@ -5,7 +5,7 @@
     <div class="container-fluid">
       <a class="navbar-brand mt-2 mt-lg-0" href="#">
         <img
-          src="@/assets/logo.png"
+          src="@/assets/beeldmerk.png"
           height="40"
           alt="duo-run Logo"
           loading="lazy"
@@ -42,9 +42,9 @@
             aria-expanded="false"
           >
             <img
-              :src="getProfileImage()"
+              :src="getProfileImage"
               class="rounded-circle"
-              height="40"
+              height="30"
               alt="profile picture"
               loading="lazy"
             />
@@ -85,23 +85,30 @@ export default {
       user: {},
     };
   },
-  methods: {
+  computed: {
     getProfileImage() {
-      try {
-        let photoURL = this.$store.getters.getUser.photoURL;
-        console.log(photoURL);
-        if (typeof photoURL === "undefined") {
-          let image = require("@/assets/" + "blackImage.jpg");
-          return image;
-        } else {
-          return photoURL;
-        }
-      } catch {
-        console.log("image");
-        let image = require("@/assets/" + "blackImage.jpg");
-        return image;
-      }
+      console.log(this.$store.getters.getUser.photoURL);
+      return this.$store.getters.getUser.photoURL || "@/assets/blackImage.jpg";
     },
+  },
+  methods: {
+    // getProfileImage() {
+    //   try {
+    //     // console.log(this.$store.getters.getUser);
+
+    //     let photoURL = this.$store.getters.getUser.photoURL;
+    //     photoURL = this.$store.getters.getUser.photoURL;
+    //     if (!photoURL) throw "error";
+    //     return photoURL;
+
+    //     // return photoURL;
+    //     // }
+    //   } catch {
+    //     let image = require("@/assets/" + "blackImage.jpg");
+    //     console.log("catch");
+    //     return image;
+    //   }
+    // },
     logOut() {
       const auth = getAuth();
       signOut(auth)
@@ -147,5 +154,10 @@ export default {
   margin-right: 10px;
   margin-top: 10px;
   color: red;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
 }
 </style>

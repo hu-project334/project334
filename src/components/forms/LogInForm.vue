@@ -79,7 +79,9 @@ form {
   background-color: #fff;
   width: 350px;
   padding: 40px;
-  margin: 0 auto;
+  margin: auto;
+
+  /* margin: 0 auto; */
   transform: translateY(-60%);
   box-shadow: 0 10px 20px -5px #ccc;
 }

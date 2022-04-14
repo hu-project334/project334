@@ -4,8 +4,8 @@ import "./registerServiceWorker";
 import router from "./router";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-
-import store from "./store";
+// import store from "./store/store"; //local import
+import store from "@/store/userStore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",

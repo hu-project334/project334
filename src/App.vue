@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <router-view />
     <PWAPrompt></PWAPrompt>
   </div>
@@ -17,10 +17,11 @@ export default {
 
 <style>
 #app {
+  min-height: 100vh;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+
+  background: #00a1e1;
 }
 </style>
