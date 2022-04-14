@@ -18,8 +18,8 @@ class XsensDot {
         this.data = []
         this.timeArr = []
         this.rawTime = 0
-        this.min = Infinity
-        this.max = -Infinity
+        this.min = new THREE.Euler(Infinity, Infinity, Infinity, 'XYZ')
+        this.max = new THREE.Euler(-Infinity, -Infinity, -Infinity, 'XYZ')
         this.minQuat = undefined
         this.maxQuat = undefined
     }
@@ -351,7 +351,7 @@ function findBluetoothDevices() {
 function angleQuaternion(start, end) {
     let z = start.multiply(end.conjugate())
     let angleDifference = new THREE.Euler().setFromQuaternion(z)
-    return [Math.abs(angleDifference.x * 57.2957795).toFixed(2), Math.abs(angleDifference.y * 57.2957795).toFixed(2), Math.abs(angleDifference.z * 57.2957795).toFixed(2)]
+    return [Math.abs(angleDifference.x * 57.2957795).toFixed(0), Math.abs(angleDifference.y * 57.2957795).toFixed(0), Math.abs(angleDifference.z * 57.2957795).toFixed(0)]
 }
 
 function startRTStream() {
@@ -440,20 +440,11 @@ function startRTStream() {
             XsensDotSensor.quaternion = prevQuaternion
 
         }
-        // Set min Y
-        if(XsensDotSensor.min > (XsensDotSensor.rotation.x * 57.2957795)){
-            XsensDotSensor.min = (XsensDotSensor.rotation.x * 57.2957795)
-            XsensDotSensor.minQuat = XsensDotSensor.quaternion
-        }
-        // Set max Y
-        if(XsensDotSensor.max < (XsensDotSensor.rotation.x * 57.2957795)){
-            XsensDotSensor.max = (XsensDotSensor.rotation.x * 57.2957795)
-            XsensDotSensor.maxQuat = XsensDotSensor.quaternion
-        }
-        let tmpArr = [(XsensDotSensor.rotation.x*57.2957795).toFixed(2),
-                      (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
-                      (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
-                      (XsensDotSensor.rawTime / 1000).toFixed(2)]
+        let tmpArr = [XsensDotSensor.quaternion,
+                     (XsensDotSensor.rotation.x*57.2957795).toFixed(2),
+                     (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
+                     (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
+                     (XsensDotSensor.rawTime / 1000).toFixed(2)]
         XsensDotSensor.data.push(tmpArr)
 
         // Display the data, in the future this will be done in a different way
@@ -471,6 +462,9 @@ function startRTStream() {
         return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     })
     .then(() => {
+        XsensDotSensor.data = []
+        XsensDotSensor.timeArr = []
+        XsensDotSensor.rawTime = 0
         let buffer = new ArrayBuffer(3)
         let dataViewObject = new DataView(buffer)
         dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
@@ -497,15 +491,23 @@ function stopRTStream() {
         return
     })
     .then(() => {
-        console.log("Euler data difference y:")
-        console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
-        console.log(`Angle: ${XsensDotSensor.max + Math.abs(XsensDotSensor.min)}`)
-        console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.minQuat, XsensDotSensor.maxQuat)}`)
+        // console.log("Euler data difference y:")
+        // console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
+        console.log(`First quaternion: `)
+        let firstIndex
+        for (let i = 0; i < XsensDotSensor.data.length; i++) {
+            if (XsensDotSensor.data[i][0].x != 0 && XsensDotSensor.data[i][0].y != 0 && XsensDotSensor.data[i][0].z != 0 && XsensDotSensor.data[i][0].w != 0) {
+                firstIndex = i
+                break
+            }
+        }
+        console.log(XsensDotSensor.data[firstIndex][0])
+        console.log(`last quaternion`)
+        console.log(XsensDotSensor.data[XsensDotSensor.data.length - 1][0])
+        console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0])}`)
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
 
         // Reset member variables
-        XsensDotSensor.min = Infinity
-        XsensDotSensor.max = -Infinity
         XsensDotSensor.data = []
         XsensDotSensor.timeArr = []
         XsensDotSensor.rawTime = 0
@@ -531,7 +533,7 @@ camera.position.z = 3;
 
 var animate = function () {
 	requestAnimationFrame( animate );
-    cube.setRotationFromEuler(XsensDotSensor.rotation);
+    cube.setRotationFromQuaternion(XsensDotSensor.quaternion);
 	renderer.render( scene, camera );
 };
 
