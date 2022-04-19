@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, recMsgAckEnum, recMsgNotEnum, getKeyByValue } from './bluetooth_enums.js'
+import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, syncMsgEnum, getKeyByValue } from './bluetooth_enums.js'
 import * as THREE from 'three';
 
 // =========================================================================
@@ -22,6 +22,7 @@ class XsensDot {
         this.max = new THREE.Euler(-Infinity, -Infinity, -Infinity, 'XYZ')
         this.minQuat = undefined
         this.maxQuat = undefined
+        this.ackEnum = recMsgEnum
     }
 
     /**
@@ -91,7 +92,11 @@ class XsensDot {
         return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
         .then((value) => {
             if(this.verbose){
-                let str = `${getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))} ack: ${getKeyByValue(recMsgAckEnum, value.getUint8(3, true))}`
+                let cmd = getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))
+                if (cmd == undefined ) {
+                    cmd = getKeyByValue(syncMsgEnum, dataViewObject.getUint8(2, true))
+                }
+                let str = `${cmd} ack: ${getKeyByValue(msgAckEnum, value.getUint8(3, true))}`
                 console.log(str)
             }
             return value
@@ -266,7 +271,7 @@ class notification_handler {
      */
     genericNotHandler = function (event) {
         const value = event.target.value
-        console.log(`New notification message: ${getKeyByValue(recMsgNotEnum, value.getUint8(2, true))}`)
+        console.log(`New notification message: ${getKeyByValue(notificationEnum, value.getUint8(2, true))}`)
         console.log(value)
     }
 
@@ -274,8 +279,9 @@ class notification_handler {
      * The constructor adds all possible notifications to its own member variables
      * and assigns the default notification handler
      */
-    constructor() {
-        Object.keys(recMsgNotEnum).map(key => { notification_handler[key] = this.genericNotHandler })
+    constructor(sync = false) {
+        if (sync) {this.enum = syncNotEnum} else {this.enum = notificationEnum}
+        Object.keys(this.enum).map(key => { notification_handler[key] = this.genericNotHandler })
     }
 
     /**
@@ -283,7 +289,7 @@ class notification_handler {
      *
      */
     setCallback(notification_type, callback_function){
-        notification_handler[getKeyByValue(recMsgNotEnum, notification_type)] = callback_function
+        notification_handler[getKeyByValue(notificationEnum, notification_type)] = callback_function
     }
 
     /**
@@ -291,7 +297,7 @@ class notification_handler {
      */
     handleNotification(event) {
         const value = event.target.value
-        let notification_type = getKeyByValue(recMsgNotEnum, value.getUint8(2, true))
+        let notification_type = getKeyByValue(notificationEnum, value.getUint8(2, true))
         return notification_handler[notification_type](event)
     }
 
@@ -517,6 +523,29 @@ function stopRTStream() {
     .catch(error => { console.error(error);})
 }
 
+function syncSensor() {
+    console.log("Synchronization started")
+
+    NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
+        let value = event.target.value
+        let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
+        console.log(`Device is: ${status}`)
+        if (status == msgAckEnum.synced) {
+            let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.stopSync, []);
+            XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+        }
+    })
+
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => {
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    })
+    .catch(err => { console.error(err); })
+}
+
+// 3D representation of sensor
+
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
@@ -540,6 +569,5 @@ var animate = function () {
 animate();
 
 // Exports
-export { findBluetoothDevices };
 export { XsensDotSensor };
-export { startRTStream, stopRTStream };
+export { findBluetoothDevices, startRTStream, stopRTStream, syncSensor };

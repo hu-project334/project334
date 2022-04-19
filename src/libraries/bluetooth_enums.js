@@ -58,15 +58,16 @@ export const recMsgTypeEnum = Object.freeze({
 
 // Recording acknowledgements messages
 // eslint-disable-next-line no-unused-vars
-export const recMsgAckEnum = Object.freeze({
+export const msgAckEnum = Object.freeze({
     // ReID res || Hex value
     'success' : 0x00,                   // Control message write success
     'invalidCmd' : 0x02,                // Invalid command
     'flashProcessBusy' : 0x03,          // Flash is occupied by other process
+    'synced' : 0x04,                    // Device is synced
     'NotEnoughSample' : 0x05,           // Sync failed for not enough data samples
     'SkewTooLarge' : 0x07,              // Sync failed for estimated skew too large
     'StartingTimingError' : 0x08,       // Sync failed for start time error
-    'Unstarted' : 0x09,                 // Sync is not started
+    'un-synced' : 0x09,                 // Sync is not started
     'idleState' : 0x06,                 // Idle state
     'onErasing' : 0x30,                 // Erasing internal storage
     'onRecording' : 0x40,               // In recording state
@@ -77,7 +78,7 @@ export const recMsgAckEnum = Object.freeze({
 
 // Recording notification messages
 // eslint-disable-next-line no-unused-vars
-export const recMsgNotEnum = Object.freeze({
+export const notificationEnum = Object.freeze({
     // ReID || Hex value
     'flashProcessBusy' : 0x03,     // Flash is occupied by other process
     'storeFlashInfoDone1' : 0x33,  // Recording flash erase is completed
@@ -86,6 +87,8 @@ export const recMsgNotEnum = Object.freeze({
     'invalidFlashFormat' : 0x35,   // Recording flash format is invalid (erase flash!)
     'recordingStopped' : 0x41,     // Recording stopped
     'recordingTime' : 0x43,        // StartUTC 4 bytes TotRecTime 2 bytes RemRecTie 2 bytes
+    'stopSyncResult' : 0x50,       // The result of the stop sync command 0x00 = success 0x01 = fail
+    'syncStatus' : 0x51,           // The sync status of the sensor. 0x04 = synced, 0x09 = un-synced
     'exportFlashInfo' : 0x51,      // Recording file system info
     'exportFlashInfoDone' : 0x52,  // Recording flash information export completed
     'exportFileInfo' : 0x61,       // File structure header
@@ -104,14 +107,6 @@ export const syncMsgEnum = Object.freeze({
     'startSync' : 0x01,     // Start the synchronization
     'stopSync' : 0x02,      // Stop the synchronization (stopSyncResult notification will be sent)
     'getSyncStatus' : 0x08  // Check if the sensor is already synced (syncStatus notification will be sent)
-});
-
-// Synchronization notification messages
-// eslint-disable-next-line no-unused-vars
-export const syncMsgNotEnum = Object.freeze({
-      // SyID || Hex value
-    'stopSyncResult' : 0x50, // The result of the stop sync command 0x00 = success 0x01 = fail
-    'syncStatus' : 0x51      // The sync status of the sensor. 0x04 = synced, 0x09 = un-synced
 });
 
 /**
