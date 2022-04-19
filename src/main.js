@@ -1,11 +1,9 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-import "./registerServiceWorker";
 import router from "./router";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-// import store from "./store/store"; //local import
-import store from "@/store/userStore.js";
+import store from "./store/userStore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",
@@ -23,10 +21,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
 import "mdb-ui-kit";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { createDB } from "./db/idb";
 
 // Initialize Firebase
 initializeApp(firebaseConfig);
 getFirestore();
-createDB();
 createApp(App).use(router).use(store).mount("#app");
