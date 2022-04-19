@@ -15,13 +15,9 @@
     "core-js": "^3.6.5",
     "firebase": "^9.6.7",
     "lodash": "^4.17.21",
-    "mdb-ui-kit": "^3.11.0",
-<<<<<<< HEAD
-    "register-service-worker": "^1.7.2",
-=======
-    "register-service-worker": "^1.7.1",
     "three": "^0.139.2",
->>>>>>> d0b3aaf3a4aab4bec65acd0a888b651e36aa0504
+    "mdb-ui-kit": "^3.11.0",
+    "register-service-worker": "^1.7.2",
     "vee-validate": "^4.5.10",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12",

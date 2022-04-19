@@ -15,12 +15,7 @@ Register.vue - base vue
 </template>
 
 <script>
-<<<<<<< HEAD
-import NavbarTop from "../components/navbars/NavBarTop.vue";
-import { findBluetoothDevices } from "@/libraries/bluetooth.js";
-=======
 import NavBarTop from '../components/navbars/NavBarTop.vue';
->>>>>>> d0b3aaf3a4aab4bec65acd0a888b651e36aa0504
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
 import { findBluetoothDevices, startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
 export default {
