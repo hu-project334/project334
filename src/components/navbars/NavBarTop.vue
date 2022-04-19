@@ -7,7 +7,7 @@
         <img
           src="@/assets/beeldmerk.png"
           height="40"
-          alt="duo-run Logo"
+          alt="hu logo"
           loading="lazy"
         />
       </a>
@@ -87,7 +87,7 @@ export default {
     getProfileImage() {
       console.log(this.$store.getters.getUser.photoURL);
       if (typeof this.$store.getters.getUser.photoURL === "undefined") {
-        return require("@/assets/" + "blackImage.jpg");
+        return require("./assets/" + "blackImage.jpg");
       } else {
         return this.$store.getters.getUser.photoURL;
       }

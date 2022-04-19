@@ -44,9 +44,9 @@
 </template>
 
 <script>
-import NavBarTop from "@/components/navbars/NavBarTop.vue";
+import NavBarTop from "../components/navbars/NavBarTop.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
-import IconButton from "@/components/btns/IconButton.vue";
+import IconButton from "../components/btns/IconButton.vue";
 import _ from "lodash";
 
 export default {

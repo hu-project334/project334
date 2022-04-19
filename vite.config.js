@@ -20,9 +20,9 @@ export default defineConfig({
       filename: "sw.js",
       strategies: "injectManifest",
       manifest: {
-        name: "Name of your app",
-        short_name: "Short name of your app",
-        description: "Description of your app",
+        name: "Project334",
+        short_name: "P334",
+        description: "Sensortechnologie voor de fysiotherapuit",
         theme_color: "#ffffff",
         icons: [
           {

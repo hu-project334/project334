@@ -18,9 +18,9 @@
 </template>
 
 <script>
-import NavBarTop from "@/components/navbars/NavBarTop.vue";
+import NavBarTop from "../components/navbars/NavBarTop.vue";
 import _ from "lodash";
-import patients from "@/db/patients.json";
+import patients from "../db/patients.json";
 
 export default {
   name: "patients",
