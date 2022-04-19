@@ -2,8 +2,6 @@
 
 module.exports = {
   // ...Other Vue config options here, possibly
-  publicPath: "/project334/",
-
   pwa: {
     name: "project",
     themeColor: "#d8222a",

@@ -3,54 +3,60 @@
 
   <h1 class="title">Patients</h1>
 
-  <link-button
-    icon="bi bi-person-plus-fill"
-    name="Create patient"
-    navigate-to="/newPatient"
-    class="addPatientBtn"
-    color="#0275d8"
-  />
-  <template v-for="patient in patients" :key="patient">
-    <div class="patient">
-      <link-param-button
-        icon="bi bi-person-square"
-        color="text-primary"
-        name="go to patient"
-        navigate-to="patient"
-        :id="patient.id"
-        class="link-param-button"
-      />
+  <main>
+    <link-button
+      icon="bi bi-person-plus-fill"
+      name="Create patient"
+      navigate-to="/newPatient"
+      class="addPatientBtn"
+      color="#0275d8"
+    />
 
-      <div class="patient-text">
-        <p class="text">Name: {{ patient.name }}</p>
-        <p class="text">surname : {{ patient.surname }}</p>
+    <template v-for="patient in patients" :key="patient">
+      <div class="patient">
+        <link-param-button
+          icon="bi bi-person-square"
+          color="text-primary"
+          name="go to patient"
+          navigate-to="patient"
+          :id="patient.id"
+          class="link-param-button"
+        />
+
+        <div class="patient-text">
+          <p class="text">Name: {{ patient.name }}</p>
+          <p class="text">surname : {{ patient.surname }}</p>
+        </div>
+        <icon-button
+          name="delete patient"
+          icon="bi bi-trash icon"
+          color="text-primary"
+          type="button"
+          aria-label="deletePatient"
+          class="icon-button"
+          @click="deletePatient(patient.id)"
+        />
+
+        <button
+          class="seeResultsButton"
+          @click="getExcersizeResults(patient.id)"
+        >
+          Exercise history
+        </button>
       </div>
-      <icon-button
-        name="delete patient"
-        icon="bi bi-trash icon"
-        color="text-primary"
-        type="button"
-        aria-label="deletePatient"
-        class="icon-button"
-        @click="deletePatient(patient.id)"
-      />
-
-      <button class="seeResultsButton" @click="getExcersizeResults(patient.id)">
-        Exercise history
-      </button>
-    </div>
-  </template>
+    </template>
+  </main>
 </template>
 
 <script>
-import NavBarTop from "@/components/navbars/NavBarTop.vue";
-import IconButton from "@/components/btns/IconButton.vue";
+import NavBarTop from "../components/navbars/NavBarTop.vue";
+import IconButton from "../components/btns/IconButton.vue";
 import _ from "lodash";
 import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 
 // json file;
-import patients from "@/db/patients.json";
+import patients from "../db/patients.json";
 
 export default {
   name: "patients",

@@ -1,15 +1,15 @@
 // Register.vue - base vue
 <template>
   <div class="container" @click="closeForm()" :style="blurrStyle()">
-    <img class="logo" src="@/assets/logo.png" />
+    <img class="logo" alt="hogeschool utrecht logo" src="@/assets/logo.png" />
 
-    <p class="main-text">Sensor technology for the fysio</p>
+    <p class="main-text">Sensor technologie voor de fysiotherapeut</p>
 
     <GoogleRegisterButton @click="RegisterWithGoogle()"></GoogleRegisterButton>
 
     <EmailRegisterButton @click="showRegisterForm"></EmailRegisterButton>
     <p style="color: white">
-      ALREADY HAVE AN ACCOUNT?<button @click="showLogForm" class="loginBTN">
+      HEB JE AL EEN ACCOUNT?<button @click="showLogForm" class="loginBTN">
         LOGIN
       </button>
     </p>
@@ -34,12 +34,12 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
+
+import { createUser } from "../db/fdb";
 import GoogleRegisterButton from "../components/registerBtns/googleRegisterBtn.vue";
 import EmailRegisterButton from "../components/registerBtns/emailRegisterBtn.vue";
 import RegisterForm from "../components/forms/RegisterForm.vue";
 import LoginForm from "../components/forms/LogInForm.vue";
-
-import { createUser } from "../db/fdb";
 
 export default {
   name: "register",
@@ -87,26 +87,25 @@ export default {
       this.errorMessage = "";
 
       const auth = getAuth();
-      createUserWithEmailAndPassword(auth, value.email, value.password)
+      Auth.createUserWithEmailAndPassword(auth, value.email, value.password)
         .then((userCredential) => {
           // Signed in
 
           let user = userCredential.user;
-          createUser;
+          Auth.createUser;
           this.$store.commit("setUser", user);
 
           this.$router.push({ path: "/patients" });
         })
         .catch((error) => {
           const errorCode = error.code;
-          // const errorMessage = error.message;
-
           this.firebaseErrorFromRegister = errorCode;
         });
     },
 
     login(value) {
       const auth = getAuth();
+
       signInWithEmailAndPassword(auth, value.email, value.password)
         .then((userCredential) => {
           // Signed in
@@ -144,8 +143,6 @@ export default {
         .then((result) => {
           // user info
           const user = result.user;
-          // const credential = GoogleAuthProvider.credentialFromResult(result);
-          // const accessToken = credential.accessToken;
 
           // firestore uid storage
           createUser(user.uid);
@@ -159,7 +156,6 @@ export default {
           // Handle Errors here.
           const errorCode = error.code;
           const errorMessage = error.message;
-          // The email of the user's account used.
           const email = error.email;
           // The AuthCredential type that was used.
           const credential = GoogleAuthProvider.credentialFromError(error);
@@ -179,6 +175,7 @@ export default {
 }
 .main-text {
   color: white;
+  font-weight: bold;
   margin-top: 5px;
   font-size: 2em;
   padding: 5px;

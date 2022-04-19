@@ -1,6 +1,6 @@
 <template>
   <nav-bar-top></nav-bar-top>
-  <Form @submit="addClient" class="form" :validation-schema="schema">
+  <Form @submit="submitForm" class="form" :validation-schema="schema">
     <div class="row mb-3">
       <label for="name" class="col-sm-2 col-form-label">Name</label>
       <div class="col-sm-8">
@@ -63,7 +63,7 @@
         <ErrorMessage name="dateOfBirth"></ErrorMessage>
       </div>
     </div>
-    <button>Create client</button>
+    <button>Create patient</button>
   </Form>
 </template>
 

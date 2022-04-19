@@ -9,7 +9,7 @@ npm install
 ### Compiles and hot-reloads for development
 
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
@@ -31,7 +31,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ## Testing a Progressive web app (PWA)
 
 ```
-- npm run build
+- npm run preview
 ```
 
 ```
