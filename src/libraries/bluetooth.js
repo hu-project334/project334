@@ -361,6 +361,7 @@ function angleQuaternion(start, end) {
 }
 
 function startRTStream() {
+    render3Dsensor()
     console.log("Real time streaming started")
     XsensDotSensor.rawTime = 0 // Clear the rawTime
 
@@ -484,6 +485,7 @@ function startRTStream() {
 }
 
 function stopRTStream() {
+    document.body.removeChild(document.body.lastChild)
     console.log("Real time streaming stopped")
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
     .then(() => {
@@ -545,28 +547,29 @@ function syncSensor() {
 }
 
 // 3D representation of sensor
+function render3Dsensor() {
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
-var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
 
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+    var geometry = new THREE.BoxGeometry( 1.5, 1, 0.5 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    scene.add( cube );
 
-var geometry = new THREE.BoxGeometry( 1.5, 1, 0.5 );
-var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-var cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
+    camera.position.z = 3;
 
-camera.position.z = 3;
+    var animate = function () {
+        requestAnimationFrame( animate );
+        cube.setRotationFromQuaternion(XsensDotSensor.quaternion);
+        renderer.render( scene, camera );
+    };
 
-var animate = function () {
-	requestAnimationFrame( animate );
-    cube.setRotationFromQuaternion(XsensDotSensor.quaternion);
-	renderer.render( scene, camera );
-};
-
-animate();
+    animate();
+}
 
 // Exports
 export { XsensDotSensor };
