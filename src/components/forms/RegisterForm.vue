@@ -10,7 +10,7 @@
       <div class="form-group">
         <label for="password">Password</label>
         <Field name="password" type="password" class="form-control" />
-        <ErrorMessage name="passwordConfirmation" class="error-feedback" />
+        <ErrorMessage name="password" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="passwordConfirmation">Password</label>
@@ -19,7 +19,7 @@
           type="password"
           class="form-control"
         />
-        <ErrorMessage name="password" class="error-feedback" />
+        <ErrorMessage name="passwordConfirmation" class="error-feedback" />
       </div>
       <div id="submit_btn_cover">
         <button :disabled="loading">
@@ -70,7 +70,8 @@ export default {
         .max(40, "Must be maximum 40 characters!"),
       passwordConfirmation: yup
         .string()
-        .oneOf([yup.ref("password"), null], "Passwords must match"),
+        .oneOf([yup.ref("password"), null], "Passwords must match")
+        .required("Password confirmation is required"),
     });
     return {
       successful: false,
@@ -86,7 +87,7 @@ export default {
       this.successful = false;
       this.loading = true;
       this.$emit("send", user);
-      console.log(user);
+      // console.log(user);
 
       this.successful = true;
       this.loading = false;

@@ -77,6 +77,6 @@
 }
 
 .text {
-  color: #d20e0e;
+  color: #e81717;
 }
 </style>

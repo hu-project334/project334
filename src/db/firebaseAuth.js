@@ -4,6 +4,7 @@ import {
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
 } from "firebase/auth";
 import store from "../store/userStore.js";
 import router from "../router/index.js";
@@ -30,10 +31,9 @@ export async function login(value) {
     .then((userCredential) => {
       const user = userCredential.user;
       store.commit("setUser", user);
+      router.push({ path: "/patients" });
 
-      return { succes: true };
-      //   this.$store.commit("setUser", user);
-      //   this.$router.push({ path: "/patients" });
+      return { succes: true, errorMessage: "" };
     })
 
     .catch((error) => {
@@ -70,5 +70,17 @@ export async function RegisterWithGoogle() {
       const email = error.email;
       const credential = GoogleAuthProvider.credentialFromError(error);
       console.log(errorCode, errorMessage, email, credential);
+    });
+}
+
+export async function logOut() {
+  const auth = getAuth();
+  return signOut(auth)
+    .then(() => {
+      store.dispatch("logOutUser");
+      router.push({ path: "/" });
+    })
+    .catch((error) => {
+      console.log(error);
     });
 }

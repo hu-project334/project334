@@ -147,7 +147,7 @@ p {
 }
 
 /*Any Mobile Device*/
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 500px) {
   .link-param-button {
     font-size: 3em;
   }
@@ -161,6 +161,23 @@ p {
   .addPatientBtn {
     left: calc(100vw - 2.5em);
     top: calc(100vh - 3em);
+    font-size: 3em;
+  }
+}
+@media only screen and (max-width: 767px) and (min-width: 500px) {
+  .link-param-button {
+    font-size: 3em;
+  }
+  .icon-button {
+    font-size: 4em;
+  }
+  .text {
+    padding: 0;
+    font-size: 0.8em;
+  }
+  .addPatientBtn {
+    left: calc(100vw - 2.5em);
+    top: calc(100vh - 4em);
     font-size: 3em;
   }
 }

@@ -27,14 +27,6 @@
 </template>
 
 <script>
-// import {
-//   getAuth,
-//   createUserWithEmailAndPassword,
-//   GoogleAuthProvider,
-//   signInWithEmailAndPassword,
-//   signInWithPopup,
-// } from "firebase/auth";
-// import { createUser } from "../db/fdb";
 import GoogleRegisterButton from "../components/registerBtns/googleRegisterBtn.vue";
 import EmailRegisterButton from "../components/registerBtns/emailRegisterBtn.vue";
 import RegisterForm from "../components/forms/RegisterForm.vue";
@@ -94,38 +86,14 @@ export default {
 
     registerWithEmail(value) {
       registerWithEmail(value).then((data) => {
-        this.firebaseErrorFromRegister = data;
+        this.firebaseErrorFromRegister = data.error;
       });
     },
 
     login(value) {
-      login(value).then(() => {});
-
-      // const auth = getAuth();
-      // signInWithEmailAndPassword(auth, value.email, value.password)
-      //   .then((userCredential) => {
-      //     // Signed in
-      //     const user = userCredential.user;
-      //     this.$store.commit("setUser", user);
-      //     this.$router.push({ path: "/patients" });
-      //     // ...
-      //   })
-      //   .catch((error) => {
-      //     switch (error.code) {
-      //       case "auth/invalid-email":
-      //         this.errorMessage = "Invalid email";
-      //         break;
-      //       case "auth/user-not-found":
-      //         this.errorMessage = "No account with that email was found";
-      //         break;
-      //       case "auth/wrong-password":
-      //         this.errorMessage = "Incorrect password";
-      //         break;
-      //       default:
-      //         this.errorMessage = "Email or password was incorrect";
-      //         break;
-      //     }
-      //   });
+      login(value).then((data) => {
+        this.errorMessage = data.error;
+      });
     },
   },
 };
