@@ -1,7 +1,7 @@
 <template>
   <NavBarTop></NavBarTop>
 
-  <h1 class="title">Patients</h1>
+  <h1 class="title">Patienten</h1>
 
   <main>
     <link-button
@@ -24,8 +24,8 @@
         />
 
         <div class="patient-text">
-          <p class="text">Name: {{ patient.name }}</p>
-          <p class="text">surname : {{ patient.surname }}</p>
+          <p class="text">Naam: {{ patient.name }}</p>
+          <p class="text">Achternaam : {{ patient.surname }}</p>
         </div>
         <icon-button
           name="delete patient"
@@ -41,7 +41,7 @@
           class="seeResultsButton"
           @click="getExcersizeResults(patient.id)"
         >
-          Exercise history
+          geschiedenis van oefeningen
         </button>
       </div>
     </template>
@@ -147,7 +147,7 @@ p {
 }
 
 /*Any Mobile Device*/
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 500px) {
   .link-param-button {
     font-size: 3em;
   }
@@ -161,6 +161,23 @@ p {
   .addPatientBtn {
     left: calc(100vw - 2.5em);
     top: calc(100vh - 3em);
+    font-size: 3em;
+  }
+}
+@media only screen and (max-width: 767px) and (min-width: 500px) {
+  .link-param-button {
+    font-size: 3em;
+  }
+  .icon-button {
+    font-size: 4em;
+  }
+  .text {
+    padding: 0;
+    font-size: 0.8em;
+  }
+  .addPatientBtn {
+    left: calc(100vw - 2.5em);
+    top: calc(100vh - 4em);
     font-size: 3em;
   }
 }

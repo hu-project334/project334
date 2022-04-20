@@ -2,68 +2,70 @@
   <nav-bar-top></nav-bar-top>
   <Form @submit="submitForm" class="form" :validation-schema="schema">
     <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label">Name</label>
+      <label for="name" class="col-sm-2 col-form-label">Naam</label>
       <div class="col-sm-8">
         <Field
           type="email"
           class="form-control"
           name="name"
-          placeholder="Name"
+          placeholder="Naam"
         />
         <ErrorMessage name="name"></ErrorMessage>
       </div>
     </div>
     <div class="row mb-3">
-      <label for="inputSurname" class="col-sm-2 col-form-label">Surname</label>
+      <label for="inputSurname" class="col-sm-2 col-form-label"
+        >Achternaam</label
+      >
       <div class="col-sm-8">
         <Field
           type="name"
           class="form-control"
           name="surname"
-          placeholder="Surname"
+          placeholder="achternaam"
         />
         <ErrorMessage name="surname"></ErrorMessage>
       </div>
     </div>
     <div class="row mb-3">
-      <label for="height" class="col-sm-2 col-form-label">Height</label>
+      <label for="height" class="col-sm-2 col-form-label">Lengte</label>
       <div class="col-sm-8">
         <Field
           type="number"
           class="form-control"
           name="height"
-          placeholder="height in m"
+          placeholder="Lengte in m"
         />
         <ErrorMessage name="height"></ErrorMessage>
       </div>
     </div>
     <div class="row mb-3">
-      <label for="weight" class="col-sm-2 col-form-label">Weight</label>
+      <label for="weight" class="col-sm-2 col-form-label">Gewicht</label>
       <div class="col-sm-8">
         <Field
           type="number"
           class="form-control"
           name="weight"
-          placeholder="weight in kg"
+          placeholder="Gewicht in kg"
         />
         <ErrorMessage name="weight"></ErrorMessage>
       </div>
     </div>
     <div class="row mb-3">
       <label for="dateOfBirth" class="col-sm-2 col-form-label"
-        >Date of birth</label
+        >Geboortedatum</label
       >
       <div class="col-sm-8">
         <Field
           type="name"
           class="form-control"
           name="dateOfBirth"
-          placeholder="date of birth in dd-mm-yy"
+          placeholder="Geboortedatum in dd-mm-yy"
         />
         <ErrorMessage name="dateOfBirth"></ErrorMessage>
       </div>
     </div>
-    <button>Create patient</button>
+    <button>Maak patient</button>
   </Form>
 </template>
 
@@ -82,11 +84,11 @@ export default {
   },
   data() {
     const schema = yup.object().shape({
-      name: yup.string().required("Name is required"),
-      surname: yup.string().required("Surname is required"),
-      height: yup.string().required("Height is required"),
-      weight: yup.string().required("Weight is required"),
-      dateOfBirth: yup.string().required("Date of birth is required"),
+      name: yup.string().required("Naam is verplicht"),
+      surname: yup.string().required("Achternaam is verplicht"),
+      height: yup.string().required("Lengte is verplicht"),
+      weight: yup.string().required("Gewicht is verplicht"),
+      dateOfBirth: yup.string().required("Geboortedatum is verplicht"),
     });
     return {
       schema,

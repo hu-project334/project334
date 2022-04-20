@@ -3,7 +3,7 @@
 module.exports = {
   // ...Other Vue config options here, possibly
   pwa: {
-    name: "project",
+    name: "project334",
     themeColor: "#d8222a",
   },
 };

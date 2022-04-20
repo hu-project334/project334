@@ -5,7 +5,7 @@
         <img alt="envelop" src="@/assets/output-onlinepngtools.png" />
       </div>
       <span class="text-container">
-        <span class="text">Log in met email</span>
+        <span class="text">Registreer met email</span>
       </span>
     </div>
   </div>

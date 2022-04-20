@@ -1,27 +1,39 @@
 Register.vue - base vue
 <template>
-<nav-bar-top></nav-bar-top>
+  <nav-bar-top></nav-bar-top>
   <h1>XsensDotSensor Development</h1>
 
   <p><button @click="getData()">connect</button></p>
   <p><button @click="identify()">identify device</button></p>
-  <h2>Battery level: <p id="batterylevel">0</p></h2>
+  <h2>
+    Battery level:
+    <p id="batterylevel">0</p>
+  </h2>
   <p><button @click="startDataExport()">Export data</button></p>
   <p><button @click="streamData()">Start real time streaming</button></p>
   <p><button @click="stopDataStream()">stop real time streaming</button></p>
-  <h2>X: <p id="x-axis"> 0 </p></h2>
-  <h2>Y: <p id="y-axis"> 0 </p></h2>
-  <h2>Z: <p id="z-axis"> 0 </p></h2>
+  <h2>
+    X:
+    <p id="x-axis">0</p>
+  </h2>
+  <h2>
+    Y:
+    <p id="y-axis">0</p>
+  </h2>
+  <h2>
+    Z:
+    <p id="z-axis">0</p>
+  </h2>
 </template>
 
 <script>
-import NavBarTop from '../components/navbars/NavBarTop.vue';
-import { XsensDotSensor } from "/src/libraries/bluetooth.js";
-import { findBluetoothDevices, startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
+import NavBarTop from "../components/navbars/NavBarTop.vue";
+// import { XsensDotSensor } from "/src/libraries/bluetooth.js";
+// import { findBluetoothDevices, startRTStream, stopRTStream } from "/src/libraries/bluetooth.js";
 export default {
   name: "Feed",
   components: {
-    NavBarTop
+    NavBarTop,
   },
   data() {
     return {
@@ -37,14 +49,14 @@ export default {
       XsensDotSensor.blinkDeviceLED();
     },
     startDataExport() {
-      XsensDotSensor.downloadDataToCSV()
+      XsensDotSensor.downloadDataToCSV();
     },
     streamData() {
-      startRTStream()
+      startRTStream();
     },
     stopDataStream() {
-      stopRTStream()
-    }
+      stopRTStream();
+    },
   },
 };
 </script>
