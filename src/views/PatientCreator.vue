@@ -84,11 +84,11 @@ export default {
   },
   data() {
     const schema = yup.object().shape({
-      name: yup.string().required("Name is required"),
-      surname: yup.string().required("Surname is required"),
-      height: yup.string().required("Height is required"),
-      weight: yup.string().required("Weight is required"),
-      dateOfBirth: yup.string().required("Date of birth is required"),
+      name: yup.string().required("Naam is verplicht"),
+      surname: yup.string().required("Achternaam is verplicht"),
+      height: yup.string().required("Lengte is verplicht"),
+      weight: yup.string().required("Gewicht is verplicht"),
+      dateOfBirth: yup.string().required("Geboortedatum is verplicht"),
     });
     return {
       schema,
