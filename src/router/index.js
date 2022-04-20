@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import store from "../store/userStore";
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
@@ -19,7 +19,6 @@ const router = createRouter({
       name: "patients",
       component: () => import("../views/Patients.vue"),
     },
-    // nu mee bezig
     {
       path: "/excersiseHistory/:id",
       name: "excersiseResults",

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="shown">
+  <div class="pwa-prompt" v-if="shown">
     Add app to home screen?
 
     <button @click="installPWA">Install!</button>
@@ -41,3 +41,11 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.pwa-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

@@ -2,10 +2,10 @@
   <div class="g-sign-in-button">
     <div class="content-wrapper">
       <div class="logo-wrapper">
-        <img src="@/assets/output-onlinepngtools.png" />
+        <img alt="envelop" src="@/assets/output-onlinepngtools.png" />
       </div>
       <span class="text-container">
-        <span class="text">Sign in with email</span>
+        <span class="text">Registreer met email</span>
       </span>
     </div>
   </div>

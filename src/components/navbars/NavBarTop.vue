@@ -1,37 +1,18 @@
 <template>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar1">
     <!-- Container wrapper -->
-    <div class="container-fluid">
-      <a class="navbar-brand mt-2 mt-lg-0" href="#">
-        <img
-          src="@/assets/beeldmerk.png"
-          height="40"
-          alt="duo-run Logo"
-          loading="lazy"
-        />
-      </a>
-      <!-- Left links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="#">{{ debt }}</a>
-        </li>
-      </ul>
-      <!-- Left links -->
-      <!-- </div> -->
-      <!-- Collapsible wrapper -->
-
-      <!-- Right elements -->
-      <div class="d-flex align-items-center">
-        <!-- Icon -->
-        <a class="text-reset me-3" href="#">
-          <i class="fas fa-shopping-cart"></i>
-        </a>
-
-        <p class="nav-text userName">
+    <div class="container-fluid1">
+      <img
+        src="@/assets/beeldmerk.png"
+        height="40"
+        alt="hu logo"
+        loading="lazy"
+      />
+      <div class="item-left-side">
+        <p class="userName">
           {{ getDisplayName() }}
         </p>
-
         <div class="dropdown">
           <a
             class="dropdown-toggle d-flex align-items-center hidden-arrow"
@@ -42,7 +23,7 @@
             aria-expanded="false"
           >
             <img
-              :src="getProfileImage"
+              src="src/assets/blackImage.jpg"
               class="rounded-circle"
               height="30"
               alt="profile picture"
@@ -73,52 +54,34 @@
 </template>
 
 <script>
-import { getAuth, signOut } from "firebase/auth";
+import { logOut } from "@/db/firebaseAuth.js";
 
 export default {
   name: "NavBarTop",
-  props: {
-    debt: String,
-  },
+
   data() {
     return {
       user: {},
     };
   },
   computed: {
-    getProfileImage() {
-      console.log(this.$store.getters.getUser.photoURL);
-      return this.$store.getters.getUser.photoURL || "@/assets/blackImage.jpg";
-    },
-  },
-  methods: {
+    // TODO fix profile image
     // getProfileImage() {
-    //   try {
-    //     // console.log(this.$store.getters.getUser);
-
-    //     let photoURL = this.$store.getters.getUser.photoURL;
-    //     photoURL = this.$store.getters.getUser.photoURL;
-    //     if (!photoURL) throw "error";
-    //     return photoURL;
-
-    //     // return photoURL;
-    //     // }
-    //   } catch {
-    //     let image = require("@/assets/" + "blackImage.jpg");
-    //     console.log("catch");
-    //     return image;
+    //   console.log(this.$store.getters.getUser.photoURL);
+    //   if (
+    //     typeof this.$store.getters.getUser.photoURL === "undefined" ||
+    //     this.$store.getters.getUser.photoURL === null
+    //   ) {
+    //     // return new URL(`../../lib/Carousel/assets/${name}`, import.meta.url).href
+    //     return new URL("src/assets/blackImage.jpg", import.meta.url);
+    //   } else {
+    //     return this.$store.getters.getUser.photoURL;
     //   }
     // },
+  },
+  methods: {
     logOut() {
-      const auth = getAuth();
-      signOut(auth)
-        .then(() => {
-          this.$store.dispatch("logOutUser");
-          this.$router.push({ path: "/" });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      logOut();
     },
     getDisplayName() {
       // if registered with mail  -> mail is the displayName
@@ -131,11 +94,39 @@ export default {
       }
     },
   },
-  mounted() {},
 };
 </script>
 
 <style scoped>
+.navbar1 {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.container-fluid1 {
+  width: 100%;
+  padding-right: var(--bs-gutter-x, 0.75rem);
+  padding-left: var(--bs-gutter-x, 0.75rem);
+  margin-right: auto;
+  margin-left: auto;
+}
+.navbar1 > .container-fluid1 {
+  display: flex;
+  flex-wrap: inherit;
+  align-items: center;
+  justify-content: space-between;
+}
+.item-left-side {
+  align-items: center !important;
+  display: flex !important;
+}
+
 /* dropdown for the logout en user settings */
 .dropdown-menu.show {
   right: 20px;
@@ -146,9 +137,6 @@ export default {
 }
 
 /* pages dropdown */
-.navbar-dark .navbar-toggler {
-  border: 2px solid #a19797;
-}
 
 .userName {
   margin-right: 10px;

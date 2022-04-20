@@ -2,10 +2,10 @@
   <div class="g-sign-in-button">
     <div class="content-wrapper">
       <div class="logo-wrapper">
-        <img src="@/assets/g-logo.png" />
+        <img alt="google logo" src="@/assets/g-logo.png" />
       </div>
       <span class="text-container">
-        <span class="text">Sign in with Google</span>
+        <span class="text">Log in met Google</span>
       </span>
     </div>
   </div>
@@ -77,6 +77,6 @@
 }
 
 .text {
-  color: grey;
+  color: #e81717;
 }
 </style>

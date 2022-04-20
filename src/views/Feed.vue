@@ -1,6 +1,6 @@
 Register.vue - base vue
 <template>
-<nav-bar-top></nav-bar-top>
+  <nav-bar-top></nav-bar-top>
   <h1>XsensDotSensor Development</h1>
 
   <p><button @click="getData()">connect</button></p>
@@ -11,9 +11,18 @@ Register.vue - base vue
   <p><button @click="startDataExport()">Export data</button></p>
   <p><button @click="streamData()">Start real time streaming</button></p>
   <p><button @click="stopDataStream()">stop real time streaming</button></p>
-  <h2>X: <p id="x-axis"> 0 </p></h2>
-  <h2>Y: <p id="y-axis"> 0 </p></h2>
-  <h2>Z: <p id="z-axis"> 0 </p></h2>
+  <h2>
+    X:
+    <p id="x-axis">0</p>
+  </h2>
+  <h2>
+    Y:
+    <p id="y-axis">0</p>
+  </h2>
+  <h2>
+    Z:
+    <p id="z-axis">0</p>
+  </h2>
 </template>
 
 <script>
@@ -23,7 +32,7 @@ import { findBluetoothDevices, startRTStream, stopRTStream, syncSensor } from "/
 export default {
   name: "Feed",
   components: {
-    NavBarTop
+    NavBarTop,
   },
   data() {
     return {
@@ -45,17 +54,14 @@ export default {
       XsensDotSensor.blinkDeviceLED()
     },
     startDataExport() {
-      XsensDotSensor.downloadDataToCSV()
+      XsensDotSensor.downloadDataToCSV();
     },
     streamData() {
-      startRTStream()
+      startRTStream();
     },
     stopDataStream() {
-      stopRTStream()
+      stopRTStream();
     },
-    handler: function handler() {
-      stopRTStream()
-    }
   },
 };
 </script>
