@@ -1,6 +1,6 @@
 <template>
   <form class="form">
-    <h3>Register with email</h3>
+    <h3>Registreer met email</h3>
     <Form @submit="handleRegister" :validation-schema="schema">
       <div class="form-group">
         <label for="email">Email</label>
@@ -8,12 +8,12 @@
         <ErrorMessage name="email" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">Wachtwoord</label>
         <Field name="password" type="password" class="form-control" />
         <ErrorMessage name="password" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="passwordConfirmation">Password</label>
+        <label for="passwordConfirmation"> Herhaal wachtwoord</label>
         <Field
           name="passwordConfirmation"
           type="password"
@@ -27,7 +27,7 @@
             v-show="loading"
             class="spinner-border spinner-border-sm"
           ></span>
-          Sign Up
+          Registreer
         </button>
       </div>
     </Form>

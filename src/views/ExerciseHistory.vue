@@ -1,6 +1,6 @@
 <template>
   <NavBarTop></NavBarTop>
-  <h1 class="title">exercises</h1>
+  <h1 class="title">Oefeningen</h1>
 
   <!-- button for creating a new exercise -->
   <link-button
@@ -16,8 +16,8 @@
     <div class="exercise">
       <div class="flex-wrapper-btn-icon">
         <div class="text-holder">
-          <p class="text">Name: {{ exercise.name }}</p>
-          <p class="text">Date: {{ exercise.date }}</p>
+          <p class="text">Naam: {{ exercise.name }}</p>
+          <p class="text">Datum: {{ exercise.date }}</p>
         </div>
         <!-- delete exercise -->
         <icon-button

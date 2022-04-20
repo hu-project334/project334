@@ -1,6 +1,6 @@
 <template>
   <form>
-    <h3>Log in with email</h3>
+    <h3>Log in met email</h3>
     <label for="email">Email adress</label>
     <div class="input_box">
       <input
@@ -10,7 +10,7 @@
         name="emailAdress"
       />
     </div>
-    <label for="password">Password</label>
+    <label for="password">Wachtwoord</label>
     <div class="input_box">
       <input
         v-model="userData.password"
