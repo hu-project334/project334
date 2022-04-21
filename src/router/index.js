@@ -20,11 +20,6 @@ const router = createRouter({
       component: () => import("../views/Patients.vue"),
     },
     {
-      path: "/excersiseHistory/:id",
-      name: "excersiseResults",
-      component: () => import("../views/ExerciseHistory.vue"),
-    },
-    {
       path: "/patient/:id",
       name: "patient",
       component: () => import("../views/Patient.vue"),
