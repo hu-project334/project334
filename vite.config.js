@@ -15,7 +15,7 @@ export default defineConfig({
         "robots.txt",
         "apple-touch-icon.png",
       ],
-      base: "/project334/",
+      base: "/http://334-hogeschool-utrecht-instituut-voor-bewegingsstudies/",
       srcDir: "src",
       filename: "sw.js",
       strategies: "injectManifest",
@@ -51,7 +51,7 @@ export default defineConfig({
     }),
   ],
 
-  base: "/project334/",
+  base: "/http://334-hogeschool-utrecht-instituut-voor-bewegingsstudies/",
 
   resolve: {
     alias: {
