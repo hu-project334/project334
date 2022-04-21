@@ -23,12 +23,13 @@
             aria-expanded="false"
           >
             <img
-              src="src/assets/blackImage.jpg"
+              src="@/assets/blackImage.jpg"
               class="rounded-circle"
               height="30"
               alt="profile picture"
               loading="lazy"
             />
+            @/assets/logo.png
           </a>
           <ul
             class="dropdown-menu dropdown-menu-end"
