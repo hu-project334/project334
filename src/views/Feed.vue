@@ -29,7 +29,7 @@ Register.vue - base vue
 <script>
 import NavBarTop from '../components/navbars/NavBarTop.vue';
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
-import { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor } from "/src/libraries/bluetooth.js";
+import { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor } from "/src/libraries/interface.js";
 export default {
   name: "Feed",
   components: {
