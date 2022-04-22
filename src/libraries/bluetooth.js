@@ -32,17 +32,17 @@ class XsensDot {
         return navigator.bluetooth.requestDevice({
         filters: [{
             manufacturerData: [{
-            companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
+                companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
             }]
         }],
-        optionalServices: [(prefix + serviceEnum.battery_service + suffix),
-                            (prefix + serviceEnum.measurement_service + suffix),
-                            (prefix + serviceEnum.configuration_service + suffix),
-                            (prefix + serviceEnum.message_service + suffix)]
+        optionalServices: [(prefix + serviceEnum.battery_service       + suffix),
+                           (prefix + serviceEnum.measurement_service   + suffix),
+                           (prefix + serviceEnum.configuration_service + suffix),
+                           (prefix + serviceEnum.message_service       + suffix)]
         })
         .then(device => {
-        this.device = device;
-        this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
+            this.device = device;
+            this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
         });
     }
 
@@ -117,6 +117,56 @@ class XsensDot {
     }
 
     /**
+     * writeDeviceName allows you to change the name of the device in the device control characteristic
+     */
+    writeDeviceName(name) {
+        return this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
+        .then(value => {
+
+            if(name.length > 16){
+                return Promise.reject('Name is too long, max 16 characters')
+            }
+
+            // Clear the old name before writing a new one
+            let initialLength = value.getUint8(7, true)
+            for(let i = 0; i < initialLength; i++){
+                value.setUint8(i, 0x0, true)
+            }
+
+            value.setUint8(0, 0x8, true) // Set the write name
+            value.setUint8(7, name.length, true) // Set the new name length
+
+            // Write the new name
+            let charArray = Array.from(name)
+            for(let i = 0; i < name.length; i++) {
+                value.setUint8(8 + i, charArray[i].charCodeAt(0), true)
+            }
+
+            // Write new name to object
+            this.device_name = name
+            this.verbose = false
+            return this.writeCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control, value)
+            .then(() => {
+                this.verbose = true
+                return this.readDeviceName()
+                .then((res) => {
+                    console.log("New Name:")
+                    console.log(res)
+                })
+            })
+        })
+        .catch(error => {
+            if (error == 'Name is too long, max 16 characters'){
+                console.error(error);
+            }
+            else{
+                XsensDotSensor.changeSensorStatus("connection error")
+                console.error(error);
+            }
+        });
+    }
+
+    /**
      * readDeviceName reads the device name from the device_control information, returns it and prints it to the console
      */
     readDeviceName() {
@@ -124,9 +174,10 @@ class XsensDot {
         .then(value => {
             let startOffset = 8;
             let res = '';
-            for (let index = startOffset; index < (16 + startOffset); index++) {
+            for (let index = startOffset; index < (value.getUint8(7, true) + startOffset); index++) {
                 res += String.fromCharCode(value.getUint8(index, true));
             }
+            this.device_name = res
             return res;
         })
         .catch(error => { 
@@ -161,7 +212,11 @@ class XsensDot {
      */
     getInitialBatteryLevel() {
         return this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
-        .then((value) => { return value.getUint8(0, true) })
+        .then((value) => {
+            let batteryLevel = value.getUint8(0, true)
+            this.battery_level = batteryLevel
+            return batteryLevel
+     })
         .catch((error) => { 
             XsensDotSensor.changeSensorStatus("connection error")
             console.error(error); 
@@ -340,8 +395,7 @@ function findBluetoothDevices() {
         return XsensDotSensor.readDeviceName()
         .then((value) => {
             XsensDotSensor.changeSensorStatus("online")
-            XsensDotSensor.name = value
-            console.log(XsensDotSensor.name)
+            console.log(XsensDotSensor.device_name)
         })
     })
     .then(() => { return XsensDotSensor.getInitialBatteryLevel()
@@ -369,6 +423,7 @@ function startRTStream() {
         // parseCompleteEulerData(event)
         let normalize = (val, max, min) => { return (val - min) / (max - min); }
         let value = event.target.value;
+        console.log(value)
 
         // The first element from the event is 4 bits worth of time
         let timestampArr = []
@@ -564,7 +619,6 @@ function syncSensor() {
 }
 
 function getSyncStatusSensor() {
-    
     NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
         let value = event.target.value
         let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
