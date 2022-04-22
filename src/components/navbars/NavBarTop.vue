@@ -29,7 +29,6 @@
               alt="profile picture"
               loading="lazy"
             />
-            @/assets/logo.png
           </a>
           <ul
             class="dropdown-menu dropdown-menu-end"

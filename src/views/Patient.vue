@@ -1,59 +1,64 @@
 <template>
-  <NavBarTop></NavBarTop>
-  <h1 class="title">Patient</h1>
+  <div>
+    <NavBarTop></NavBarTop>
 
-  <div class="container">
-    <b>Patient gegevens</b>
-    <table>
-      <tr>
-        <td class="header_name"><b>Naam </b></td>
-        <td>{{ name }} {{ surName }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>Gewicht </b></td>
-        <td>{{ weight }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>Lengte </b></td>
-        <td class="header_name">{{ heightInM }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>leeftijd </b></td>
-        <td>{{ age }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>Patientnummer</b></td>
-        <td>{{ patientID }}</td>
-      </tr>
-    </table>
-  </div>
+    <h1 class="title">Patient</h1>
 
-  <template v-for="category in categories" :key="category">
-    <div class="category">
-      <div class="text-holder">
-        <p>
-          <b>{{ category.category }} </b>
-        </p>
-        <p>Laatste meting: {{ category.lastMeasure }}</p>
-      </div>
-      <!-- TOO set param for patient -> category -> results -->
-      <button
-        class="see-results"
-        @click="goToExerciseResults(category.category)"
-      >
-        Bekijk
-      </button>
+    <div class="container">
+      <b>Patient gegevens</b>
+      <table>
+        <tr>
+          <td class="header_name"><b>Naam </b></td>
+          <td>{{ name }} {{ surName }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Gewicht </b></td>
+          <td>{{ weight }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Lengte </b></td>
+          <td class="header_name">{{ heightInM }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>leeftijd </b></td>
+          <td>{{ age }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Patientnummer</b></td>
+          <td>{{ patientID }}</td>
+        </tr>
+      </table>
     </div>
-  </template>
 
-  <button class="deletePatientBtn" @click="deletePatient(patientID)">
-    <b>Verwijder patient</b>
-  </button>
+    <template v-for="category in categories" :key="category">
+      <div class="category">
+        <div class="text-holder">
+          <p>
+            <b>{{ category.category }} </b>
+          </p>
+          <p>Laatste meting: {{ category.lastMeasure }}</p>
+        </div>
+        <!-- TOO set param for patient -> category -> results -->
+        <button
+          class="see-results"
+          @click="goToExerciseResults(category.category)"
+        >
+          Bekijk
+        </button>
+      </div>
+    </template>
 
-  <footer>
-    <button class="backBtn" @click="goBackToPatientList()"><b>Terug</b></button>
-    <button class="addCategory"><b>Categorie toevoegen</b></button>
-  </footer>
+    <button class="deletePatientBtn" @click="deletePatient(patientID)">
+      <b>Verwijder patient</b>
+    </button>
+
+    <footer>
+      <button class="backBtn" @click="goBackToPatientList()">
+        <b>Terug</b>
+      </button>
+      <button class="addCategory"><b>Categorie toevoegen</b></button>
+    </footer>
+  </div>
 </template>
 
 <script>
@@ -137,7 +142,6 @@ p {
 /* patient data */
 .container {
   margin-top: 1%;
-  height: 50%;
   background: white;
   width: 90%;
   border-radius: 15px;
@@ -211,8 +215,10 @@ tr td {
 /* footer */
 
 footer {
-  position: sticky;
-  bottom: 0;
+  /* position: sticky; */
+
+  top: 400px;
+
   background-color: #f8f9fa;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
