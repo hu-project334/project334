@@ -10,14 +10,14 @@
     "comparedToNorm": 98
   },
   {
-    "date": "20-03-22",
-    "MovementInDegree": 100,
-    "comparedToNorm": 83
-  },
-  {
     "date": "20-04-22",
     "MovementInDegree": 30,
     "comparedToNorm": 50
+  },
+  {
+    "date": "20-03-22",
+    "MovementInDegree": 100,
+    "comparedToNorm": 83
   },
   {
     "date": "20-04-22",
@@ -50,13 +50,13 @@
     "comparedToNorm": 98
   },
   {
-    "date": "20-03-22",
-    "MovementInDegree": 100,
-    "comparedToNorm": 83
-  },
-  {
     "date": "20-04-22",
     "MovementInDegree": 30,
     "comparedToNorm": 50
+  },
+  {
+    "date": "20-03-22",
+    "MovementInDegree": 100,
+    "comparedToNorm": 83
   }
 ]
