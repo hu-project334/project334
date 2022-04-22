@@ -28,7 +28,7 @@ Register.vue - base vue
 <script>
 import NavBarTop from '../components/navbars/NavBarTop.vue';
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
-import { findBluetoothDevices, startRTStream, stopRTStream, syncSensor } from "/src/libraries/bluetooth.js";
+import { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor } from "/src/libraries/bluetooth.js";
 export default {
   name: "Feed",
   components: {
@@ -48,7 +48,7 @@ export default {
       findBluetoothDevices()
     },
     sync() {
-      syncSensor()
+      getSyncStatusSensor()
     },
     identify() {
       XsensDotSensor.blinkDeviceLED()

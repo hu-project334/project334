@@ -532,9 +532,49 @@ function syncSensor() {
         let value = event.target.value
         let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
         console.log(`Device is: ${status}`)
-        if (status == msgAckEnum.synced) {
+    })
+
+    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    .then(() => { // Start sync
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 6, syncMsgEnum.startSync, [0x4E,0x02,0x00,0xCD,0x22,0xD4])
+        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    })
+    .then(() => {
+        XsensDotSensor.device.gatt.disconnect()
+        XsensDotSensor.changeSensorStatus("synchronizing")
+
+        setTimeout(() => {
+            console.log("Attempting to connect to device")
+            XsensDotSensor.device.gatt.connect()
+            .then(() => {
+                console.log("Connection re-established")
+                XsensDotSensor.changeSensorStatus("online")
+                XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+                .then(() => {
+                    let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
+                    return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+                })
+                .catch(err => { console.error(err); })
+            })
+        }, 14000) // End of setTimeout
+
+        return
+        })
+    .catch(err => { console.error(err); })
+}
+
+function getSyncStatusSensor() {
+    
+    NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
+        let value = event.target.value
+        let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
+        console.log(`Device is: ${status}`)
+        if (value.getUint8(3, false) == msgAckEnum.synced) {
             let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.stopSync, []);
             XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+            .then(() => {console.log("Sync stopped")})
+        } else if (value.getUint8(3, false) == msgAckEnum['un-synced']) {
+            syncSensor()
         }
     })
 
@@ -573,4 +613,4 @@ function render3Dsensor() {
 
 // Exports
 export { XsensDotSensor };
-export { findBluetoothDevices, startRTStream, stopRTStream, syncSensor };
+export { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor };
