@@ -4,9 +4,7 @@ import router from "./router";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import store from "./store/userStore.js";
-// charts
 import VueChartkick from "vue-chartkick";
-import "chartkick/chart.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",
