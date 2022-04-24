@@ -1,17 +1,19 @@
 <template>
   <!-- x,y -->
-  <line-chart
-    :data="dataProp"
+  <!-- <line-chart
+    :data="{ '2021-01-01': 11, '2021-01-02': 6 }"
     xtitle="data"
     ytitle="Bewegingspercentage"
-  ></line-chart>
+  ></line-chart> -->
+
+  <line-chart :data="{ '2021-01-01': 11, '2021-01-02': 6 }"></line-chart>
 </template>
 
 <script>
 export default {
   name: "MovementPercentageInTime",
   props: {
-    dataProp: Array,
+    dataProp: Object,
   },
   data() {
     return {
@@ -19,7 +21,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.dataProp);
+    // console.log(this.dataProp);
   },
 };
 </script>
