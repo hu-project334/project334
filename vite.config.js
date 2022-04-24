@@ -16,7 +16,7 @@ export default defineConfig({
         "robots.txt",
         "apple-touch-icon.png",
       ],
-      base: "/334-hogeschool-utrecht-instituut-voor-bewegingsstudies/",
+      base: "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/",
       srcDir: "src",
       filename: "sw.js",
       strategies: "injectManifest",
@@ -25,7 +25,6 @@ export default defineConfig({
         short_name: "P334",
         description: "Sensortechnologie voor de fysiotherapuit",
         theme_color: "#ffffff",
-        start_url: "/334-hogeschool-utrecht-instituut-voor-bewegingsstudies/",
         display: "standalone",
         background_color: "#ffffff",
 
@@ -56,7 +55,7 @@ export default defineConfig({
     }),
   ],
 
-  base: "/334-hogeschool-utrecht-instituut-voor-bewegingsstudies/",
+  base: "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/",
 
   resolve: {
     alias: {

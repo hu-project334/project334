@@ -8,12 +8,12 @@
 </template>
 
 <script>
-// import PWAPrompt from "@/components/PWAPrompt.vue";
+import PWAPrompt from "@/components/PWAPrompt.vue";
 // import ReloadPWA from "@/components/ReloadPWA.vue";
 export default {
   name: "App",
   components: {
-    // PWAPrompt,
+    PWAPrompt,
     // ReloadPWA,
   },
 };
