@@ -26,4 +26,4 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 // Initialize Firebase
 initializeApp(firebaseConfig);
 getFirestore();
-createApp(App).use(router).use(store).app.use(VueChartkick).mount("#app");
+createApp(App).use(router).use(VueChartkick).use(store).mount("#app");
