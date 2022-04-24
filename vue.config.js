@@ -2,10 +2,7 @@
 
 module.exports = {
   // ...Other Vue config options here, possibly
-  publicPath:
-    process.env.NODE_ENV === "production"
-      ? "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/"
-      : "/",
+  publicPath: process.env.NODE_ENV === "production" ? "/project334/" : "/",
   pwa: {
     name: "project",
     themeColor: "#d8222a",
