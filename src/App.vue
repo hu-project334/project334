@@ -1,20 +1,20 @@
 <template>
-  <reload-pwa></reload-pwa>
+  <!-- <reload-pwa></reload-pwa> -->
 
   <div id="app">
     <router-view />
-    <PWAPrompt></PWAPrompt>
+    <!-- <PWAPrompt></PWAPrompt> -->
   </div>
 </template>
 
 <script>
-import PWAPrompt from "./components/PWAPrompt.vue";
-import ReloadPWA from "./components/ReloadPWA.vue";
+// import PWAPrompt from "./components/PWAPrompt.vue";
+// import ReloadPWA from "./components/ReloadPWA.vue";
 export default {
   name: "App",
   components: {
-    PWAPrompt,
-    ReloadPWA,
+    // PWAPrompt,
+    // ReloadPWA,
   },
 };
 </script>
