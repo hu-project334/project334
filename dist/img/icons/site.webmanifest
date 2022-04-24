@@ -1,6 +1,7 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "Project334",
+  "short_name": "Project334",
+  "start_url": ".",
   "icons": [
     {
       "src": "/pwa-192x192.png",

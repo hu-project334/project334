@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
+      mode: "development",
       includeAssets: [
         "favicon.svg",
         "favicon.ico",
@@ -24,6 +25,10 @@ export default defineConfig({
         short_name: "P334",
         description: "Sensortechnologie voor de fysiotherapuit",
         theme_color: "#ffffff",
+        start_url: "/334-hogeschool-utrecht-instituut-voor-bewegingsstudies/",
+        display: "standalone",
+        background_color: "#ffffff",
+
         icons: [
           {
             src: "img/icons/pwa-192x192.png",
