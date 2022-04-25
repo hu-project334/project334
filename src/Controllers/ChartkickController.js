@@ -4,18 +4,19 @@
 
 // different days work because they have different keys
 
-// [[174.0, 80.0], [176.5, 82.3]]
-
 export function ReformatArrayList(arraylistWithObjects) {
   let newResults = {};
-  console.log(arraylistWithObjects);
+  // console.log(arraylistWithObjects);
   let cloneResults = arraylistWithObjects;
   cloneResults.map(function (cloneResults) {
     newResults[cloneResults.date] = cloneResults.comparedToNorm;
     console.log(newResults);
   });
-  console.log(newResults);
+  // console.log(newResults);
   return newResults;
 }
+
+// from : [ {"04-04-2022": 45}  ,{"04-04-2022": 45}, {"04-04-2022": 45}  ]
+// function DateInRightOrder(arraylistWithObjects) {}
 
 // calculate average movement function
