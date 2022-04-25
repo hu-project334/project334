@@ -4,6 +4,8 @@ import router from "./router";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import store from "./store/userStore.js";
+import VueChartkick from "vue-chartkick";
+import "chartkick/chart.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",
@@ -25,4 +27,4 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 // Initialize Firebase
 initializeApp(firebaseConfig);
 getFirestore();
-createApp(App).use(router).use(store).mount("#app");
+createApp(App).use(router).use(VueChartkick).use(store).mount("#app");
