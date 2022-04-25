@@ -48,7 +48,7 @@
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import MovementPercentageInTime from "../components/tiles/charts/MovementPercentageInTime.vue";
 import results from "../db/results.json";
-import { ReformatArrayList } from "../Controllers/ReformatArrayList.js";
+import { ReformatArrayList } from "../Controllers/ChartkickController.js";
 export default {
   name: "Exercise results",
   components: {
