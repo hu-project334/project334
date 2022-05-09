@@ -32,17 +32,17 @@ class XsensDot {
         return navigator.bluetooth.requestDevice({
         filters: [{
             manufacturerData: [{
-            companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
+                companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
             }]
         }],
-        optionalServices: [(prefix + serviceEnum.battery_service + suffix),
-                            (prefix + serviceEnum.measurement_service + suffix),
-                            (prefix + serviceEnum.configuration_service + suffix),
-                            (prefix + serviceEnum.message_service + suffix)]
+        optionalServices: [(prefix + serviceEnum.battery_service       + suffix),
+                           (prefix + serviceEnum.measurement_service   + suffix),
+                           (prefix + serviceEnum.configuration_service + suffix),
+                           (prefix + serviceEnum.message_service       + suffix)]
         })
         .then(device => {
-        this.device = device;
-        this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
+            this.device = device;
+            this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
         });
     }
 
@@ -117,6 +117,56 @@ class XsensDot {
     }
 
     /**
+     * writeDeviceName allows you to change the name of the device in the device control characteristic
+     */
+    writeDeviceName(name) {
+        return this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
+        .then(value => {
+
+            if(name.length > 16){
+                return Promise.reject('Name is too long, max 16 characters')
+            }
+
+            // Clear the old name before writing a new one
+            let initialLength = value.getUint8(7, true)
+            for(let i = 0; i < initialLength; i++){
+                value.setUint8(i, 0x0, true)
+            }
+
+            value.setUint8(0, 0x8, true) // Set the write name
+            value.setUint8(7, name.length, true) // Set the new name length
+
+            // Write the new name
+            let charArray = Array.from(name)
+            for(let i = 0; i < name.length; i++) {
+                value.setUint8(8 + i, charArray[i].charCodeAt(0), true)
+            }
+
+            // Write new name to object
+            this.device_name = name
+            this.verbose = false
+            return this.writeCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control, value)
+            .then(() => {
+                this.verbose = true
+                return this.readDeviceName()
+                .then((res) => {
+                    console.log("New Name:")
+                    console.log(res)
+                })
+            })
+        })
+        .catch(error => {
+            if (error == 'Name is too long, max 16 characters'){
+                console.error(error);
+            }
+            else{
+                XsensDotSensor.changeSensorStatus("connection error")
+                console.error(error);
+            }
+        });
+    }
+
+    /**
      * readDeviceName reads the device name from the device_control information, returns it and prints it to the console
      */
     readDeviceName() {
@@ -124,9 +174,10 @@ class XsensDot {
         .then(value => {
             let startOffset = 8;
             let res = '';
-            for (let index = startOffset; index < (16 + startOffset); index++) {
+            for (let index = startOffset; index < (value.getUint8(7, true) + startOffset); index++) {
                 res += String.fromCharCode(value.getUint8(index, true));
             }
+            this.device_name = res
             return res;
         })
         .catch(error => { 
@@ -161,7 +212,11 @@ class XsensDot {
      */
     getInitialBatteryLevel() {
         return this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
-        .then((value) => { return value.getUint8(0, true) })
+        .then((value) => {
+            let batteryLevel = value.getUint8(0, true)
+            this.battery_level = batteryLevel
+            return batteryLevel
+     })
         .catch((error) => { 
             XsensDotSensor.changeSensorStatus("connection error")
             console.error(error); 
@@ -259,318 +314,5 @@ class XsensDot {
     }
 }
 
-// =========================================================================
-//                           NOTIFICATION HANDLER
-// =========================================================================
-
-
-class notification_handler {
-
-    /**
-     * genericNotHandler is the default function which is called when a notication comes in
-     */
-    genericNotHandler = function (event) {
-        const value = event.target.value
-        console.log(`New notification message: ${getKeyByValue(notificationEnum, value.getUint8(2, true))}`)
-        console.log(value)
-    }
-
-    /**
-     * The constructor adds all possible notifications to its own member variables
-     * and assigns the default notification handler
-     */
-    constructor(sync = false) {
-        if (sync) {this.enum = syncNotEnum} else {this.enum = notificationEnum}
-        Object.keys(this.enum).map(key => { notification_handler[key] = this.genericNotHandler })
-    }
-
-    /**
-     * The setCallback function assigns a new callback to a notification type
-     *
-     */
-    setCallback(notification_type, callback_function){
-        notification_handler[getKeyByValue(notificationEnum, notification_type)] = callback_function
-    }
-
-    /**
-     * The handle notification function calls the function assigned to the notification
-     */
-    handleNotification(event) {
-        const value = event.target.value
-        let notification_type = getKeyByValue(notificationEnum, value.getUint8(2, true))
-        return notification_handler[notification_type](event)
-    }
-
-}
-
-// =========================================================================
-//                            HELPER FUNCTIONS
-// =========================================================================
-
-function parseIEEE754(singleByteDataView){
-
-    let axisString = ""
-    for (let i = 0; i < 4; i++) {
-        let tmpValue = (singleByteDataView.getUint8(i, true) >>> 0).toString(2)
-        axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
-    }
-
-    let a = parseInt(axisString.charAt(0), 2)
-    let b = parseInt(axisString.substring(1,9), 2)
-    let c = parseInt("1"+axisString.substring(9), 2)
-
-    let result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
-    // if (result > 180 || result < -180){
-        // result = 0
-    // }
-    return result
-}
-
-// =========================================================================
-//                            PUBLIC FUNCTIONS
-// =========================================================================
-
 let XsensDotSensor = new XsensDot();
-let NotificationHandler = new notification_handler();
-
-function findBluetoothDevices() {
-    XsensDotSensor.request()
-    .then(() => { return XsensDotSensor.connect()})
-    .then(() => { 
-        return XsensDotSensor.readDeviceName()
-        .then((value) => {
-            XsensDotSensor.changeSensorStatus("online")
-            XsensDotSensor.name = value
-            console.log(XsensDotSensor.name)
-        })
-    })
-    .then(() => { return XsensDotSensor.getInitialBatteryLevel()
-        .then((value) => {
-            XsensDotSensor.battery_level = value;
-            console.log("Battery Level: " + XsensDotSensor.battery_level)
-        })
-    })
-    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(XsensDotSensor.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
-}
-
-// calculate angle between two quaternions
-function angleQuaternion(start, end) {
-    let z = start.multiply(end.conjugate())
-    let angleDifference = new THREE.Euler().setFromQuaternion(z)
-    return [Math.abs(angleDifference.x * 57.2957795).toFixed(0), Math.abs(angleDifference.y * 57.2957795).toFixed(0), Math.abs(angleDifference.z * 57.2957795).toFixed(0)]
-}
-
-function startRTStream() {
-    render3Dsensor()
-    console.log("Real time streaming started")
-    XsensDotSensor.rawTime = 0 // Clear the rawTime
-
-    let handlePayload = (event) => {
-        // parseCompleteEulerData(event)
-        let normalize = (val, max, min) => { return (val - min) / (max - min); }
-        let value = event.target.value;
-
-        // The first element from the event is 4 bits worth of time
-        let timestampArr = []
-        for (var i = 0; i < 4; i++){
-            timestampArr.push(value.getUint8(i, true))
-        }
-        var result = ((timestampArr[timestampArr.length - 24]) |
-                        (timestampArr[timestampArr.length - 2] << 16) |
-                        (timestampArr[timestampArr.length - 3] << 8) |
-                        (timestampArr[timestampArr.length - 4] << 1));
-
-        result = result / 1000
-        XsensDotSensor.timeArr.push(result)
-        if(XsensDotSensor.timeArr.length > 1){
-            if(XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1] > XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2]){
-                XsensDotSensor.rawTime += XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1] - XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2]
-            } else {
-                XsensDotSensor.rawTime += XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2] - XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1]
-            }
-        }
-
-        // Parse quaternion values
-        // Parse w
-        let offset = 4
-        const buffer = new ArrayBuffer(4);
-        let w = new DataView(buffer);
-        for (let i = 0; i < 4; i++) {
-            w.setInt8(i, value.getUint8(i + offset, true))
-        }
-        w = normalize(parseIEEE754(w), 1, 0)
-        offset += 4
-
-        // Parse x
-        const buffer_x = new ArrayBuffer(4);
-        let x = new DataView(buffer_x);
-        for (let i = 0; i < 4; i++) {
-            x.setInt8(i, value.getUint8(i + offset, true))
-        }
-        x = normalize(parseIEEE754(x), 1, 0)
-        offset += 4
-
-        // Parse y
-        const buffer_y = new ArrayBuffer(4);
-        let y = new DataView(buffer_y);
-        for (let i = 0; i < 4; i++) {
-            y.setInt8(i, value.getUint8(i + offset, true))
-        }
-        y = normalize(parseIEEE754(y), 1, 0)
-        offset += 4
-
-        // Parse z
-        const buffer_z = new ArrayBuffer(4);
-        let z = new DataView(buffer_z);
-        for (let i = 0; i < 4; i++) {
-            z.setInt8(i, value.getUint8(i + offset, true))
-        }
-        z = normalize(parseIEEE754(z), 1, 0)
-
-        // Filter data and store it in the member variables
-        let prevQuaternion = XsensDotSensor.quaternion
-        XsensDotSensor.quaternion = new THREE.Quaternion(x, y, z, w)
-        let prevRotation = XsensDotSensor.rotation
-        XsensDotSensor.rotation = new THREE.Euler().setFromQuaternion(XsensDotSensor.quaternion, "XYZ")
-        if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
-            XsensDotSensor.rotation.x = prevRotation.x
-            XsensDotSensor.quaternion = prevQuaternion
-
-        }
-        if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
-            XsensDotSensor.rotation.y = prevRotation.y
-            XsensDotSensor.quaternion = prevQuaternion
-
-        }
-        if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
-            XsensDotSensor.rotation.z = prevRotation.z
-            XsensDotSensor.quaternion = prevQuaternion
-
-        }
-        let tmpArr = [XsensDotSensor.quaternion,
-                     (XsensDotSensor.rotation.x*57.2957795).toFixed(2),
-                     (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
-                     (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
-                     (XsensDotSensor.rawTime / 1000).toFixed(2)]
-        XsensDotSensor.data.push(tmpArr)
-
-        // Display the data, in the future this will be done in a different way
-        let element = document.getElementById("x-axis")
-        element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
-        element = document.getElementById("y-axis")
-        element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
-        element = document.getElementById("z-axis")
-        element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
-    }
-
-    // Set notifications for short payload
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
-    .then(() => { // Set the normal message notification handler
-        return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    })
-    .then(() => {
-        XsensDotSensor.data = []
-        XsensDotSensor.timeArr = []
-        XsensDotSensor.rawTime = 0
-        let buffer = new ArrayBuffer(3)
-        let dataViewObject = new DataView(buffer)
-        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
-        dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
-        XsensDotSensor.verbose = false
-        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
-        return
-    })
-    .catch(error => { console.error(error);})
-}
-
-function stopRTStream() {
-    document.body.removeChild(document.body.lastChild)
-    console.log("Real time streaming stopped")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let buffer = new ArrayBuffer(3)
-        let dataViewObject = new DataView(buffer)
-        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
-        dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
-        XsensDotSensor.verbose = false
-        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
-        return
-    })
-    .then(() => {
-        // console.log("Euler data difference y:")
-        // console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
-        console.log(`First quaternion: `)
-        let firstIndex
-        for (let i = 0; i < XsensDotSensor.data.length; i++) {
-            if (XsensDotSensor.data[i][0].x != 0 && XsensDotSensor.data[i][0].y != 0 && XsensDotSensor.data[i][0].z != 0 && XsensDotSensor.data[i][0].w != 0) {
-                firstIndex = i
-                break
-            }
-        }
-        console.log(XsensDotSensor.data[firstIndex][0])
-        console.log(`last quaternion`)
-        console.log(XsensDotSensor.data[XsensDotSensor.data.length - 1][0])
-        console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0])}`)
-        console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
-
-        // Reset member variables
-        XsensDotSensor.data = []
-        XsensDotSensor.timeArr = []
-        XsensDotSensor.rawTime = 0
-
-        return
-    })
-    .catch(error => { console.error(error);})
-}
-
-function syncSensor() {
-    console.log("Synchronization started")
-
-    NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
-        let value = event.target.value
-        let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
-        console.log(`Device is: ${status}`)
-        if (status == msgAckEnum.synced) {
-            let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.stopSync, []);
-            XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-        }
-    })
-
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .catch(err => { console.error(err); })
-}
-
-// 3D representation of sensor
-function render3Dsensor() {
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-
-    var renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-
-    var geometry = new THREE.BoxGeometry( 1.5, 1, 0.5 );
-    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    var cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
-
-    camera.position.z = 3;
-
-    var animate = function () {
-        requestAnimationFrame( animate );
-        cube.setRotationFromQuaternion(XsensDotSensor.quaternion);
-        renderer.render( scene, camera );
-    };
-
-    animate();
-}
-
-// Exports
 export { XsensDotSensor };
-export { findBluetoothDevices, startRTStream, stopRTStream, syncSensor };
