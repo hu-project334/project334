@@ -14,9 +14,7 @@ export default {
     dataProp: Array,
   },
   data() {
-    return {
-      //   data1: { "2021-01-01": 10, "2021-01-02": 6 },
-    };
+    return {};
   },
   mounted() {
     console.log(this.dataProp);
