@@ -59,7 +59,10 @@ function findBluetoothDevices() {
 function startRTStream() {
     render3Dsensor()
     console.log("Real time streaming started")
-    XsensDotSensor.rawTime = 0 // Clear the rawTime
+    // Reset member variables
+    XsensDotSensor.data = []
+    XsensDotSensor.timeArr = []
+    XsensDotSensor.rawTime = 0
 
     let handlePayload = (event) => {
         // parseCompleteEulerData(event)
@@ -144,9 +147,7 @@ function startRTStream() {
 
         }
         let tmpArr = [XsensDotSensor.quaternion,
-                     (XsensDotSensor.rotation.x*57.2957795).toFixed(2),
-                     (XsensDotSensor.rotation.y*57.2957795).toFixed(2),
-                     (XsensDotSensor.rotation.z*57.2957795).toFixed(2),
+                      XsensDotSensor.rotation,
                      (XsensDotSensor.rawTime / 1000).toFixed(2)]
         XsensDotSensor.data.push(tmpArr)
 
@@ -211,14 +212,12 @@ function stopRTStream() {
         console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0])}`)
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
 
-        // Reset member variables
-        XsensDotSensor.data = []
-        XsensDotSensor.timeArr = []
-        XsensDotSensor.rawTime = 0
+        console.log(XsensDotSensor.data.length)
 
         return
     })
     .catch(error => { console.error(error);})
+
 }
 
 function syncSensor() {

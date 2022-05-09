@@ -282,12 +282,27 @@ class XsensDot {
     downloadDataToCSV(){
         let csvContent = "data:text/csv;charset=utf-8,"
 
-        let downloadArray = [['X','      Y','      Z', '      T']].concat(this.data)
+        let downloadArray = [['Qx', 'Qy', 'Qz', 'Qw', 'R', 'P', 'Y', 'T']].concat(this.data)
 
+        // Go through all data points
         downloadArray.forEach(function(rowArray) {
-            let row = rowArray.join(", ");
+            let tmpArr = []
+            // Each data point has a quaternion object, euler object and time stamp.
+            // The floats have to be extracted from the objects
+            for(let i = 0; i < rowArray.length; i++) {
+                if (rowArray[i].constructor.name === 'Quaternion'){
+                    tmpArr.push(rowArray[i].x.toString(), rowArray[i].y.toString(), rowArray[i].z.toString(), rowArray[i].w.toString())
+                } else if (rowArray[i].constructor.name === 'Euler'){
+                    tmpArr.push(rowArray[i].x.toString(), rowArray[i].y.toString(), rowArray[i].z.toString())
+                } else {
+                    tmpArr.push(rowArray[i].toString())
+                }
+            }
+            let row = tmpArr.join(", ");
+            tmpArr = [];
             csvContent += row + "\r\n";
         });
+        console.log(`Amount of data points: ${downloadArray.length}, amount of columns for each data point: ${downloadArray[0].length}`)
 
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
