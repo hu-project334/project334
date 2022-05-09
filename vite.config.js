@@ -15,7 +15,7 @@ export default defineConfig({
         "robots.txt",
         "apple-touch-icon.png",
       ],
-      base: "/project334/",
+      base: "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/",
       srcDir: "src",
       filename: "sw.js",
       strategies: "injectManifest",
@@ -51,7 +51,7 @@ export default defineConfig({
     }),
   ],
 
-  base: "/project334/",
+  base: "/334-HOGESCHOOL-UTRECHT-INSTITUUT-VOOR-BEWEGINGSSTUDIES/",
 
   resolve: {
     alias: {
