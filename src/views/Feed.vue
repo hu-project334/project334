@@ -55,7 +55,7 @@ export default {
       findBluetoothDevices();
     },
     sync() {
-      syncSensor();
+      getSyncStatusSensor();
     },
     identify() {
       XsensDotSensor.blinkDeviceLED();
