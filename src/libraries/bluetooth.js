@@ -202,7 +202,7 @@ class XsensDot {
         })
         .then(() => { console.log('Identifying sensor'); })
         .catch(error => { 
-            XsensDotSensor.changeSensorStatus("connection error")
+            this.changeSensorStatus("connection error")
             console.error(error); 
         });
     }
@@ -218,7 +218,7 @@ class XsensDot {
             return batteryLevel
      })
         .catch((error) => { 
-            XsensDotSensor.changeSensorStatus("connection error")
+            this.changeSensorStatus("connection error")
             console.error(error); 
         });
     }
@@ -282,7 +282,7 @@ class XsensDot {
     downloadDataToCSV(){
         let csvContent = "data:text/csv;charset=utf-8,"
 
-        let downloadArray = [['Qx', 'Qy', 'Qz', 'Qw', 'R', 'P', 'Y', 'T']].concat(this.data)
+        let downloadArray = [['Qx', 'Qy', 'Qz', 'Qw', 'E', 'N', 'U', 'T']].concat(this.data)
 
         // Go through all data points
         downloadArray.forEach(function(rowArray) {
@@ -313,6 +313,12 @@ class XsensDot {
         link.click();
     }
 
+    changeBatteryLevel(batteryLevel) {
+        this.battery_level = batteryLevel;
+        let element = document.getElementById("batterylevel")
+        element.innerHTML = batteryLevel
+    }
+
     /**
     * handleBatteryChanged is executed when the battery characteristic changes
     */
@@ -320,7 +326,7 @@ class XsensDot {
         const value = event.target.value
         this.battery_level = value.getUint8(0, true)
         let element = document.getElementById("batterylevel")
-        element.innerHTML = this.battery_level
+        element.innerHTML = this.batteryLevel
     }
 
     changeSensorStatus(status) {

@@ -28,7 +28,7 @@ function parseIEEE754(singleByteDataView){
 function angleQuaternion(start, end) {
     let z = start.multiply(end.conjugate())
     let angleDifference = new THREE.Euler().setFromQuaternion(z)
-    return [Math.abs(angleDifference.x * 57.2957795).toFixed(0), Math.abs(angleDifference.y * 57.2957795).toFixed(0), Math.abs(angleDifference.z * 57.2957795).toFixed(0)]
+    return [(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)]
 }
 
 // =========================================================================
@@ -50,10 +50,13 @@ function findBluetoothDevices() {
     .then(() => { return XsensDotSensor.getInitialBatteryLevel()
         .then((value) => {
             XsensDotSensor.battery_level = value;
+            XsensDotSensor.changeBatteryLevel(value)
             console.log("Battery Level: " + XsensDotSensor.battery_level)
         })
     })
-    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(XsensDotSensor.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level) });
+    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(
+        (event) => {XsensDotSensor.changeBatteryLevel(event.target.value.getUint8(0, true))},
+        serviceEnum.battery_service, serviceEnum.battery_level) });
 }
 
 function startRTStream() {
@@ -207,12 +210,14 @@ function stopRTStream() {
             }
         }
         console.log(XsensDotSensor.data[firstIndex][0])
+        let euler = XsensDotSensor.data[firstIndex][1]
+        console.log(`X: ${(euler.x * 57.2957795).toFixed(2)} Y: ${(euler.y * 57.2957795).toFixed(2)} Z: ${(euler.z * 57.2957795).toFixed(2)}`)
         console.log(`last quaternion`)
         console.log(XsensDotSensor.data[XsensDotSensor.data.length - 1][0])
+        euler = XsensDotSensor.data[XsensDotSensor.data.length - 1][1]
+        console.log(`X: ${(euler.x * 57.2957795).toFixed(2)} Y: ${(euler.y * 57.2957795).toFixed(2)} Z: ${(euler.z * 57.2957795).toFixed(2)}`)
         console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0])}`)
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
-
-        console.log(XsensDotSensor.data.length)
 
         return
     })
@@ -299,6 +304,8 @@ function render3Dsensor() {
     var animate = function () {
         requestAnimationFrame( animate );
         cube.setRotationFromQuaternion(XsensDotSensor.quaternion);
+        // console.log(`${cube.quaternion.x} ${cube.quaternion.y} ${cube.quaternion.z}  ${cube.quaternion.w}`)
+        // console.log(`${XsensDotSensor.quaternion.x} ${XsensDotSensor.quaternion.y} ${XsensDotSensor.quaternion.z}  ${XsensDotSensor.quaternion.w}`)
         renderer.render( scene, camera );
     };
 
