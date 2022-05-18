@@ -2,13 +2,14 @@
 
 export function ReformatArrayList(arraylistWithObjects) {
   let newResults = {};
-  // console.log(arraylistWithObjects);
   let cloneResults = arraylistWithObjects;
   cloneResults.map(function (cloneResults) {
-    newResults[cloneResults.date] = cloneResults.comparedToNorm;
-    console.log(newResults);
+    let splitDate = String(cloneResults.date).split('-')
+    let newDate = splitDate[1] + "-" + splitDate[0] + "-" + splitDate[2]
+    newResults[newDate] = cloneResults.comparedToNorm;
   });
-  // console.log(newResults);
+  
+  console.log(newResults)
   return newResults;
 }
 

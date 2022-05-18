@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Alexander",
-    "surname": "de graaff",
+    "surName": "de Graaff",
     "weight": 70,
     "dateOfBirth": "22-06-2002",
     "heightInM": 1.82,
@@ -11,7 +11,7 @@
   {
     "id": 2,
     "name": "Milo",
-    "surname": "Belien",
+    "surName": "Belien",
     "weight": 70,
     "dateOfBirth": "28-09-2002",
     "heightInM": 1.83,
@@ -20,7 +20,7 @@
   {
     "id": 3,
     "name": "Jayh",
-    "surname": "de Cuba",
+    "surName": "de Cuba",
     "weight": 65,
     "dateOfBirth": "24-11-1998",
     "heightInM": 1.71,
@@ -29,7 +29,7 @@
   {
     "id": 4,
     "name": "Twan",
-    "surname": "van de Bor",
+    "surName": "van de Bor",
     "weight": 65,
     "dateOfBirth": "28-09-1997",
     "heightInM": 1.78,
@@ -38,7 +38,7 @@
   {
     "id": 5,
     "name": "Twan",
-    "surname": "van de Bor",
+    "surName": "van de Bor",
     "weight": 65,
     "dateOfBirth": "28-09-1997",
     "heightInM": 1.78,
@@ -47,7 +47,7 @@
   {
     "id": 6,
     "name": "Jayh",
-    "surname": "de Cuba",
+    "surName": "de Cuba",
     "weight": 65,
     "dateOfBirth": "24-11-1998",
     "heightInM": 1.71,

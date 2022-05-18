@@ -24,7 +24,7 @@
           name="surname"
           placeholder="achternaam"
         />
-        <ErrorMessage name="surname"></ErrorMessage>
+        <ErrorMessage name="name"></ErrorMessage>
       </div>
     </div>
     <div class="row mb-3">
@@ -47,6 +47,7 @@
           class="form-control"
           name="weight"
           placeholder="Gewicht in kg"
+          step="0.01"
         />
         <ErrorMessage name="weight"></ErrorMessage>
       </div>
@@ -65,7 +66,7 @@
         <ErrorMessage name="dateOfBirth"></ErrorMessage>
       </div>
     </div>
-    <button>Maak patient</button>
+    <button class="addButton">Voeg patiënt toe</button>
   </Form>
 </template>
 
@@ -84,11 +85,11 @@ export default {
   },
   data() {
     const schema = yup.object().shape({
-      name: yup.string().required("Naam is verplicht"),
-      surname: yup.string().required("Achternaam is verplicht"),
-      height: yup.string().required("Lengte is verplicht"),
-      weight: yup.string().required("Gewicht is verplicht"),
-      dateOfBirth: yup.string().required("Geboortedatum is verplicht"),
+      name: yup.string().required("Dit veld is verplicht"),
+      surname: yup.string().required("Dit veld is verplicht"),
+      height: yup.string().required("Dit veld is verplicht"),
+      weight: yup.string().required("Dit veld is verplicht"),
+      dateOfBirth: yup.string().required("Dit veld is verplicht"),
     });
     return {
       schema,
@@ -109,18 +110,23 @@ export default {
   width: 90%;
   margin-left: 5%;
 }
-button {
+.addButton {
   display: block;
   width: 40vw;
   margin-left: 30%;
   margin-right: 30%;
   color: #fff;
-  background-color: red;
+  background-color: #e6302b;
   border-radius: 2px;
   border: 0;
   font-size: 18px;
   font-weight: bold;
   padding: 16px 16px 18px 16px;
+}
+
+.addButton:hover {
+  background: #d3322c;
+  border: none;
 }
 
 .form {

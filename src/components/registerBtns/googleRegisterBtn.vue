@@ -36,12 +36,9 @@
   cursor: pointer;
   -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, 0.3);
   box-shadow: 0 0 3px 3px rgba(66, 133, 244, 0.3);
+  background-color: rgb(240, 240, 240);
 }
 
-.g-sign-in-button:active {
-  background-color: #a3a5a8;
-  transition: background-color 0.2s;
-}
 
 .g-sign-in-button .content-wrapper {
   height: 100%;

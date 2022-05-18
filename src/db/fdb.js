@@ -1,12 +1,3 @@
-/** ------------ Dit is tijdelijk om de functionaliteit te testen binnen nodeJS */
-import promptSync from 'prompt-sync';
-const prompt = promptSync();
-/** ------------ Dit is tijdelijk om de functionaliteit te testen binnen nodeJS */
-
-
-
-
-/** IMPORTS */
 import {
   getFirestore,
   collection,
@@ -21,8 +12,6 @@ import {
   where,
   getDoc,
 } from "firebase/firestore";
-
-
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -50,93 +39,16 @@ const db = getFirestore();
 
 
 
-
-
-export async function addExercises(){
-
-}
-
-
-/**--------------------------- FUNCTIONS --------------------------- */
 export async function createPatient() {
-  const voornaam = prompt("Voornaam:");
-  const achternaam = prompt("Achternaam:");
-  const patientnummer = prompt("Patientnummer:");
-  const gewicht = 60
-  const geboortedatum = new Date("Mei, 20, 1969");
-  const lengte = 1.78;
-  const geslacht = "Man";
-  const fysiotherapeut = "Jaap Jansen";
-
-
-  const newPatient = await setDoc(doc(db, "patients", patientnummer), {
-    voornaam:voornaam,
-    achternaam:achternaam,
-    gewicht:gewicht,
-    geboortedatum:geboortedatum,
-    lengte:lengte,
-    geslacht:geslacht,
-    fysiotherapeut:fysiotherapeut,
-    patientnummer:patientnummer
-  })
-  .then(()=>{
-    console.log("Data added successfully");
-  })
-  .catch((error)=>{
-    console.log("Unsuccessful operation, error:"+ error);
-  })
-
-  const newPatientresults = await setDoc(doc(db, "patients", patientnummer, "resultaten"),{
-    testwaarde:"test"
-
-
-  })
-}
-
-
-
-
-export async function getPatient(){
-  const patientnummer = prompt("Welke patient document wilt u inzien? (Patientnummer)");
-  var ref = doc(db, "patients", patientnummer);
-  const docSnap = await getDoc(ref);
-
-  if (docSnap.exists()){
-    console.log("Voornaam: ", docSnap.data().voornaam);
-    console.log("Achternaam: ", docSnap.data().achternaam);
-    console.log("Gewicht: ", docSnap.data().gewicht);
-    console.log("Geboortedatum: ", docSnap.data().geboortedatum);
-    console.log("Lengte: ", docSnap.data().lengte);
-    console.log("Geslacht: ", docSnap.data().geslacht);
-    console.log("Fysiotherapeut: ", docSnap.data().fysiotherapeut);
-    console.log("Patientnummer: ", docSnap.data().patientnummer);
-
-  } else{
-    console.log("No such document");
-  }
-}
-
-
-
-
-export async function deletePatient(){
-  const patientnummer = prompt("Welke patient document wilt u verwijderen? (Patientnummer)");
-  var ref = doc(db, "patients", patientnummer)
-  const docSnap = await getDoc(ref);
-
-  if(!docSnap.exists()){
-    console.log("Document does not exist");
-    return;
-
-  }
-
-  await deleteDoc(ref)
-  .then(() => {
-    console.log("Patient is succesvol verwijderd");
-  }) 
-  .catch((error) => {
-    console.log("Patient kon niet worden verwijderd:"+error);
-  })
+  const newPatient = await addDoc(collection(db, "patients"), { //Create new document with auto generated ID
+    voornaam:"Dogukan",
+    achternaam:"Cali",
+    gewicht:60,
+    geboortedatum:new Date("Mei 20, 1999"),
+    lengte:1.78,
+    geslacht:"Man",
+    fysiotherapeut:"Jaap Jansen"
+  });
 }
 
 
@@ -144,17 +56,6 @@ export async function deletePatient(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-/**--------------------------- OUDE CODE VOOR REFERENTIE --------------------------- */
 /** 
 // users
 export async function createUser(uid) {

@@ -9,9 +9,8 @@
 
     <EmailRegisterButton @click="showRegisterForm"></EmailRegisterButton>
     <p style="color: white">
-      HEB JE AL EEN ACCOUNT?<button @click="showLogForm" class="loginBTN">
-        LOGIN
-      </button>
+      HEB JE AL EEN ACCOUNT?
+      <button @click="showLogForm" class="loginBTN"> LOGIN </button>
     </p>
   </div>
   <RegisterForm
@@ -121,7 +120,7 @@ export default {
   margin-top: 3em;
 }
 .loginBTN {
-  color: #e81717;
+  color: #e6302b;
   border: none;
   background-color: inherit;
   padding: 5px 5px;
@@ -132,6 +131,6 @@ export default {
 }
 
 .loginBTN:hover {
-  background: #eee;
+  color: #d3322c;
 }
 </style>

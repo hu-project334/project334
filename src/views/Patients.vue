@@ -1,7 +1,7 @@
 <template>
   <NavBarTop></NavBarTop>
 
-  <h1 class="title">Patienten</h1>
+  <h1 class="title">Patiënten</h1>
 
   <main>
     <template v-for="patient in patients" :key="patient">
@@ -9,12 +9,12 @@
         <i class="bi bi-person-square userIcon"></i>
         <div class="patient-text-holder">
           <p>
-            <b>{{ patient.name }} {{ patient.surname }}</b>
+            <b>{{ patient.name }} {{ patient.surName }}</b>
           </p>
           <p class="text">{{ patient.email }}</p>
         </div>
         <button class="seeResultsButton" @click="goToPatient(patient.id)">
-          <b> Ga naar patient</b>
+          <b> Ga naar patiënt</b>
         </button>
       </div>
     </template>
@@ -22,7 +22,7 @@
 
   <footer>
     <button class="seeResultsButton" @click="addNewPatient()">
-      <b>Patient toevoegen</b>
+      <b>Patiënt toevoegen</b>
     </button>
   </footer>
 </template>
@@ -118,7 +118,7 @@ p {
 .seeResultsButton:focus,
 .seeResultsButton:focus-within,
 .seeResultsButton:hover {
-  background: blue;
+  background: #0161b6;
   border: none;
 }
 

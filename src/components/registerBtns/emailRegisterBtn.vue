@@ -35,7 +35,7 @@ export default {
   display: inline-block;
   width: 240px;
   height: 50px;
-  background-color: red;
+  background-color: #e6302b;
   color: #fff;
   border-radius: 15px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
@@ -46,11 +46,8 @@ export default {
   cursor: pointer;
   -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, 0.3);
   box-shadow: 0 0 3px 3px rgba(66, 133, 244, 0.3);
-}
-
-.g-sign-in-button:active {
-  background-color: #580808;
-  transition: background-color 0.2s;
+  background: #d3322c;
+  border: none;
 }
 
 .g-sign-in-button .content-wrapper {
@@ -66,7 +63,6 @@ export default {
 
 .g-sign-in-button .logo-wrapper {
   padding: 10px;
-  background: red;
   width: 48px;
   height: 100%;
   border-radius: 15px;

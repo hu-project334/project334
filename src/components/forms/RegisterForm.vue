@@ -60,18 +60,18 @@ export default {
     const schema = yup.object().shape({
       email: yup
         .string()
-        .required("Email is required!")
-        .email("Email is invalid!")
-        .max(50, "Must be maximum 50 characters!"),
+        .required("Dit veld is verplicht")
+        .email("Email is ongeldig")
+        .max(50, "Karakter limiet bereikt"),
       password: yup
         .string()
-        .required("Password is required!")
-        .min(6, "Must be at least 6 characters!")
-        .max(40, "Must be maximum 40 characters!"),
+        .required("Dit veld is verplicht")
+        .min(6, "Wachtwoord moet minimaal 6 karakters zijn")
+        .max(40, "Karakter limiet bereikt"),
       passwordConfirmation: yup
         .string()
-        .oneOf([yup.ref("password"), null], "Passwords must match")
-        .required("Password confirmation is required"),
+        .oneOf([yup.ref("password"), null], "Wachtwoord komt niet overeen")
+        .required("Dit veld is verplicht"),
     });
     return {
       successful: false,
