@@ -26,9 +26,15 @@ function parseIEEE754(singleByteDataView){
 
 // calculate angle between two quaternions
 function angleQuaternion(start, end) {
-    let z = start.multiply(end.conjugate())
+    let s2 = start.clone()
+    let e2 = end.clone()
+    let z = s2.multiply(e2.conjugate())
     let angleDifference = new THREE.Euler().setFromQuaternion(z)
-    return [(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)]
+    console.log([(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)])
+    let angle = 2 * Math.acos(start.dot(end) / (start.length() * end.length())) * 57.2957795
+    console.log(angle)
+    return angle
+
 }
 
 // =========================================================================
@@ -199,9 +205,6 @@ function stopRTStream() {
         return
     })
     .then(() => {
-        // console.log("Euler data difference y:")
-        // console.log(`Min: ${XsensDotSensor.min}, Max: ${XsensDotSensor.max}`)
-        console.log(`First quaternion: `)
         let firstIndex
         for (let i = 0; i < XsensDotSensor.data.length; i++) {
             if (XsensDotSensor.data[i][0].x != 0 && XsensDotSensor.data[i][0].y != 0 && XsensDotSensor.data[i][0].z != 0 && XsensDotSensor.data[i][0].w != 0) {
@@ -209,13 +212,6 @@ function stopRTStream() {
                 break
             }
         }
-        console.log(XsensDotSensor.data[firstIndex][0])
-        let euler = XsensDotSensor.data[firstIndex][1]
-        console.log(`X: ${(euler.x * 57.2957795).toFixed(2)} Y: ${(euler.y * 57.2957795).toFixed(2)} Z: ${(euler.z * 57.2957795).toFixed(2)}`)
-        console.log(`last quaternion`)
-        console.log(XsensDotSensor.data[XsensDotSensor.data.length - 1][0])
-        euler = XsensDotSensor.data[XsensDotSensor.data.length - 1][1]
-        console.log(`X: ${(euler.x * 57.2957795).toFixed(2)} Y: ${(euler.y * 57.2957795).toFixed(2)} Z: ${(euler.z * 57.2957795).toFixed(2)}`)
         console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0])}`)
         console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
 
