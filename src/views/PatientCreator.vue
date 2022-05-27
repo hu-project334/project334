@@ -1,120 +1,193 @@
 <template>
-  <nav-bar-top></nav-bar-top>
-  <Form @submit="submitForm" class="form" :validation-schema="schema">
-    <div class="row mb-3">
-      <label for="name" class="col-sm-2 col-form-label">Naam</label>
-      <div class="col-sm-8">
-        <Field
-          type="email"
-          class="form-control"
-          name="name"
-          placeholder="Naam"
-        />
-        <ErrorMessage name="name"></ErrorMessage>
+  <form class="form">
+    <h3><b>Patiënt Toevoegen</b></h3>
+    <Form @submit="handleRegister" :validation-schema="schema">
+      <div class="form-group">
+        <label for="email" style="font-weight: bold">Email</label>
+        <Field name="email" type="email" class="form-control" />
+        <ErrorMessage name="email" class="error-feedback" />
       </div>
-    </div>
-    <div class="row mb-3">
-      <label for="inputSurname" class="col-sm-2 col-form-label"
-        >Achternaam</label
-      >
-      <div class="col-sm-8">
-        <Field
-          type="name"
-          class="form-control"
-          name="surname"
-          placeholder="achternaam"
-        />
-        <ErrorMessage name="name"></ErrorMessage>
+      <div class="form-group">
+        <label for="naam" style="font-weight: bold">Naam</label>
+        <Field name="password" type="name" class="form-control" />
+        <ErrorMessage name="naam" class="error-feedback" />
       </div>
-    </div>
-    <div class="row mb-3">
-      <label for="height" class="col-sm-2 col-form-label">Lengte</label>
-      <div class="col-sm-8">
+      <div class="form-group">
+        <label for="gewicht" style="font-weight: bold"> Gewicht (kg)</label>
         <Field
-          type="number"
-          class="form-control"
-          name="height"
-          placeholder="Lengte in m"
+          name="gewicht" type="number" class="form-control"
         />
-        <ErrorMessage name="height"></ErrorMessage>
+        <ErrorMessage name="gewicht" class="error-feedback" />
       </div>
-    </div>
-    <div class="row mb-3">
-      <label for="weight" class="col-sm-2 col-form-label">Gewicht</label>
-      <div class="col-sm-8">
+      <div class="form-group">
+        <label for="lengte" style="font-weight: bold"> Lengte (m)</label>
         <Field
-          type="number"
-          class="form-control"
-          name="weight"
-          placeholder="Gewicht in kg"
-          step="0.01"
+          name="lengte" type="number" class="form-control"
         />
-        <ErrorMessage name="weight"></ErrorMessage>
+        <ErrorMessage name="lengte" class="error-feedback" />
       </div>
-    </div>
-    <div class="row mb-3">
-      <label for="dateOfBirth" class="col-sm-2 col-form-label"
-        >Geboortedatum</label
-      >
-      <div class="col-sm-8">
+      <div class="form-group">
+        <label for="geslacht" style="font-weight: bold"> Geslacht</label>
+        <select name="geslacht" class="form-control">
+          <option> Man </option>
+          <option> Vrouw </option>
+          <option> Ander </option>
+        </select>
+        <ErrorMessage name="geslacht" class="error-feedback" />
+      </div>
+      <div class="form-group">
+        <label for="date" style="font-weight: bold"> Geboorte datum</label>
         <Field
-          type="name"
-          class="form-control"
-          name="dateOfBirth"
-          placeholder="Geboortedatum in dd-mm-yy"
+          name="date" type="date" class="form-control"
         />
-        <ErrorMessage name="dateOfBirth"></ErrorMessage>
+        <ErrorMessage name="date" class="error-feedback" />
       </div>
+      <div id="submit_btn_cover">
+        <button class="registerButton" style="font-weight: bold"><b>Voeg patient toe</b></button>
+      </div>
+    </Form>
+    <button class="returnButton" @click="goBackToPatients()"><b>Terug</b></button>
+    <div v-if="firebaseError !== ''" id="errorText">{{ firebaseError }}</div>
+
+    <div
+      v-if="message"
+      class="alert"
+      :class="successful ? 'alert-success' : 'alert-danger'"
+    >
+      {{ message }}
     </div>
-    <button class="addButton">Voeg patiënt toe</button>
-  </Form>
+  </form>
 </template>
 
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
-import NavBarTop from "../components/navbars/NavBarTop.vue";
-
 export default {
-  name: "patients",
+  name: "Register",
+  props: {
+    firebaseError: String,
+  },
   components: {
     Form,
     Field,
     ErrorMessage,
-    NavBarTop,
   },
   data() {
     const schema = yup.object().shape({
-      name: yup.string().required("Dit veld is verplicht"),
-      surname: yup.string().required("Dit veld is verplicht"),
-      height: yup.string().required("Dit veld is verplicht"),
-      weight: yup.string().required("Dit veld is verplicht"),
-      dateOfBirth: yup.string().required("Dit veld is verplicht"),
+      email: yup
+        .string()
+        .required("Dit veld is verplicht")
+        .email("Email is ongeldig")
+        .max(50, "Karakter limiet bereikt"),
+      naam: yup
+        .string()
+        .required("Dit veld is verplicht")
+        .max(50, "Karakter limiet bereikt"),
+      gewicht: yup
+        .number()
+        .required("Dit veld is verplicht")
+        .max(50, "Karakter limiet bereikt"),
+      date: yup
+        .string()
+        .required("Dit veld is verplicht")
+        .max(50, "Karakter limiet bereikt"),
+      lengte: yup
+        .number()
+        .required("Dit veld is verplicht")
+        .lessThan(3, "Voer een valide lengte in")
+        .moreThan(0, "Voer een valide lengte in")
     });
     return {
+      successful: false,
+      loading: false,
+      message: "",
       schema,
-      patients: [],
     };
   },
+
   methods: {
-    submitForm(patient) {
-      console.log(patient);
+    handleRegister(user) {
+      this.message = "";
+      this.successful = false;
+      this.loading = true;
+      this.$emit("send", user);
+      // console.log(user);
+
+      this.successful = true;
+      this.loading = false;
+    },
+    goBackToPatients() {
+      this.$emit("close")
     },
   },
 };
 </script>
 
 <style scoped>
-.form-control {
-  padding: 1rem 1rem;
-  width: 90%;
-  margin-left: 5%;
+html,
+body {
+  height: 100%;
 }
-.addButton {
+body {
+  margin: 0;
+}
+body,
+input,
+button {
+  font-family: "segeo UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  filter: blur(24px);
+  opacity: 0.3;
+  z-index: 1;
+}
+
+.form {
+  position: absolute;
+  top: 60%;
+  right: 0;
+  left: 0;
+  background-color: #fff;
+  width: 350px;
+  padding: 40px;
+  margin: 0 auto;
+  transform: translateY(-60%);
+  box-shadow: 0 10px 20px -5px #ccc;
+}
+
+h3 {
+  color: #e6302b;
+  font-size: 30px;
+  margin: 0 0 40px 0;
+}
+
+label {
   display: block;
-  width: 40vw;
-  margin-left: 30%;
-  margin-right: 30%;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+.input_box {
+  margin-bottom: 20px;
+}
+#tnc_text {
+  font-size: 14px;
+}
+
+#submit_btn_cover {
+  margin-top: 40px;
+}
+
+.returnButton {
+  display: block;
+  width: 100%;
   color: #fff;
   background-color: #e6302b;
   border-radius: 2px;
@@ -124,13 +197,43 @@ export default {
   padding: 16px 16px 18px 16px;
 }
 
-.addButton:hover {
+.returnButton:hover {
   background: #d3322c;
   border: none;
 }
 
-.form {
-  margin-top: 3%;
-  text-align: center;
+.registerButton {
+  display: block;
+  width: 100%;
+  color: #fff;
+  background-color: #0275d8;
+  border-radius: 2px;
+  border: 0;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 16px 16px 18px 16px;
+  margin-bottom: 1rem;
+}
+
+.registerButton:hover {
+  background: #0161b6;
+  border: none;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #f1f2f3;
+  border-radius: 2px;
+  border: 0;
+  box-sizing: border-box;
+}
+
+.form-group {
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 </style>

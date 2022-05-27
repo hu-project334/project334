@@ -1,19 +1,19 @@
 <template>
   <form class="form">
-    <h3>Registreer met email</h3>
+    <h3><b>Registreer met email</b></h3>
     <Form @submit="handleRegister" :validation-schema="schema">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email" style="font-weight: bold">Email</label>
         <Field name="email" type="email" class="form-control" />
         <ErrorMessage name="email" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="password">Wachtwoord</label>
+        <label for="password" style="font-weight: bold">Wachtwoord</label>
         <Field name="password" type="password" class="form-control" />
         <ErrorMessage name="password" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="passwordConfirmation"> Herhaal wachtwoord</label>
+        <label for="passwordConfirmation" style="font-weight: bold"> Herhaal wachtwoord</label>
         <Field
           name="passwordConfirmation"
           type="password"
@@ -22,15 +22,10 @@
         <ErrorMessage name="passwordConfirmation" class="error-feedback" />
       </div>
       <div id="submit_btn_cover">
-        <button :disabled="loading">
-          <span
-            v-show="loading"
-            class="spinner-border spinner-border-sm"
-          ></span>
-          Registreer
-        </button>
+        <button class="registerButton"><b>Registreer</b></button>
       </div>
     </Form>
+    <button class="returnButton" @click="goBackToRegister()"><b>Terug</b></button>
     <div v-if="firebaseError !== ''" id="errorText">{{ firebaseError }}</div>
 
     <div
@@ -92,6 +87,9 @@ export default {
       this.successful = true;
       this.loading = false;
     },
+    goBackToRegister() {
+      this.$emit("close")
+    },
   },
 };
 </script>
@@ -136,7 +134,7 @@ body:before {
 }
 
 h3 {
-  color: red;
+  color: #e6302b;
   font-size: 30px;
   margin: 0 0 40px 0;
 }
@@ -158,16 +156,39 @@ label {
   margin-top: 40px;
 }
 
-button {
+.returnButton {
   display: block;
   width: 100%;
   color: #fff;
-  background-color: red;
+  background-color: #e6302b;
   border-radius: 2px;
   border: 0;
   font-size: 18px;
   font-weight: bold;
   padding: 16px 16px 18px 16px;
+}
+
+.returnButton:hover {
+  background: #d3322c;
+  border: none;
+}
+
+.registerButton {
+  display: block;
+  width: 100%;
+  color: #fff;
+  background-color: #0275d8;
+  border-radius: 2px;
+  border: 0;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 16px 16px 18px 16px;
+  margin-bottom: 1rem;
+}
+
+.registerButton:hover {
+  background: #0161b6;
+  border: none;
 }
 
 .form-control {

@@ -66,8 +66,7 @@ export default {
 
   methods: {
     goBackToPatient() {
-      //! patient id is necesary change routing param
-      // this.$router.push({ name: "patient" });
+      this.$router.push({ name: "patient", params: { id: id } });
     },
     addMeasurement() {
       this.$router.push({ name: "feed" });
@@ -93,12 +92,12 @@ export default {
 }
 .title {
   color: white;
-  margin-bottom: 1rem;
+  margin-bottom: 3%;
   margin-top: 3%;
-  margin-right: 25%;
-  margin-left: 25%;
+  margin-right: 10%;
+  margin-left: 10%;
   font-size: 3em;
-  width: 50%;
+  width: 80%;
   text-align: center;
 }
 
