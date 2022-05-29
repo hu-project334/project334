@@ -51,11 +51,6 @@ export async function createPatient() {
   });
 }
 
-
-
-
-
-
 /** 
 // users
 export async function createUser(uid) {

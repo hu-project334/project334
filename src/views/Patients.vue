@@ -1,30 +1,37 @@
 <template>
-  <NavBarTop></NavBarTop>
+  <div :style="blurrStyle()">
+    <NavBarTop></NavBarTop>
 
-  <h1 class="title">Patiënten</h1>
+    <h1 class="title">Patiënten</h1>
 
-  <main>
-    <template v-for="patient in patients" :key="patient">
-      <div class="patient">
-        <i class="bi bi-person-square userIcon"></i>
-        <div class="patient-text-holder">
-          <p>
-            <b>{{ patient.name }} {{ patient.surName }}</b>
-          </p>
-          <p class="text">{{ patient.email }}</p>
+    <main>
+      <template v-for="patient in patients" :key="patient">
+        <div class="patient">
+          <i class="bi bi-person-square userIcon"></i>
+          <div class="patient-text-holder">
+            <p>
+              <b>{{ patient.name }} {{ patient.surName }}</b>
+            </p>
+            <p class="text">{{ patient.email }}</p>
+          </div>
+          <button class="seeResultsButton" @click="goToPatient(patient.id)">
+            <b> Ga naar patiënt</b>
+          </button>
         </div>
-        <button class="seeResultsButton" @click="goToPatient(patient.id)">
-          <b> Ga naar patiënt</b>
-        </button>
-      </div>
-    </template>
-  </main>
+      </template>
+    </main>
 
-  <footer>
-    <button class="seeResultsButton" @click="addNewPatient()">
-      <b>Patiënt toevoegen</b>
-    </button>
-  </footer>
+    <footer>
+      <button class="seeResultsButton" @click="showPatientForm">
+        <b>Patiënt toevoegen</b>
+      </button>
+    </footer>
+  </div>
+  <PatientForm
+  @send="registerWithEmail"
+  @close="closeForm"
+  v-if="showForm && !showLoginForm"
+></PatientForm>
 </template>
 
 <script>
@@ -33,6 +40,7 @@ import IconButton from "../components/btns/IconButton.vue";
 import _ from "lodash";
 import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
+import PatientForm from "../components/forms/PatientCreatorForm.vue";
 
 // json file;
 import patients from "../db/patients.json";
@@ -43,10 +51,14 @@ export default {
     NavBarTop,
     IconButton,
     LinkParamButton,
+    PatientForm,
     LinkButton,
   },
   data() {
     return {
+      showForm: false,
+      user: null,
+      showLoginForm: false,
       patients: null,
       newPatientForm: false,
     };
@@ -57,6 +69,25 @@ export default {
   methods: {
     goToPatient(id) {
       this.$router.push({ name: "patient", params: { id: id } });
+    },
+    showPatientForm(event) {
+      event.stopPropagation();
+      this.showForm = true;
+    },
+    blurrStyle() {
+      if (this.showForm) {
+        let style = "filter: blur(24px); opacity: 0.6;";
+        return style;
+      } else {
+        return "";
+      }
+    },
+    closeForm() {
+      this.showForm = false;
+      this.showLoginForm = false;
+      this.errorMessage = "";
+
+      return;
     },
 
     addNewPatient() {
