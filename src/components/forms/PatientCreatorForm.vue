@@ -9,42 +9,44 @@
       </div>
       <div class="form-group">
         <label for="naam" style="font-weight: bold">Naam</label>
-        <Field name="password" type="name" class="form-control" />
+        <Field name="naam" type="name" class="form-control" />
         <ErrorMessage name="naam" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="gewicht" style="font-weight: bold"> Gewicht (kg)</label>
-        <Field name="gewicht" type="number" class="form-control" />
+        <Field
+          name="gewicht" type="number" class="form-control"
+        />
         <ErrorMessage name="gewicht" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="lengte" style="font-weight: bold"> Lengte (m)</label>
-        <Field name="lengte" type="number" class="form-control" />
+        <Field
+          name="lengte" type="number" class="form-control"
+        />
         <ErrorMessage name="lengte" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="geslacht" style="font-weight: bold"> Geslacht</label>
         <select name="geslacht" class="form-control">
-          <option>Man</option>
-          <option>Vrouw</option>
-          <option>Ander</option>
+          <option> Man </option>
+          <option> Vrouw </option>
+          <option> Ander </option>
         </select>
         <ErrorMessage name="geslacht" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="date" style="font-weight: bold"> Geboorte datum</label>
-        <Field name="date" type="date" class="form-control" />
+        <Field
+          name="date" type="date" class="form-control"
+        />
         <ErrorMessage name="date" class="error-feedback" />
       </div>
       <div id="submit_btn_cover">
-        <button class="registerButton" style="font-weight: bold">
-          <b>Voeg patient toe</b>
-        </button>
+        <button class="registerButton" style="font-weight: bold"><b>Voeg patient toe</b></button>
       </div>
     </Form>
-    <button class="returnButton" @click="goBackToPatients()">
-      <b>Terug</b>
-    </button>
+    <button class="returnButton" @click="goBackToPatients()"><b>Terug</b></button>
     <div v-if="firebaseError !== ''" id="errorText">{{ firebaseError }}</div>
 
     <div
@@ -60,12 +62,6 @@
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
-<<<<<<< HEAD
-import NavBarTop from "../components/navbars/NavBarTop.vue";
-import { createPatient } from "../db/fdb";
-
-=======
->>>>>>> 27ed815d3267d498b8e35666e4b31c5560bdfe71
 export default {
   name: "Register",
   props: {
@@ -90,7 +86,8 @@ export default {
       gewicht: yup
         .number()
         .required("Dit veld is verplicht")
-        .max(50, "Karakter limiet bereikt"),
+        .max(50, "Karakter limiet bereikt")
+        .typeError("Dit veld is verplicht"),
       date: yup
         .string()
         .required("Dit veld is verplicht")
@@ -98,8 +95,9 @@ export default {
       lengte: yup
         .number()
         .required("Dit veld is verplicht")
-        .lessThan(3, "Voer een valide lengte in")
+        .lessThan(2.5, "Voer een valide lengte in")
         .moreThan(0, "Voer een valide lengte in")
+        .typeError("Dit veld is verplicht")
     });
     return {
       successful: false,
@@ -108,6 +106,7 @@ export default {
       schema,
     };
   },
+
   methods: {
     handleRegister(user) {
       this.message = "";
@@ -121,21 +120,6 @@ export default {
     },
     goBackToPatients() {
       this.$emit("close")
-    },
-    createPatientWithFireStore() {
-      // test
-      let fysioId = this.$store.getters.getUser.uid;
-
-      createPatient(
-        1,
-        "jayh",
-        "de Cuba",
-        70,
-        "24-11-1998",
-        171,
-        "jayh.decuba@student.hu.nl",
-        fysioId
-      );
     },
   },
 };

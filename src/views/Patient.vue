@@ -7,7 +7,7 @@
     <b>Patiënt gegevens</b>
     <table>
       <tr>
-        <td class="header_name"><b>Naam </b></td>
+        <td class="header_name"><b class="table_content" >Naam </b></td>
         <td>{{ name }} {{ surName }}</td>
       </tr>
       <tr>
@@ -16,7 +16,7 @@
       </tr>
       <tr>
         <td class="header_name"><b>Lengte </b></td>
-        <td class="header_name">{{ heightInM }}</td>
+        <td>{{ heightInM }}</td>
       </tr>
       <tr>
         <td class="header_name"><b>leeftijd </b></td>
@@ -132,10 +132,10 @@ export default {
   color: white;
   margin-bottom: 3%;
   margin-top: 3%;
-  margin-right: 25%;
-  margin-left: 25%;
+  margin-right: 10%;
+  margin-left: 10%;
   font-size: 3em;
-  width: 50%;
+  width: 80%;
   text-align: center;
 }
 p {
@@ -151,21 +151,28 @@ p {
   background: white;
   width: 90%;
   border-radius: 15px;
-  padding-bottom: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
   padding-top: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 tr td {
   border: 2px solid #00a1e1;
+  padding-left: 1%;
   width: 100%;
 }
 .header_name {
+
+  padding-left: 1%;
   width: 20%;
 }
+.table_content{
+  margin-right: 100px;
 
-/* list of categorys */
+}
+
+/* list of categories */
 .category {
   cursor: pointer;
   background: white;
@@ -203,6 +210,7 @@ tr td {
   margin-right: 5%;
   padding: 0.5rem;
   background-color: #e6302b;
+  margin-top: 1rem;
   margin-bottom: 1rem;
   color: white;
   border: none;

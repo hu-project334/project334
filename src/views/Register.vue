@@ -7,20 +7,24 @@
 
     <GoogleRegisterButton @click="RegisterWithGoogle()"></GoogleRegisterButton>
 
-    <EmailRegisterButton @click="showRegisterForm"></EmailRegisterButton>
-    <p style="color: white">
-      HEB JE AL EEN ACCOUNT?
-      <button @click="showLogForm" class="loginBTN"> LOGIN </button>
+    <EmailRegisterButton @click="showLogForm"></EmailRegisterButton>
+    <p class="acountText">
+      HEB JE NOG GEEN ACCOUNT?
+    </p>
+    <p>
+      <button @click="showRegisterForm" class="loginBTN"> Registreer </button>
     </p>
   </div>
   <RegisterForm
     :firebaseError="firebaseErrorFromRegister"
     @send="registerWithEmail"
+    @close="closeForm"
     v-if="showForm && !showLoginForm"
   ></RegisterForm>
   <LoginForm
     :errorMessage="errorMessage"
     @send="login"
+    @close="closeForm"
     v-if="showLoginForm"
   ></LoginForm>
 </template>
@@ -124,7 +128,7 @@ export default {
   border: none;
   background-color: inherit;
   padding: 5px 5px;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   display: inline-block;
   font-weight: bold;
@@ -133,4 +137,10 @@ export default {
 .loginBTN:hover {
   color: #d3322c;
 }
+
+.acountText{
+  color: white;
+  margin-bottom: -5px;
+}
+
 </style>
