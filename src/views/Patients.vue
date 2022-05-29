@@ -10,7 +10,7 @@
           <i class="bi bi-person-square userIcon"></i>
           <div class="patient-text-holder">
             <p>
-              <b>{{ patient.name }} {{ patient.surName }}</b>
+              <b>{{ patient.name }} </b>
             </p>
             <p class="text">{{ patient.email }}</p>
           </div>

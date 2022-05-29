@@ -77,23 +77,24 @@ export async function getPatients(uid) {
 export async function createPatient(
   id,
   name,
-  surName,
   weight,
   dateOfBirth,
   heightInM,
   email,
+  gender,
   fysiotherapeutNummer
 ) {
   const patientsRef = collection(db, "patients");
   // where id is not id in patientID
+  console.log(email);
   await setDoc(doc(patientsRef), {
     id: id,
     name: name,
-    surName: surName,
     weight: weight,
     dateOfBirth: dateOfBirth,
     heightInM: heightInM,
     email: email,
+    gender: gender,
     fysiotherapeutNummer: fysiotherapeutNummer,
   });
 }

@@ -118,11 +118,13 @@ export default {
         patient.naam,
         patient.gewicht,
         patient.date,
-        patient.geslacht,
+        patient.lengte,
         patient.email,
+        patient.geslacht,
         fysioId
       );
     },
+
     goBackToPatients() {
       this.$emit("close");
     },
