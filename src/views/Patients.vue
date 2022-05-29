@@ -33,6 +33,7 @@ import IconButton from "../components/btns/IconButton.vue";
 import _ from "lodash";
 import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
+import { getPatients } from "../db/fdb";
 
 // json file;
 import patients from "../db/patients.json";
@@ -52,9 +53,17 @@ export default {
     };
   },
   mounted() {
-    this.patients = patients;
+    // this.patients = ;
+    this.getPatientsFromFireStore();
   },
   methods: {
+    getPatientsFromFireStore() {
+      let uid = this.$store.getters.getUser.uid;
+      getPatients(uid).then((results) => {
+        this.patients = results;
+      });
+    },
+
     goToPatient(id) {
       this.$router.push({ name: "patient", params: { id: id } });
     },

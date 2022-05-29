@@ -74,6 +74,7 @@
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
+import { createPatient } from "../db/fdb";
 
 export default {
   name: "patients",
@@ -96,9 +97,27 @@ export default {
       patients: [],
     };
   },
+  mounted() {
+    this.createPatientWithFireStore();
+  },
   methods: {
     submitForm(patient) {
       console.log(patient);
+    },
+    createPatientWithFireStore() {
+      // test
+      let fysioId = this.$store.getters.getUser.uid;
+
+      createPatient(
+        1,
+        "jayh",
+        "de Cuba",
+        70,
+        "24-11-1998",
+        171,
+        "jayh.decuba@student.hu.nl",
+        fysioId
+      );
     },
   },
 };

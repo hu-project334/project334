@@ -47,7 +47,10 @@
     </div>
   </template>
 
-  <button class="deletePatientBtn" @click="deletePatient(patientID)">
+  <button
+    class="deletePatientBtn"
+    @click="deletePatientWithFireStore(patientID)"
+  >
     <b>Verwijder patiënt</b>
   </button>
 
@@ -66,6 +69,7 @@ import patients from "../db/patients.json";
 import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
+import { deletePatient } from "../db/fdb";
 
 export default {
   name: "patients",
@@ -104,11 +108,12 @@ export default {
       this.age = formatBirthDateToAge(patient.dateOfBirth);
       this.heightInM = patient.heightInM;
     },
-    deletePatient(id) {
-      let index = _.findIndex(this.patients, { id: id });
-      this.patients.splice(index, 1);
+    deletePatientWithFireStore(id) {
+      deletePatient(id);
+      // let index = _.findIndex(this.patients, { id: id });
+      // this.patients.splice(index, 1);
       // in database this should delete the patient
-      this.$router.push({ name: "patients" });
+      // this.$router.push({ name: "patients" });
     },
     goBackToPatientList() {
       this.$router.push({ name: "patients" });
