@@ -59,7 +59,7 @@
 
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
-import { createPatient } from "../db/fdb.js";
+import { createPatient } from "@/db/fdb.js";
 
 import * as yup from "yup";
 export default {
