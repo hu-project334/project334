@@ -8,11 +8,9 @@
     <GoogleRegisterButton @click="RegisterWithGoogle()"></GoogleRegisterButton>
 
     <EmailRegisterButton @click="showLogForm"></EmailRegisterButton>
-    <p class="acountText">
-      HEB JE NOG GEEN ACCOUNT?
-    </p>
+    <p class="acountText">HEB JE NOG GEEN ACCOUNT?</p>
     <p>
-      <button @click="showRegisterForm" class="loginBTN"> Registreer </button>
+      <button @click="showRegisterForm" class="loginBTN">Registreer</button>
     </p>
   </div>
   <RegisterForm
@@ -138,9 +136,8 @@ export default {
   color: #d3322c;
 }
 
-.acountText{
+.acountText {
   color: white;
   margin-bottom: -5px;
 }
-
 </style>
