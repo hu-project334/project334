@@ -44,7 +44,7 @@ import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
 
 // json file;
-import patients from "../db/patients.json";
+// import patients from "../db/patients.json";
 
 export default {
   name: "patients",
