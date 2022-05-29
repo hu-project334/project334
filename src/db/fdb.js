@@ -62,8 +62,12 @@ export async function getPatients(uid) {
 
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
-    console.log(doc.id);
+    // console.log(doc.id);
+
+    // documentID  =doc.id   user= doc.data()
+    //  user.id = documentID
     // console.log(doc.id, " => ", doc.data());
+
     patientList.push(doc.data());
     // console.log(doc.id, " => ", doc.data());
   });
@@ -81,6 +85,7 @@ export async function createPatient(
   fysiotherapeutNummer
 ) {
   const patientsRef = collection(db, "patients");
+  // where id is not id in patientID
   await setDoc(doc(patientsRef), {
     id: id,
     name: name,
