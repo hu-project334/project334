@@ -113,7 +113,12 @@ export default {
     },
 
     createPatientWithFireStore(patient) {
-      let newDate = patient.date.split('-')[2] + "-" + patient.date.split('-')[1] + "-" + patient.date.split('-')[0]
+      let newDate =
+        patient.date.split("-")[2] +
+        "-" +
+        patient.date.split("-")[1] +
+        "-" +
+        patient.date.split("-")[0];
       let fysioId = this.$store.getters.getUser.uid;
 
       createPatient(
@@ -128,8 +133,6 @@ export default {
       );
       this.goBackToPatients();
     },
-
-
   },
 };
 </script>
