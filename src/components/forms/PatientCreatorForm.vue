@@ -24,11 +24,7 @@
       </div>
       <div class="form-group">
         <label for="geslacht" style="font-weight: bold"> Geslacht</label>
-        <select name="geslacht" class="form-control">
-          <option>Man</option>
-          <option>Vrouw</option>
-          <option>Ander</option>
-        </select>
+        <Field name="geslacht" type="name" class="form-control" />
         <ErrorMessage name="geslacht" class="error-feedback" />
       </div>
       <div class="form-group">
@@ -83,6 +79,10 @@ export default {
         .string()
         .required("Dit veld is verplicht")
         .max(50, "Karakter limiet bereikt"),
+      geslacht: yup
+        .string()
+        .required("Dit veld is verplicht")
+        .max(50, "Karakter limiet bereikt"),
       gewicht: yup
         .number()
         .required("Dit veld is verplicht")
@@ -108,26 +108,28 @@ export default {
   mounted() {},
 
   methods: {
-    createPatientWithFireStore(patient) {
-      console.log(patient);
+    goBackToPatients() {
+      this.$emit("close");
+    },
 
+    createPatientWithFireStore(patient) {
+      let newDate = patient.date.split('-')[2] + "-" + patient.date.split('-')[1] + "-" + patient.date.split('-')[0]
       let fysioId = this.$store.getters.getUser.uid;
 
       createPatient(
         1,
         patient.naam,
         patient.gewicht,
-        patient.date,
+        newDate,
         patient.lengte,
         patient.email,
         patient.geslacht,
         fysioId
       );
+      this.goBackToPatients();
     },
 
-    goBackToPatients() {
-      this.$emit("close");
-    },
+
   },
 };
 </script>

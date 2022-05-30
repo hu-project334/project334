@@ -43,8 +43,6 @@ import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
 
-// json file;
-// import patients from "../db/patients.json";
 
 export default {
   name: "patients",
@@ -65,7 +63,6 @@ export default {
     };
   },
   mounted() {
-    // this.patients = ;
     this.getPatientsFromFireStore();
   },
   methods: {
@@ -95,7 +92,7 @@ export default {
       this.showForm = false;
       this.showLoginForm = false;
       this.errorMessage = "";
-
+      this.getPatientsFromFireStore(); // Show newly added patients
       return;
     },
 
@@ -127,7 +124,7 @@ p {
 
   margin-right: 5%;
   margin-left: 5%;
-  margin-bottom: 3%;
+  margin-bottom: 1%;
   width: 90%;
   padding: 1em;
   border: 1px solid white;

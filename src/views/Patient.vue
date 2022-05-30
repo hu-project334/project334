@@ -101,7 +101,6 @@ export default {
     getPatientData() {
       let id = parseInt(this.patientID);
       let patient = _.find(this.patients, { id: id });
-      console.log(patient);
       this.name = patient.name;
       this.surName = patient.surName;
       this.weight = patient.weight;
@@ -120,7 +119,6 @@ export default {
     },
     goToExerciseResults(category) {
       //! fix params
-      console.log(category);
       this.$router.push({ name: "exerciseResults" });
     },
   },

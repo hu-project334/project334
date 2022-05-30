@@ -9,7 +9,6 @@ export function ReformatArrayList(arraylistWithObjects) {
     newResults[newDate] = cloneResults.comparedToNorm;
   });
   
-  console.log(newResults)
   return newResults;
 }
 

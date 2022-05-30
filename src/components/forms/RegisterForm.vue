@@ -82,8 +82,6 @@ export default {
       this.successful = false;
       this.loading = true;
       this.$emit("send", user);
-      // console.log(user);
-
       this.successful = true;
       this.loading = false;
     },
