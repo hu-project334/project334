@@ -34,6 +34,21 @@ const router = createRouter({
       name: "exerciseResults",
       component: () => import("../views/ExerciseResults.vue"),
     },
+    {
+      path: "/selectSensor",
+      name: "selectSensor",
+      component: () => import("../views/SelectSensor.vue"),
+    },
+    {
+      path: "/measureInfo",
+      name: "measureInfo",
+      component: () => import("../views/MeasureInfo.vue"),
+    },
+    {
+      path: "/measure",
+      name: "measure",
+      component: () => import("../views/Measure.vue"),
+    },
   ],
 });
 

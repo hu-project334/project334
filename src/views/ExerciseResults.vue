@@ -69,7 +69,7 @@ export default {
       this.$router.push({ name: "patient", params: { id: id } });
     },
     addMeasurement() {
-      this.$router.push({ name: "feed" });
+      this.$router.push({ name: "measureInfo" });
     },
     deleteCategory() {
       //! delete category from the patient with firestore and than route to categories

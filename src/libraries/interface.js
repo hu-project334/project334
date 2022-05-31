@@ -50,13 +50,14 @@ function angleQuaternion(start, end) {
 // =========================================================================
 
 function findBluetoothDevices() {
-  XsensDotSensor.request()
+  return new Promise((resolve) => {
+    XsensDotSensor.request()
     .then(() => {
       return XsensDotSensor.connect();
     })
     .then(() => {
       return XsensDotSensor.readDeviceName().then((value) => {
-        XsensDotSensor.changeSensorStatus("online");
+        //XsensDotSensor.changeSensorStatus("online");
         console.log(XsensDotSensor.device_name);
       });
     })
@@ -72,7 +73,10 @@ function findBluetoothDevices() {
         serviceEnum.battery_service,
         serviceEnum.battery_level
       );
+      resolve();
     });
+  });
+  
 }
 
 function startRTStream() {
@@ -191,12 +195,12 @@ function startRTStream() {
     XsensDotSensor.data.push(tmpArr);
 
     // Display the data, in the future this will be done in a different way
-    let element = document.getElementById("x-axis");
-    element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2);
-    element = document.getElementById("y-axis");
-    element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2);
-    element = document.getElementById("z-axis");
-    element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2);
+    //let element = document.getElementById("x-axis");
+    //element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2);
+    //element = document.getElementById("y-axis");
+    //element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2);
+    //element = document.getElementById("z-axis");
+    //element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2);
   };
 
   // Set notifications for short payload

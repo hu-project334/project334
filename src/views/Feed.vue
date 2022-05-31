@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     getData() {
-      findBluetoothDevices();
+      findBluetoothDevices(function (){});
     },
     sync() {
       syncSensor();

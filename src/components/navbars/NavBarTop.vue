@@ -36,13 +36,16 @@
             aria-labelledby="navbarDropdownMenuAvatar"
           >
             <li>
-              <a class="dropdown-item" href="#">My profile</a>
+              <a class="dropdown-item">My profile</a>
             </li>
             <li>
-              <a class="dropdown-item" href="#">Settings</a>
+              <a class="dropdown-item">Settings</a>
             </li>
             <li>
-              <a @click="logOut()" class="dropdown-item" href="#">Logout</a>
+              <a @click="logOut()" class="dropdown-item">Logout</a>
+            </li>
+            <li>
+              <a @click="goToDevelop()" class="dropdown-item">Development</a>
             </li>
           </ul>
         </div>
@@ -86,6 +89,9 @@ export default {
     },
     goBackToHome() {
       this.$router.push({ name: "patients" });
+    },
+    goToDevelop() {
+      this.$router.push({ name: "feed" });
     },
     getDisplayName() {
       // if registered with mail  -> mail is the displayName

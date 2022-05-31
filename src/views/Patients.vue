@@ -124,7 +124,7 @@ p {
 
   margin-right: 5%;
   margin-left: 5%;
-  margin-bottom: 1%;
+  margin-bottom: 2%;
   width: 90%;
   padding: 1em;
   border: 1px solid white;
