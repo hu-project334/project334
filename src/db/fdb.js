@@ -82,23 +82,30 @@ export async function createFysio(name, email, uid) {
   try {
     const fysioRef = collection(db, "fysio");
 
-    // let fysioList = [];
-    // querySnapshot.forEach((doc) => {
-    //   fysioList.push(doc.data.uid);
+    // const querySnapshot = await getDocs(fysioRef);
 
-    // });
+    const q = query(collection(db, "fysio"), where("userID", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    let fysioList = [];
+    querySnapshot.forEach((doc) => {
+      fysioList.push(doc.data().uid);
+      console.log(doc.data());
+    });
+
+    let fysioExists = true;
 
     // loop trough fysios to check if fysio exists then dont make new object
 
-    // if (!fysioExists) {
-    //   await setDoc(doc(fysioRef, uid), {
-    //     userID: uid,
-    //     name: name,
-    //     email: email,
-    //   });
-    // } else {
-    //   console.log("object already exists");
-    // }
+    if (!fysioExists) {
+      await setDoc(doc(fysioRef, uid), {
+        userID: uid,
+        name: name,
+        email: email,
+      });
+    } else {
+      console.log("object already exists");
+    }
   } catch (error) {
     console.error("Error writing new message to Firebase Database", error);
   }
