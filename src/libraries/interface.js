@@ -1,8 +1,13 @@
 /* eslint-disable */
 import { serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, syncMsgEnum, getKeyByValue } from './bluetooth_enums.js'
 import { NotificationHandler } from './notification_handler.js'
-import { XsensDotSensor } from './bluetooth.js'
 import * as THREE from 'three';
+
+let XsensDotSensor = null;
+
+function setGlobal(sensor){
+    XsensDotSensor = sensor
+}
 
 // =========================================================================
 //                            HELPER FUNCTIONS
@@ -28,44 +33,35 @@ function parseIEEE754(singleByteDataView){
 function angleQuaternion(start, end) {
     let s2 = start.clone()
     let e2 = end.clone()
+
     let z = s2.multiply(e2.conjugate())
     let angleDifference = new THREE.Euler().setFromQuaternion(z)
     console.log([(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)])
+
     let angle = 2 * Math.acos(start.dot(end) / (start.length() * end.length())) * 57.2957795
     console.log(angle)
     return angle
-
 }
 
 // =========================================================================
 //                            PUBLIC FUNCTIONS
 // =========================================================================
 
-function findBluetoothDevices() {
-    XsensDotSensor.request()
-    .then(() => { 
-        return XsensDotSensor.connect()
-    })
-    .then(() => {
-        return XsensDotSensor.readDeviceName()
-        .then((value) => {
-            XsensDotSensor.changeSensorStatus("online")
-            console.log(XsensDotSensor.device_name)
-        })
-    })
-    .then(() => { return XsensDotSensor.getInitialBatteryLevel()
-        .then((value) => {
-            XsensDotSensor.battery_level = value;
-            XsensDotSensor.changeBatteryLevel(value)
-            console.log("Battery Level: " + XsensDotSensor.battery_level)
-        })
-    })
-    .then(() => { XsensDotSensor.subscribeToCharacteristicChangedNotifications(
-        (event) => {XsensDotSensor.changeBatteryLevel(event.target.value.getUint8(0, true))},
-        serviceEnum.battery_service, serviceEnum.battery_level) });
+async function findBluetoothDevices(XsensDotSensor) {
+
+    await XsensDotSensor.request()
+    await XsensDotSensor.connect()
+    XsensDotSensor.sensor_status = "online";
+
+    await XsensDotSensor.readDeviceName()
+    await XsensDotSensor.getInitialBatteryLevel()
+
+    await XsensDotSensor.subscribeToCharacteristicChangedNotifications(
+        (event) => { XsensDotSensor.changeBatteryLevel(event.target.value.getUint8(0, true)) },
+        serviceEnum.battery_service, serviceEnum.battery_level);
 }
 
-function startRTStream() {
+function startRTStream(XsensDotSensor) {
     render3Dsensor()
     console.log("Real time streaming started")
     // Reset member variables
@@ -160,13 +156,13 @@ function startRTStream() {
                      (XsensDotSensor.rawTime / 1000).toFixed(2)]
         XsensDotSensor.data.push(tmpArr)
 
-        // Display the data, in the future this will be done in a different way
-        let element = document.getElementById("x-axis")
-        element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
-        element = document.getElementById("y-axis")
-        element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
-        element = document.getElementById("z-axis")
-        element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
+        // // Display the data, in the future this will be done in a different way
+        // let element = document.getElementById("x-axis")
+        // element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
+        // element = document.getElementById("y-axis")
+        // element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
+        // element = document.getElementById("z-axis")
+        // element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
     }
 
     // Set notifications for short payload
@@ -190,7 +186,7 @@ function startRTStream() {
     .catch(error => { console.error(error);})
 }
 
-function stopRTStream() {
+function stopRTStream(XsensDotSensor) {
     document.body.removeChild(document.body.lastChild)
     console.log("Real time streaming stopped")
     XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
@@ -221,7 +217,7 @@ function stopRTStream() {
 
 }
 
-function syncSensor() {
+function syncSensor(XsensDotSensor) {
     console.log("Synchronization started")
 
     NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
@@ -237,14 +233,14 @@ function syncSensor() {
     })
     .then(() => {
         XsensDotSensor.device.gatt.disconnect()
-        XsensDotSensor.changeSensorStatus("synchronizing")
+        XsensDotSensor.sensor_status = "synchronizing";
 
         setTimeout(() => {
             console.log("Attempting to connect to device")
             XsensDotSensor.device.gatt.connect()
             .then(() => {
                 console.log("Connection re-established")
-                XsensDotSensor.changeSensorStatus("online")
+                XsensDotSensor.sensor_status = "online";
                 XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
                 .then(() => {
                     let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
@@ -259,7 +255,7 @@ function syncSensor() {
     .catch(err => { console.error(err); })
 }
 
-function getSyncStatusSensor() {
+function getSyncStatusSensor(XsensDotSensor) {
     NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
         let value = event.target.value
         let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
@@ -309,4 +305,4 @@ function render3Dsensor() {
 }
 
 // Exports
-export { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor };
+export { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor, setGlobal };

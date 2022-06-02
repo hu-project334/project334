@@ -10,6 +10,8 @@ class XsensDot {
 
     constructor(verbose = true) {
         this.device = null;
+        this.device_name = null;
+        this.sensor_status = 'disconnected'
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
         this.battery_level = 0;
@@ -51,7 +53,7 @@ class XsensDot {
      */
     connect() {
         if (!this.device) {
-            this.changeSensorStatus("disconnected")
+            this.sensor_status = "disconnected";
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.connect()
@@ -62,7 +64,7 @@ class XsensDot {
      */
     disconnect() {
         if (!this.device) {
-            this.changeSensorStatus("disconnected")
+            this.sensor_status = "disconnected";
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.disconnect();
@@ -72,7 +74,7 @@ class XsensDot {
      * onDisonnected is executed when the connected device disconnects
      */
     onDisconnected() {
-        this.changeSensorStatus("disconnected")
+        this.sensor_status = "disconnected";
         console.log('Device is disconnected.');
     }
 
@@ -89,7 +91,7 @@ class XsensDot {
      * readMessageAck reads the acknowledge of a given dataViewObject
      */
     readMessageAck(dataViewObject) {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+        return this.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
         .then((value) => {
             if(this.verbose){
                 let cmd = getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))
@@ -111,7 +113,7 @@ class XsensDot {
         .then(service => { return service.getCharacteristic((prefix + characteristic + suffix)); })
         .then(characteristic => { return characteristic.writeValue(dataViewObject); })
         .then(() => {
-            return XsensDotSensor.readMessageAck(dataViewObject)
+            return this.readMessageAck(dataViewObject)
         })
         .catch(error => { console.error(error); })
     }
@@ -160,7 +162,7 @@ class XsensDot {
                 console.error(error);
             }
             else{
-                XsensDotSensor.changeSensorStatus("connection error")
+                this.sensor_status = "connection error";
                 console.error(error);
             }
         });
@@ -202,7 +204,7 @@ class XsensDot {
         })
         .then(() => { console.log('Identifying sensor'); })
         .catch(error => { 
-            this.changeSensorStatus("connection error")
+            this.sensor_status = "connection error";
             console.error(error); 
         });
     }
@@ -218,7 +220,7 @@ class XsensDot {
             return batteryLevel
      })
         .catch((error) => { 
-            this.changeSensorStatus("connection error")
+            this.sensor_status = "connection error";
             console.error(error); 
         });
     }
@@ -315,8 +317,6 @@ class XsensDot {
 
     changeBatteryLevel(batteryLevel) {
         this.battery_level = batteryLevel;
-        let element = document.getElementById("batterylevel")
-        element.innerHTML = batteryLevel
     }
 
     /**
@@ -325,15 +325,8 @@ class XsensDot {
     handleBatteryChanged(event) {
         const value = event.target.value
         this.battery_level = value.getUint8(0, true)
-        let element = document.getElementById("batterylevel")
-        element.innerHTML = this.batteryLevel
-    }
-
-    changeSensorStatus(status) {
-        let element = document.getElementById("sensorStatus")
-        element.innerHTML = status
     }
 }
 
-let XsensDotSensor = new XsensDot();
-export { XsensDotSensor };
+// let XsensDotSensor = new XsensDot();
+export { XsensDot  };
