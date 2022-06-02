@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import("../views/Patients.vue"),
     },
     {
-      path: "/patient/:id",
+      path: "/patient",
       name: "patient",
       component: () => import("../views/Patient.vue"),
     },
@@ -48,6 +48,11 @@ const router = createRouter({
       path: "/measure",
       name: "measure",
       component: () => import("../views/Measure.vue"),
+    },
+    {
+      path: "/addCategorie",
+      name: "addCategorie",
+      component: () => import("../views/AddCategorie.vue"),
     },
   ],
 });

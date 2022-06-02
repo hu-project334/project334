@@ -7,6 +7,7 @@
             <b>Koppel sensor</b>
         </button>
 
+        <div style="margin-top: 80px;"></div>
         <footer>
             <button class="backBtn" @click="goBackToInfo()"><b>Terug</b></button>
         </footer>
@@ -133,7 +134,7 @@ export default {
 
 footer {
   display: flex;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;

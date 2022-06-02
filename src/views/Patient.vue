@@ -54,11 +54,12 @@
     <b>Verwijder patiënt</b>
   </button>
 
+  <div style="margin-top: 80px;"></div>
   <footer>
     <button class="backBtn" @click="goBackToPatientList()">
       <b>Terug</b>
     </button>
-    <button class="addCategory"><b>Categorie toevoegen</b></button>
+    <button class="addCategory" @click="goToCategory()"><b>Categorie toevoegen</b></button>
   </footer>
 </template>
 
@@ -121,6 +122,10 @@ export default {
       //! fix params
       this.$router.push({ name: "exerciseResults" });
     },
+    goToCategory(category) {
+      //! fix params
+      this.$router.push({ name: "addCategorie" });
+    },
   },
 };
 </script>
@@ -161,13 +166,11 @@ tr td {
   width: 100%;
 }
 .header_name {
-
   padding-left: 1%;
   width: 20%;
 }
 .table_content{
   margin-right: 100px;
-
 }
 
 /* list of categories */
@@ -253,7 +256,7 @@ tr td {
 
 footer {
   display: flex;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;

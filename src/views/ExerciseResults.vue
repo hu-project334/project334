@@ -36,6 +36,7 @@
     <b>Verwijder categorie</b>
   </button>
 
+  <div style="margin-top: 80px;"></div>
   <footer>
     <button class="backBtn" @click="goBackToPatient()"><b>Terug</b></button>
     <button class="addMeasurement" @click="addMeasurement()">
@@ -66,7 +67,7 @@ export default {
 
   methods: {
     goBackToPatient() {
-      this.$router.push({ name: "patient", params: { id: id } });
+      this.$router.push({ name: "patient" });
     },
     addMeasurement() {
       this.$router.push({ name: "measureInfo" });
@@ -193,7 +194,7 @@ th {
 
 footer {
   display: flex;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
