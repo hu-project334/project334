@@ -50,11 +50,12 @@ function angleQuaternion(start, end) {
 async function findBluetoothDevices(XsensDotSensor) {
 
     await XsensDotSensor.request()
+    XsensDotSensor.sensor_status = "connecting...";
     await XsensDotSensor.connect()
-    XsensDotSensor.sensor_status = "online";
 
     await XsensDotSensor.readDeviceName()
     await XsensDotSensor.getInitialBatteryLevel()
+    XsensDotSensor.sensor_status = "online";
 
     await XsensDotSensor.subscribeToCharacteristicChangedNotifications(
         (event) => { XsensDotSensor.changeBatteryLevel(event.target.value.getUint8(0, true)) },
@@ -186,34 +187,30 @@ function startRTStream(XsensDotSensor) {
     .catch(error => { console.error(error);})
 }
 
-function stopRTStream(XsensDotSensor) {
+async function stopRTStream(XsensDotSensor) {
     document.body.removeChild(document.body.lastChild)
     console.log("Real time streaming stopped")
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let buffer = new ArrayBuffer(3)
-        let dataViewObject = new DataView(buffer)
-        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
-        dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
-        XsensDotSensor.verbose = false
-        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
-        return
-    })
-    .then(() => {
-        let firstIndex
-        for (let i = 0; i < XsensDotSensor.data.length; i++) {
-            if (XsensDotSensor.data[i][0].x != 0 && XsensDotSensor.data[i][0].y != 0 && XsensDotSensor.data[i][0].z != 0 && XsensDotSensor.data[i][0].w != 0) {
-                firstIndex = i
-                break
-            }
-        }
-        console.log(`Quat angle: ${angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0])}`)
-        console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
+    await XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
 
-        return
-    })
-    .catch(error => { console.error(error);})
+    let buffer = new ArrayBuffer(3)
+    let dataViewObject = new DataView(buffer)
+    dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+    dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
+    dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
+    XsensDotSensor.verbose = false
+    await XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
+
+    let firstIndex
+    for (let i = 0; i < XsensDotSensor.data.length; i++) {
+        if (XsensDotSensor.data[i][0].x != 0 && XsensDotSensor.data[i][0].y != 0 && XsensDotSensor.data[i][0].z != 0 && XsensDotSensor.data[i][0].w != 0) {
+            firstIndex = i
+            break
+        }
+    }
+
+    XsensDotSensor.max_angle = angleQuaternion(XsensDotSensor.data[firstIndex][0], XsensDotSensor.data[XsensDotSensor.data.length - 1][0]).toFixed(2)
+    console.log(`Quat angle: ${XsensDotSensor.max_angle}`)
+    console.log("Recording duurde:", (XsensDotSensor.rawTime / 1000).toFixed(2), "seconden")
 
 }
 

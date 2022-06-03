@@ -25,6 +25,9 @@ Register.vue - base vue
   <h2>
     Z: {{z}}
   </h2>
+  <h2>
+    Biggest angle: {{ angle }}
+  </h2>
 </template>
 
 <script>
@@ -46,6 +49,7 @@ export default {
       device_name: "",
       sensorstatus: "",
       XsensDotSensor: null,
+      angle: null,
     };
   },
   created() {
@@ -69,6 +73,12 @@ export default {
     'XsensDotSensor.sensor_status': {
       handler(newStatus) {
         this.sensorstatus = newStatus;
+      },
+      deep: true,
+    },
+    'XsensDotSensor.max_angle': {
+      handler(newAngle) {
+        this.angle = newAngle;
       },
       deep: true,
     },
