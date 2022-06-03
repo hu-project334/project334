@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import store from "../store/userStore.js";
 import router from "../router/index.js";
+import { getPatients } from "./fdb";
 
 export async function registerWithEmail(value) {
   const auth = getAuth();
@@ -61,6 +62,9 @@ export async function RegisterWithGoogle() {
   signInWithPopup(auth, provider)
     .then((result) => {
       const user = result.user;
+
+      // getPatients(user.uid);
+
       store.commit("setUser", user);
       router.push({ path: "/patients" });
     })

@@ -3,12 +3,13 @@
   <nav class="navbar1">
     <!-- Container wrapper -->
     <div class="container-fluid1">
-      <img
+      <button @click="goBackToHome()"><img
         src="@/assets/beeldmerk.png"
         height="40"
         alt="hu logo"
         loading="lazy"
       />
+      </button>
       <div class="item-left-side">
         <p class="userName">
           {{ getDisplayName() }}
@@ -83,6 +84,9 @@ export default {
     logOut() {
       logOut();
     },
+    goBackToHome() {
+      this.$router.push({ name: "patients" });
+    },
     getDisplayName() {
       // if registered with mail  -> mail is the displayName
       let email = this.$store.getters.getUser.email;
@@ -141,6 +145,12 @@ export default {
 .userName {
   margin-right: 10px;
   margin-top: 10px;
+  color: red;
+}
+
+button{
+  border: none;
+  background-color: #f8f9fa;
   color: red;
 }
 

@@ -6,7 +6,7 @@
   <!-- //! graph has to be installed and used -->
   <main>
     <div class="result_container">
-      <b>Recent geplotte data </b>
+      <b>Meest recente metingen </b>
       <movement-percentage-in-time
         :dataProp="graphResults"
       ></movement-percentage-in-time>
@@ -17,8 +17,8 @@
       <table>
         <tr>
           <th>Datum</th>
-          <th>Bewginging in graden</th>
-          <th>Vergeleken tot de norm in %</th>
+          <th>Beweging (graden)</th>
+          <th>Vergeleken tot de norm i (%)</th>
         </tr>
         <template v-for="result in results" :key="result">
           <tr>
@@ -33,7 +33,7 @@
   </main>
 
   <button class="delete_categoryBtn" @click="deleteCategory()">
-    Verwijder categorie
+    <b>Verwijder categorie</b>
   </button>
 
   <footer>
@@ -42,6 +42,7 @@
       <b>Niewe meting</b>
     </button>
   </footer>
+  
 </template>
 
 <script>
@@ -65,8 +66,7 @@ export default {
 
   methods: {
     goBackToPatient() {
-      //! patient id is necesary change routing param
-      // this.$router.push({ name: "patient" });
+      this.$router.push({ name: "patient", params: { id: id } });
     },
     addMeasurement() {
       this.$router.push({ name: "feed" });
@@ -92,12 +92,12 @@ export default {
 }
 .title {
   color: white;
-  margin-bottom: 1rem;
+  margin-bottom: 3%;
   margin-top: 3%;
-  margin-right: 25%;
-  margin-left: 25%;
+  margin-right: 10%;
+  margin-left: 10%;
   font-size: 3em;
-  width: 50%;
+  width: 80%;
   text-align: center;
 }
 
@@ -114,12 +114,6 @@ export default {
   padding-left: 1rem;
   margin-bottom: 2rem;
 }
-
-/* .results_graph {
-
-
- 
-} */
 
 /* recent results */
 .recent_results {
@@ -158,6 +152,11 @@ th {
   border: none;
 }
 
+.addMeasurement:hover {
+  background: #0161b6;
+  border: none;
+}
+
 .backBtn {
   width: 30%;
   background-color: #e6302b;
@@ -165,6 +164,11 @@ th {
   color: #f8f9fa;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  border: none;
+}
+
+.backBtn:hover {
+  background: #d3322c;
   border: none;
 }
 
@@ -180,16 +184,22 @@ th {
   border-radius: 15px;
   border: none;
 }
+
+.delete_categoryBtn:hover {
+  background: #d3322c;
+  border: none;
+}
 /* footer */
 
 footer {
+  display: flex;
   position: sticky;
-  top: 0;
-  /* margin-top: 300px; */
-  background-color: #f8f9fa;
+  bottom: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
+  width: 100%;
+  background-color: #f8f9fa;
 }
 </style>

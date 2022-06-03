@@ -6,6 +6,8 @@ import { getFirestore } from "firebase/firestore";
 import store from "./store/userStore.js";
 import VueChartkick from "vue-chartkick";
 import "chartkick/chart.js";
+import Chartkick from "chartkick";
+Chartkick.configure({ language: "de" });
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",

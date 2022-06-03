@@ -1,7 +1,7 @@
 <template>
   <form>
-    <h3>Log in met email</h3>
-    <label for="email">Email adress</label>
+    <h3><b>Log in met email</b></h3>
+    <label for="email" style="font-weight: bold">Email</label>
     <div class="input_box">
       <input
         v-model="userData.email"
@@ -10,7 +10,7 @@
         name="emailAdress"
       />
     </div>
-    <label for="password">Wachtwoord</label>
+    <label for="password" style="font-weight: bold">Wachtwoord</label>
     <div class="input_box">
       <input
         v-model="userData.password"
@@ -21,7 +21,8 @@
     </div>
     <div v-if="errorMessage !== ''" id="errorText">{{ errorMessage }}</div>
     <div id="submit_btn_cover">
-      <button type="button" @click="submitForm()">Login</button>
+      <button class="logInButton" @click="submitForm()">Login</button>
+      <button class="returnButton" @click="goBackToRegister()">Terug</button>
     </div>
   </form>
 </template>
@@ -40,6 +41,9 @@ export default {
   methods: {
     submitForm() {
       this.$emit("send", this.userData);
+    },
+    goBackToRegister() {
+      this.$emit("close")
     },
   },
 };
@@ -118,16 +122,39 @@ label {
   margin-top: 40px;
 }
 
-#submit_btn_cover button {
+.returnButton {
   display: block;
   width: 100%;
   color: #fff;
-  background-color: red;
+  background-color: #e6302b;
   border-radius: 2px;
   border: 0;
   font-size: 18px;
   font-weight: bold;
   padding: 16px 16px 18px 16px;
+}
+
+.returnButton:hover {
+  background: #d3322c;
+  border: none;
+}
+
+.logInButton {
+  display: block;
+  width: 100%;
+  color: #fff;
+  background-color: #0275d8;
+  border-radius: 2px;
+  border: 0;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 16px 16px 18px 16px;
+  margin-bottom: 1rem;
+}
+
+.logInButton:hover {
+  background: #0161b6;
+  border: none;
 }
 
 #errorText {

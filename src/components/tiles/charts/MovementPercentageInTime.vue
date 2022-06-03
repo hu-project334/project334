@@ -2,8 +2,9 @@
   <!-- x,y -->
   <line-chart
     :data="dataProp"
-    xtitle="data"
-    ytitle="Bewegingspercentage"
+    xtitle="Datum"
+    ytitle="Beweegbaarheid (%)"
+    language= "de"
   ></line-chart>
 </template>
 

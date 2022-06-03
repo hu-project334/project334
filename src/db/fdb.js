@@ -1,3 +1,9 @@
+/** ------------ Dit is tijdelijk om de functionaliteit te testen binnen nodeJS */
+// import promptSync from "prompt-sync";
+// const prompt = promptSync();
+/** ------------ Dit is tijdelijk om de functionaliteit te testen binnen nodeJS */
+
+/** IMPORTS */
 import {
   getFirestore,
   collection,
@@ -8,54 +14,117 @@ import {
   setDoc,
   deleteDoc,
   Timestamp,
-  query,
   where,
   getDoc,
+  query,
 } from "firebase/firestore";
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",
-  authDomain: "project334-3d839.firebaseapp.com",
-  databaseURL: "https://project334-3d839-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "project334-3d839",
-  storageBucket: "project334-3d839.appspot.com",
-  messagingSenderId: "290669961377",
-  appId: "1:290669961377:web:352d8cfb5f270eced650e0",
-  measurementId: "G-MXJHSMN169"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
-
-
-
-export async function createPatient() {
-  const newPatient = await addDoc(collection(db, "patients"), { //Create new document with auto generated ID
-    voornaam:"Dogukan",
-    achternaam:"Cali",
-    gewicht:60,
-    geboortedatum:new Date("Mei 20, 1999"),
-    lengte:1.78,
-    geslacht:"Man",
-    fysiotherapeut:"Jaap Jansen"
+// dummy data
+async function dummyDataPatients(patientsRef, uid) {
+  // await setDoc(doc(patientsRef), {
+  //   id: 1,
+  //   name: "Alexander",
+  //   surName: "de Graaff",
+  //   weight: 70,
+  //   dateOfBirth: "22-06-2002",
+  //   heightInM: 1.82,
+  //   email: "alexander.d.graaff@gmail.com",
+  //   fysiotherapeutNummer: uid,
+  // });
+  await setDoc(doc(patientsRef), {
+    id: 2,
+    name: "Milo",
+    surName: "Belien",
+    weight: 70,
+    dateOfBirth: "28-09-2002",
+    heightInM: 1.83,
+    email: "milo.belien@student.hu.nl",
+    fysiotherapeutNummer: uid,
   });
 }
 
+/**--------------------------- FUNCTIONS --------------------------- */
 
+// https://firebase.google.com/docs/firestore/query-data/queries
+export async function getPatients(uid) {
+  // https://fireship.io/snippets/firestore-increment-tips/
 
+  // const patientsRef = collection(db, "patients");
+  // dummyDataPatients(patientsRef, uid);
 
+  const q = query(
+    collection(db, "patients"),
+    where("fysiotherapeutNummer", "==", uid)
+  );
+  let patientList = [];
 
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    // console.log(doc.id);
 
+    // documentID  =doc.id   user= doc.data()
+    //  user.id = documentID
+    // console.log(doc.id, " => ", doc.data());
+
+    patientList.push(doc.data());
+    // console.log(doc.id, " => ", doc.data());
+  });
+  return patientList;
+}
+
+export async function createPatient(
+  id,
+  name,
+  weight,
+  dateOfBirth,
+  heightInM,
+  email,
+  gender,
+  fysiotherapeutNummer
+) {
+  const patientsRef = collection(db, "patients");
+  // where id is not id in patientID
+  console.log(email);
+  await setDoc(doc(patientsRef), {
+    id: id,
+    name: name,
+    weight: weight,
+    dateOfBirth: dateOfBirth,
+    heightInM: heightInM,
+    email: email,
+    gender: gender,
+    fysiotherapeutNummer: fysiotherapeutNummer,
+  });
+}
+
+// https://firebase.google.com/docs/firestore/manage-data/delete-data
+export async function deletePatient(id) {
+  const patientRef = doc(db, "patients", id);
+  console.log(id);
+
+  // // db.collection("patients").document(id).delete();
+  // await deleteDoc(patientRef);
+  // // console.log("does this work");
+  await deleteDoc(patientRef);
+  console.log("werkt dit wel of niet");
+
+  // const handleDelete = async (id) => {
+  //   const taskDocRef = doc(db, "tasks", id);
+  //   try {
+  //     await deleteDoc(taskDocRef);
+  //   } catch (err) {
+  //     alert(err);
+  //   }
+  // };
+}
+
+export async function getPatient() {
+  const patientRef = collection("patients").where();
+}
+
+/**--------------------------- OUDE CODE VOOR REFERENTIE --------------------------- */
 /** 
 // users
 export async function createUser(uid) {

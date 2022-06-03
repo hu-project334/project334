@@ -1,41 +1,41 @@
 [
   {
-    "date": "20-02-22",
+    "date": "20-03-22",
     "MovementInDegree": 170,
-    "comparedToNorm": 53
+    "comparedToNorm": 3
   },
   {
-    "date": "20-01-22",
+    "date": "21-03-22",
     "MovementInDegree": 60,
     "comparedToNorm": 98
   },
   {
-    "date": "20-04-22",
+    "date": "22-03-22",
     "MovementInDegree": 30,
     "comparedToNorm": 50
   },
   {
-    "date": "20-03-22",
+    "date": "23-03-22",
     "MovementInDegree": 100,
     "comparedToNorm": 83
   },
   {
-    "date": "20-05-22",
+    "date": "24-03-22",
     "MovementInDegree": 60,
     "comparedToNorm": 98
   },
   {
-    "date": "20-03-22",
+    "date": "25-03-22",
     "MovementInDegree": 100,
     "comparedToNorm": 83
   },
   {
-    "date": "20-06-22",
+    "date": "05-04-22",
     "MovementInDegree": 30,
     "comparedToNorm": 50
   },
   {
-    "date": "20-03-22",
+    "date": "13-04-22",
     "MovementInDegree": 100,
     "comparedToNorm": 83
   },
@@ -45,17 +45,17 @@
     "comparedToNorm": 50
   },
   {
-    "date": "20-04-22",
+    "date": "25-04-22",
     "MovementInDegree": 60,
     "comparedToNorm": 98
   },
   {
-    "date": "20-04-22",
+    "date": "03-05-22",
     "MovementInDegree": 30,
     "comparedToNorm": 50
   },
   {
-    "date": "20-03-22",
+    "date": "31-05-22",
     "MovementInDegree": 100,
     "comparedToNorm": 83
   }
