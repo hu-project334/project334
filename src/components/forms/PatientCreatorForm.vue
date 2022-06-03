@@ -113,6 +113,7 @@ export default {
     },
 
     createPatientWithFireStore(patient) {
+      console.log(patient);
       let newDate =
         patient.date.split("-")[2] +
         "-" +
@@ -122,7 +123,6 @@ export default {
       let fysioId = this.$store.getters.getUser.uid;
 
       createPatient(
-        1,
         patient.naam,
         patient.gewicht,
         newDate,
@@ -131,6 +131,7 @@ export default {
         patient.geslacht,
         fysioId
       );
+
       this.goBackToPatients();
     },
   },
