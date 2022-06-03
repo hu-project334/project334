@@ -47,20 +47,6 @@ function angleQuaternion(start, end) {
 //                            PUBLIC FUNCTIONS
 // =========================================================================
 
-async function findBluetoothDevices(XsensDotSensor) {
-    await XsensDotSensor.request()
-    XsensDotSensor.sensor_status = "connecting...";
-    await XsensDotSensor.connect()
-
-    await XsensDotSensor.readDeviceName()
-    await XsensDotSensor.getInitialBatteryLevel()
-    XsensDotSensor.sensor_status = "online";
-
-    await XsensDotSensor.subCharChanged(
-        (event) => { XsensDotSensor.changeBatteryLevel(event.target.value.getUint8(0, true)) },
-        serviceEnum.battery_service, serviceEnum.battery_level);
-}
-
 async function startRTStream(XsensDotSensor) {
     render3Dsensor()
     console.log("Real time streaming started")
@@ -139,18 +125,16 @@ async function startRTStream(XsensDotSensor) {
         if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
             XsensDotSensor.rotation.x = prevRotation.x
             XsensDotSensor.quaternion = prevQuaternion
-
         }
         if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
             XsensDotSensor.rotation.y = prevRotation.y
             XsensDotSensor.quaternion = prevQuaternion
-
         }
         if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
             XsensDotSensor.rotation.z = prevRotation.z
             XsensDotSensor.quaternion = prevQuaternion
-
         }
+
         let tmpArr = [XsensDotSensor.quaternion,
                       XsensDotSensor.rotation,
                      (XsensDotSensor.rawTime / 1000).toFixed(2)]
@@ -271,8 +255,6 @@ function render3Dsensor() {
     var animate = function () {
         requestAnimationFrame( animate );
         cube.setRotationFromQuaternion(XsensDotSensor.quaternion);
-        // console.log(`${cube.quaternion.x} ${cube.quaternion.y} ${cube.quaternion.z}  ${cube.quaternion.w}`)
-        // console.log(`${XsensDotSensor.quaternion.x} ${XsensDotSensor.quaternion.y} ${XsensDotSensor.quaternion.z}  ${XsensDotSensor.quaternion.w}`)
         renderer.render( scene, camera );
     };
 
@@ -280,4 +262,4 @@ function render3Dsensor() {
 }
 
 // Exports
-export { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor, setGlobal };
+export {startRTStream, stopRTStream, getSyncStatusSensor, setGlobal };

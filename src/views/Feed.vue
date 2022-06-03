@@ -5,6 +5,7 @@ Register.vue - base vue
 
   <p><button @click="getData()">connect</button></p>
   <p><button @click="sync()">synchronize</button></p>
+  <input type="text" name="device name" placeholder="enter new device name"><br><br>
   <p><button @click="identify()">identify device</button></p>
   <h2>Device name: {{ device_name }}</h2>
   <h2>
@@ -33,7 +34,7 @@ Register.vue - base vue
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import { XsensDot } from "/src/libraries/bluetooth.js";
-import { findBluetoothDevices, startRTStream, stopRTStream, getSyncStatusSensor, setGlobal } from "/src/libraries/interface.js";
+import { startRTStream, stopRTStream, getSyncStatusSensor, setGlobal } from "/src/libraries/interface.js";
 
 export default {
   name: "Feed",
@@ -102,7 +103,8 @@ export default {
   },
   methods: {
     getData() {
-      findBluetoothDevices(this.XsensDotSensor);
+      // findAndConnect(this.XsensDotSensor);
+      this.XsensDotSensor.findAndConnect();
     },
     sync() {
       getSyncStatusSensor(this.XsensDotSensor);
@@ -122,3 +124,7 @@ export default {
   },
 };
 </script>
+<style scoped>
+
+
+</style>

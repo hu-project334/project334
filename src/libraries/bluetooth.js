@@ -30,22 +30,15 @@ class XsensDot {
     /**
      * requestDevice allows you to select a bluetooth device to connect to
      */
-    request() {
-        return navigator.bluetooth.requestDevice({
-        filters: [{
-            manufacturerData: [{
-                companyIdentifier: 0x0886 //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
-            }]
-        }],
+    async request() {
+        this.device = await navigator.bluetooth.requestDevice({
+        filters: [{ manufacturerData: [{ companyIdentifier: 0x0886 }] }], //Xsens Technologies B.V. bluetooth identifier (decimal: 2182, hex: 0x0886)
         optionalServices: [(prefix + serviceEnum.battery_service       + suffix),
                            (prefix + serviceEnum.measurement_service   + suffix),
                            (prefix + serviceEnum.configuration_service + suffix),
                            (prefix + serviceEnum.message_service       + suffix)]
         })
-        .then(device => {
-            this.device = device;
-            this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
-        });
+        this.device.addEventListener('gattserverdisconnected', this.onDisconnected);
     }
 
     /**
@@ -79,43 +72,54 @@ class XsensDot {
     }
 
     /**
+     * findAndConnect shows all nearby xsens sensors and connects to the chosen device
+     */
+    async findAndConnect() {
+        await this.request()
+        this.sensor_status = "connecting...";
+        await this.connect()
+
+        await this.readDeviceName()
+        await this.getInitialBatteryLevel()
+        this.sensor_status = "online";
+
+        await this.subCharChanged(this.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level);
+    }
+
+    /**
      * getCharacteristicData allows you to read a dataView object from the given characteristic
      */
-    getCharacteristicData(service, characteristic) {
-        return this.device.gatt.getPrimaryService((prefix + service + suffix))
-        .then(service => { return service.getCharacteristic((prefix + characteristic + suffix)); })
-        .then(characteristic => { return characteristic.readValue(); })
+    async getCharacteristicData(serviceEnum, characteristicEnum) {
+        let service = await this.device.gatt.getPrimaryService((prefix + serviceEnum + suffix))
+        let characteristic = await service.getCharacteristic((prefix + characteristicEnum + suffix))
+        return characteristic.readValue();
     }
 
     /**
      * readMessageAck reads the acknowledge of a given dataViewObject
      */
-    readMessageAck(dataViewObject) {
-        return this.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
-        .then((value) => {
-            if(this.verbose){
-                let cmd = getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))
-                if (cmd == undefined ) {
-                    cmd = getKeyByValue(syncMsgEnum, dataViewObject.getUint8(2, true))
-                }
-                let str = `${cmd} ack: ${getKeyByValue(msgAckEnum, value.getUint8(3, true))}`
-                console.log(str)
+    async readMessageAck(dataViewObject) {
+        let value = await this.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+
+        if(this.verbose){
+            let cmd = getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))
+            if (cmd == undefined ) {
+                cmd = getKeyByValue(syncMsgEnum, dataViewObject.getUint8(2, true))
             }
-            return value
-        })
+            let str = `${cmd} ack: ${getKeyByValue(msgAckEnum, value.getUint8(3, true))}`
+            console.log(str)
+        }
+        return value
     }
 
     /**
      * writeCharacteristicData allows you to write a dataViewObject to the given characteristic
      */
-    writeCharacteristicData(service, characteristic, dataViewObject) {
-        return this.device.gatt.getPrimaryService((prefix + service + suffix))
-        .then(service => { return service.getCharacteristic((prefix + characteristic + suffix)); })
-        .then(characteristic => { return characteristic.writeValue(dataViewObject); })
-        .then(() => {
-            return this.readMessageAck(dataViewObject)
-        })
-        .catch(error => { console.error(error); })
+    async writeCharacteristicData(serviceEnum, characteristicEnum, dataViewObject) {
+        let service = await this.device.gatt.getPrimaryService((prefix + serviceEnum + suffix))
+        let characteristic = await service.getCharacteristic((prefix + characteristicEnum + suffix))
+        await characteristic.writeValue(dataViewObject);
+        return this.readMessageAck(dataViewObject)
     }
 
     /**
