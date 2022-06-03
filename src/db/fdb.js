@@ -82,30 +82,11 @@ export async function createFysio(name, email, uid) {
   try {
     const fysioRef = collection(db, "fysio");
 
-    // const querySnapshot = await getDocs(fysioRef);
-
-    const q = query(collection(db, "fysio"), where("userID", "==", uid));
-    const querySnapshot = await getDocs(q);
-
-    let fysioList = [];
-    querySnapshot.forEach((doc) => {
-      fysioList.push(doc.data().uid);
-      console.log(doc.data());
+    await setDoc(doc(fysioRef, uid), {
+      userID: uid,
+      name: name,
+      email: email,
     });
-
-    let fysioExists = true;
-
-    // loop trough fysios to check if fysio exists then dont make new object
-
-    if (!fysioExists) {
-      await setDoc(doc(fysioRef, uid), {
-        userID: uid,
-        name: name,
-        email: email,
-      });
-    } else {
-      console.log("object already exists");
-    }
   } catch (error) {
     console.error("Error writing new message to Firebase Database", error);
   }
@@ -121,45 +102,7 @@ export async function createPatient(
   fysiotherapeutNummer
 ) {
   try {
-    // check if size === 0
-    // set new Id = 1
-    // orderby new to old
-    // get Newest Object
-    // check Id of newest object
-    // add +1 to new object ID
-    // const patientsRef = collection(db, "patients");
-
-    // const patientsQuery = await query(
-    //   collection(db, "patients"),
-    //   orderBy("id", "desc"),
-    //   limit(3)
-    // );
-
-    let id = null;
-    console.log("doe het ofzo");
-
-    // const querySnapshot = await getDocs(patientsRef);
-    // if (querySnapshot.size === 0) {
-    //   console.log(querySnapshot.size);
-    //   id = 1;
-    // } else {
-    //   // console.log(patientsQuery);
-    //   console.log(querySnapshot.size);
-    //   // console.log(patientsQuery);
-    //   id = querySnapshot.size;
-    //   console.log(patientsQuery);
-    // }
-
     const patientsRef = doc(db, "fysio", fysiotherapeutNummer, "patients");
-
-    const querySnapshot = await getDocs(patientsRef);
-    if (querySnapshot.size === 0) {
-      console.log(querySnapshot.size);
-      id = 1;
-    } else {
-      console.log(querySnapshot.size);
-      id = querySnapshot.size;
-    }
 
     await setDoc(doc(patientsRef), {
       id: id,
