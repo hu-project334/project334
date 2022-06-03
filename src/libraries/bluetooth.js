@@ -10,6 +10,8 @@ class XsensDot {
 
     constructor(verbose = true) {
         this.device = null;
+        this.device_name = null;
+        this.sensor_status = 'disconnected'
         this.onDisconnected = this.onDisconnected.bind(this);
         this.verbose = verbose;
         this.battery_level = 0;
@@ -51,7 +53,7 @@ class XsensDot {
      */
     connect() {
         if (!this.device) {
-            this.changeSensorStatus("disconnected")
+            this.sensor_status = "disconnected";
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.connect()
@@ -62,7 +64,7 @@ class XsensDot {
      */
     disconnect() {
         if (!this.device) {
-            this.changeSensorStatus("disconnected")
+            this.sensor_status = "disconnected";
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.disconnect();
@@ -72,7 +74,7 @@ class XsensDot {
      * onDisonnected is executed when the connected device disconnects
      */
     onDisconnected() {
-        this.changeSensorStatus("disconnected")
+        this.sensor_status = "disconnected";
         console.log('Device is disconnected.');
     }
 
@@ -89,7 +91,7 @@ class XsensDot {
      * readMessageAck reads the acknowledge of a given dataViewObject
      */
     readMessageAck(dataViewObject) {
-        return XsensDotSensor.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
+        return this.getCharacteristicData(serviceEnum.message_service, serviceEnum.message_acknowledge)
         .then((value) => {
             if(this.verbose){
                 let cmd = getKeyByValue(recMsgEnum, dataViewObject.getUint8(2, true))
@@ -111,7 +113,7 @@ class XsensDot {
         .then(service => { return service.getCharacteristic((prefix + characteristic + suffix)); })
         .then(characteristic => { return characteristic.writeValue(dataViewObject); })
         .then(() => {
-            return XsensDotSensor.readMessageAck(dataViewObject)
+            return this.readMessageAck(dataViewObject)
         })
         .catch(error => { console.error(error); })
     }
@@ -160,7 +162,7 @@ class XsensDot {
                 console.error(error);
             }
             else{
-                XsensDotSensor.changeSensorStatus("connection error")
+                this.sensor_status = "connection error";
                 console.error(error);
             }
         });
@@ -202,7 +204,7 @@ class XsensDot {
         })
         .then(() => { console.log('Identifying sensor'); })
         .catch(error => { 
-            XsensDotSensor.changeSensorStatus("connection error")
+            this.sensor_status = "connection error";
             console.error(error); 
         });
     }
@@ -218,7 +220,7 @@ class XsensDot {
             return batteryLevel
      })
         .catch((error) => { 
-            XsensDotSensor.changeSensorStatus("connection error")
+            this.sensor_status = "connection error";
             console.error(error); 
         });
     }
@@ -282,12 +284,27 @@ class XsensDot {
     downloadDataToCSV(){
         let csvContent = "data:text/csv;charset=utf-8,"
 
-        let downloadArray = [['X','      Y','      Z', '      T']].concat(this.data)
+        let downloadArray = [['Qx', 'Qy', 'Qz', 'Qw', 'E', 'N', 'U', 'T']].concat(this.data)
 
+        // Go through all data points
         downloadArray.forEach(function(rowArray) {
-            let row = rowArray.join(", ");
+            let tmpArr = []
+            // Each data point has a quaternion object, euler object and time stamp.
+            // The floats have to be extracted from the objects
+            for(let i = 0; i < rowArray.length; i++) {
+                if (rowArray[i].constructor.name === 'Quaternion'){
+                    tmpArr.push(rowArray[i].x.toString(), rowArray[i].y.toString(), rowArray[i].z.toString(), rowArray[i].w.toString())
+                } else if (rowArray[i].constructor.name === 'Euler'){
+                    tmpArr.push(rowArray[i].x.toString(), rowArray[i].y.toString(), rowArray[i].z.toString())
+                } else {
+                    tmpArr.push(rowArray[i].toString())
+                }
+            }
+            let row = tmpArr.join(", ");
+            tmpArr = [];
             csvContent += row + "\r\n";
         });
+        console.log(`Amount of data points: ${downloadArray.length}, amount of columns for each data point: ${downloadArray[0].length}`)
 
         var encodedUri = encodeURI(csvContent);
         var link = document.createElement("a");
@@ -298,21 +315,18 @@ class XsensDot {
         link.click();
     }
 
+    changeBatteryLevel(batteryLevel) {
+        this.battery_level = batteryLevel;
+    }
+
     /**
     * handleBatteryChanged is executed when the battery characteristic changes
     */
     handleBatteryChanged(event) {
         const value = event.target.value
         this.battery_level = value.getUint8(0, true)
-        let element = document.getElementById("batterylevel")
-        element.innerHTML = this.battery_level
-    }
-
-    changeSensorStatus(status) {
-        let element = document.getElementById("sensorStatus")
-        element.innerHTML = status
     }
 }
 
-let XsensDotSensor = new XsensDot();
-export { XsensDotSensor };
+// let XsensDotSensor = new XsensDot();
+export { XsensDot  };
