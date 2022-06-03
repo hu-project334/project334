@@ -17,6 +17,8 @@ import {
   where,
   getDoc,
   query,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -74,8 +76,42 @@ export async function getPatients(uid) {
   return patientList;
 }
 
+// logged in fysio
+export async function createFysio(name, email, uid) {
+  // https://stackoverflow.com/questions/49682327/how-to-update-a-single-firebase-firestore-document
+  try {
+    const fysioRef = collection(db, "fysio");
+
+    // const querySnapshot = await getDocs(fysioRef);
+
+    const q = query(collection(db, "fysio"), where("userID", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    let fysioList = [];
+    querySnapshot.forEach((doc) => {
+      fysioList.push(doc.data().uid);
+      console.log(doc.data());
+    });
+
+    let fysioExists = true;
+
+    // loop trough fysios to check if fysio exists then dont make new object
+
+    if (!fysioExists) {
+      await setDoc(doc(fysioRef, uid), {
+        userID: uid,
+        name: name,
+        email: email,
+      });
+    } else {
+      console.log("object already exists");
+    }
+  } catch (error) {
+    console.error("Error writing new message to Firebase Database", error);
+  }
+}
+
 export async function createPatient(
-  id,
   name,
   weight,
   dateOfBirth,
@@ -84,19 +120,60 @@ export async function createPatient(
   gender,
   fysiotherapeutNummer
 ) {
-  const patientsRef = collection(db, "patients");
-  // where id is not id in patientID
-  console.log(email);
-  await setDoc(doc(patientsRef), {
-    id: id,
-    name: name,
-    weight: weight,
-    dateOfBirth: dateOfBirth,
-    heightInM: heightInM,
-    email: email,
-    gender: gender,
-    fysiotherapeutNummer: fysiotherapeutNummer,
-  });
+  try {
+    // check if size === 0
+    // set new Id = 1
+    // orderby new to old
+    // get Newest Object
+    // check Id of newest object
+    // add +1 to new object ID
+    // const patientsRef = collection(db, "patients");
+
+    // const patientsQuery = await query(
+    //   collection(db, "patients"),
+    //   orderBy("id", "desc"),
+    //   limit(3)
+    // );
+
+    let id = null;
+    console.log("doe het ofzo");
+
+    // const querySnapshot = await getDocs(patientsRef);
+    // if (querySnapshot.size === 0) {
+    //   console.log(querySnapshot.size);
+    //   id = 1;
+    // } else {
+    //   // console.log(patientsQuery);
+    //   console.log(querySnapshot.size);
+    //   // console.log(patientsQuery);
+    //   id = querySnapshot.size;
+    //   console.log(patientsQuery);
+    // }
+
+    const patientsRef = doc(db, "fysio", fysiotherapeutNummer, "patients");
+
+    const querySnapshot = await getDocs(patientsRef);
+    if (querySnapshot.size === 0) {
+      console.log(querySnapshot.size);
+      id = 1;
+    } else {
+      console.log(querySnapshot.size);
+      id = querySnapshot.size;
+    }
+
+    await setDoc(doc(patientsRef), {
+      id: id,
+      name: name,
+      weight: weight,
+      dateOfBirth: dateOfBirth,
+      heightInM: heightInM,
+      email: email,
+      gender: gender,
+      fysiotherapeutNummer: fysiotherapeutNummer,
+    });
+  } catch {
+    console.error("Error writing new message to Firebase Database", error);
+  }
 }
 
 // https://firebase.google.com/docs/firestore/manage-data/delete-data
