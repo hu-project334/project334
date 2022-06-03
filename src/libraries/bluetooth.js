@@ -226,10 +226,10 @@ class XsensDot {
     }
 
     /**
-     * subscribeToCharacteristicChangedNotifications function allows you to add a listener function
+     * subCharChanged function allows you to add a listener function
      * to a specific bluetooth characteristic which is called when this characteristic changes.
      */
-    subscribeToCharacteristicChangedNotifications(listenerFunction, service, characteristic) {
+    subCharChanged(listenerFunction, service, characteristic) {
         return this.device.gatt.getPrimaryService((prefix + service + suffix))
         .then(service => service.getCharacteristic((prefix + characteristic + suffix)))
         .then(characteristic => characteristic.startNotifications())
