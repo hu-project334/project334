@@ -21,6 +21,7 @@
       </template>
     </main>
 
+    <div style="margin-top: 80px;"></div>
     <footer>
       <button class="seeResultsButton" @click="showPatientForm">
         <b>Patiënt toevoegen</b>
@@ -124,7 +125,7 @@ p {
 
   margin-right: 5%;
   margin-left: 5%;
-  margin-bottom: 1%;
+  margin-bottom: 2%;
   width: 90%;
   padding: 1em;
   border: 1px solid white;
@@ -190,7 +191,7 @@ p {
 
 footer {
   display: flex;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;

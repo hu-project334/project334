@@ -305,12 +305,12 @@ class XsensDot {
         const value = event.target.value
         this.battery_level = value.getUint8(0, true)
         let element = document.getElementById("batterylevel")
-        element.innerHTML = this.battery_level
+        //element.innerHTML = this.battery_level
     }
 
     changeSensorStatus(status) {
         let element = document.getElementById("sensorStatus")
-        element.innerHTML = status
+       // element.innerHTML = status
     }
 }
 
