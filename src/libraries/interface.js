@@ -31,12 +31,12 @@ function parseIEEE754(singleByteDataView){
 
 // calculate angle between two quaternions
 function angleQuaternion(start, end) {
-    let s2 = start.clone()
-    let e2 = end.clone()
+    // let s2 = start.clone()
+    // let e2 = end.clone()
 
-    let z = s2.multiply(e2.conjugate())
-    let angleDifference = new THREE.Euler().setFromQuaternion(z)
-    console.log([(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)])
+    // let z = s2.multiply(e2.conjugate())
+    // let angleDifference = new THREE.Euler().setFromQuaternion(z)
+    // console.log([(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)])
 
     let angle = 2 * Math.acos(start.dot(end) / (start.length() * end.length())) * 57.2957795
     console.log(angle)
@@ -48,7 +48,6 @@ function angleQuaternion(start, end) {
 // =========================================================================
 
 async function findBluetoothDevices(XsensDotSensor) {
-
     await XsensDotSensor.request()
     XsensDotSensor.sensor_status = "connecting...";
     await XsensDotSensor.connect()
@@ -57,12 +56,12 @@ async function findBluetoothDevices(XsensDotSensor) {
     await XsensDotSensor.getInitialBatteryLevel()
     XsensDotSensor.sensor_status = "online";
 
-    await XsensDotSensor.subscribeToCharacteristicChangedNotifications(
+    await XsensDotSensor.subCharChanged(
         (event) => { XsensDotSensor.changeBatteryLevel(event.target.value.getUint8(0, true)) },
         serviceEnum.battery_service, serviceEnum.battery_level);
 }
 
-function startRTStream(XsensDotSensor) {
+async function startRTStream(XsensDotSensor) {
     render3Dsensor()
     console.log("Real time streaming started")
     // Reset member variables
@@ -156,22 +155,13 @@ function startRTStream(XsensDotSensor) {
                       XsensDotSensor.rotation,
                      (XsensDotSensor.rawTime / 1000).toFixed(2)]
         XsensDotSensor.data.push(tmpArr)
-
-        // // Display the data, in the future this will be done in a different way
-        // let element = document.getElementById("x-axis")
-        // element.innerHTML = (XsensDotSensor.rotation.x * 57.2957795).toFixed(2)
-        // element = document.getElementById("y-axis")
-        // element.innerHTML = (XsensDotSensor.rotation.y * 57.2957795).toFixed(2)
-        // element = document.getElementById("z-axis")
-        // element.innerHTML = (XsensDotSensor.rotation.z * 57.2957795).toFixed(2)
     }
 
     // Set notifications for short payload
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
-    .then(() => { // Set the normal message notification handler
-        return XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    })
-    .then(() => {
+    await XsensDotSensor.subCharChanged(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
+
+    await XsensDotSensor.subCharChanged(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
         XsensDotSensor.data = []
         XsensDotSensor.timeArr = []
         XsensDotSensor.rawTime = 0
@@ -181,16 +171,13 @@ function startRTStream(XsensDotSensor) {
         dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
         dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
         XsensDotSensor.verbose = false
-        XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
-        return
-    })
-    .catch(error => { console.error(error);})
+    await XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
 }
 
 async function stopRTStream(XsensDotSensor) {
     document.body.removeChild(document.body.lastChild)
     console.log("Real time streaming stopped")
-    await XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+    await XsensDotSensor.subCharChanged(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
 
     let buffer = new ArrayBuffer(3)
     let dataViewObject = new DataView(buffer)
@@ -214,7 +201,7 @@ async function stopRTStream(XsensDotSensor) {
 
 }
 
-function syncSensor(XsensDotSensor) {
+async function syncSensor(XsensDotSensor) {
     console.log("Synchronization started")
 
     NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
@@ -223,55 +210,46 @@ function syncSensor(XsensDotSensor) {
         console.log(`Device is: ${status}`)
     })
 
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => { // Start sync
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 6, syncMsgEnum.startSync, [0x4E,0x02,0x00,0xCD,0x22,0xD4])
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .then(() => {
-        XsensDotSensor.device.gatt.disconnect()
-        XsensDotSensor.sensor_status = "synchronizing";
+    await XsensDotSensor.subCharChanged(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
 
-        setTimeout(() => {
-            console.log("Attempting to connect to device")
-            XsensDotSensor.device.gatt.connect()
-            .then(() => {
-                console.log("Connection re-established")
-                XsensDotSensor.sensor_status = "online";
-                XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-                .then(() => {
-                    let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
-                    return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-                })
-                .catch(err => { console.error(err); })
-            })
-        }, 14000) // End of setTimeout
+    let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 6, syncMsgEnum.startSync, [0x4E,0x02,0x00,0xCD,0x22,0xD4])
+    await XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
 
-        return
-        })
-    .catch(err => { console.error(err); })
+    await XsensDotSensor.device.gatt.disconnect()
+    XsensDotSensor.sensor_status = "synchronizing";
+
+    setTimeout(async () => {
+        console.log("Attempting to connect to device")
+        await XsensDotSensor.device.gatt.connect()
+
+        console.log("Connection re-established")
+        XsensDotSensor.sensor_status = "online";
+        await XsensDotSensor.subCharChanged(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
+        await XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+
+    }, 14000) // End of setTimeout
 }
 
-function getSyncStatusSensor(XsensDotSensor) {
-    NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
+async function getSyncStatusSensor(XsensDotSensor) {
+    NotificationHandler.setCallback(notificationEnum.syncStatus, async (event) => {
         let value = event.target.value
         let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
         console.log(`Device is: ${status}`)
         if (value.getUint8(3, false) == msgAckEnum.synced) {
             let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.stopSync, []);
-            XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-            .then(() => {console.log("Sync stopped")})
+            await XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+            console.log("Sync stopped")
         } else if (value.getUint8(3, false) == msgAckEnum['un-synced']) {
-            syncSensor()
+            syncSensor(XsensDotSensor)
         }
     })
 
-    XsensDotSensor.subscribeToCharacteristicChangedNotifications(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
-    .then(() => {
-        let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
-        return XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
-    })
-    .catch(err => { console.error(err); })
+    await XsensDotSensor.subCharChanged(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+    let dataViewObject = XsensDotSensor.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
+    await XsensDotSensor.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
 }
 
 // 3D representation of sensor
