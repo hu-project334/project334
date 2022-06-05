@@ -21,7 +21,44 @@ import {
   limit,
 } from "firebase/firestore";
 
+
+
 const db = getFirestore();
+
+
+
+//////////////////////////////////////
+import { getAuth } from "firebase/auth";
+const auth = getAuth(); // Wordt gebruikt in testPatient functie
+
+
+
+export async function addPatient(){
+  // voor het verkrijgen van de user id: https://stackoverflow.com/a/37901056
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      const docRef = doc(db, "fysio", user.uid);
+      const colRef = collection(docRef, "patienten")
+    
+      addDoc(colRef, {
+        id: 2,
+        name: "Milo",
+        surName: "Belien",
+        weight: 70,
+        dateOfBirth: "28-09-2002",
+        heightInM: 1.83,
+        email: "milo.belien@student.hu.nl",
+        fysiotherapeutNummer: user.uid,
+      });
+    } else {
+      // No user is signed in.
+    }
+  });
+}
+///////////////////////////////////
+
+
+
 
 // dummy data
 async function dummyDataPatients(patientsRef, uid) {
