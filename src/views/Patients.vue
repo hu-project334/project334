@@ -21,7 +21,7 @@
       </template>
     </main>
 
-    <div style="margin-top: 80px;"></div>
+    <div style="margin-top: 80px"></div>
     <footer>
       <button class="seeResultsButton" @click="showPatientForm">
         <b>Patiënt toevoegen</b>
@@ -43,7 +43,6 @@ import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
-
 
 export default {
   name: "patients",
@@ -67,11 +66,15 @@ export default {
     this.getPatientsFromFireStore();
   },
   methods: {
-    getPatientsFromFireStore() {
+    async getPatientsFromFireStore() {
       let uid = this.$store.getters.getUser.uid;
-      getPatients(uid).then((results) => {
+      // this.patients = getPatients();
+
+      await getPatients(uid).then((results) => {
+        console.log(results);
         this.patients = results;
       });
+      console.log(this.patients);
     },
 
     goToPatient(id) {

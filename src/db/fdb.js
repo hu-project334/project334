@@ -20,45 +20,10 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-
-
-
-const db = getFirestore();
-
-
-
-//////////////////////////////////////
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
 
-
-
-export async function addPatient(){
-  // voor het verkrijgen van de user id: https://stackoverflow.com/a/37901056
-  auth.onAuthStateChanged(function(user) {
-    if (user) {
-      const docRef = doc(db, "fysio", user.uid);
-      const colRef = collection(docRef, "patienten")
-    
-      addDoc(colRef, {
-        id: 2,
-        name: "Milo",
-        surName: "Belien",
-        weight: 70,
-        dateOfBirth: "28-09-2002",
-        heightInM: 1.83,
-        email: "milo.belien@student.hu.nl",
-        fysiotherapeutNummer: user.uid,
-      });
-    } else {
-      // No user is signed in.
-    }
-  });
-}
-///////////////////////////////////
-
-
-
+const db = getFirestore();
 
 // dummy data
 async function dummyDataPatients(patientsRef, uid) {
@@ -88,32 +53,25 @@ async function dummyDataPatients(patientsRef, uid) {
 
 // https://firebase.google.com/docs/firestore/query-data/queries
 export async function getPatients(uid) {
+  console.log("komt die hier");
   // https://fireship.io/snippets/firestore-increment-tips/
-
-  // const patientsRef = collection(db, "patients");
-  // dummyDataPatients(patientsRef, uid);
-
-  const q = query(
-    collection(db, "patients"),
-    where("fysiotherapeutNummer", "==", uid)
-  );
   let patientList = [];
-
-  const querySnapshot = await getDocs(q);
+  // auth.onAuthStateChanged(async function (user) {
+  // if (user) {
+  const docRef = doc(db, "fysio", uid);
+  const colRef = collection(docRef, "patienten");
+  const querySnapshot = await getDocs(colRef);
   querySnapshot.forEach((doc) => {
-    // console.log(doc.id);
-
-    // documentID  =doc.id   user= doc.data()
-    //  user.id = documentID
-    // console.log(doc.id, " => ", doc.data());
-
     patientList.push(doc.data());
-    // console.log(doc.id, " => ", doc.data());
   });
+  // }
+  // });
+  console.log(patientList);
   return patientList;
 }
 
 // logged in fysio
+
 export async function createFysio(name, email, uid) {
   // https://stackoverflow.com/questions/49682327/how-to-update-a-single-firebase-firestore-document
   try {
@@ -129,32 +87,61 @@ export async function createFysio(name, email, uid) {
   }
 }
 
-export async function createPatient(
+export async function addPatient(
   name,
   weight,
   dateOfBirth,
   heightInM,
   email,
-  gender,
-  fysiotherapeutNummer
+  gender
 ) {
-  try {
-    const patientsRef = doc(db, "fysio", fysiotherapeutNummer, "patients");
-
-    await setDoc(doc(patientsRef), {
-      id: id,
-      name: name,
-      weight: weight,
-      dateOfBirth: dateOfBirth,
-      heightInM: heightInM,
-      email: email,
-      gender: gender,
-      fysiotherapeutNummer: fysiotherapeutNummer,
-    });
-  } catch {
-    console.error("Error writing new message to Firebase Database", error);
-  }
+  // voor het verkrijgen van de user id: https://stackoverflow.com/a/37901056
+  auth.onAuthStateChanged(function (user) {
+    if (user) {
+      const docRef = doc(db, "fysio", user.uid);
+      const colRef = collection(docRef, "patienten");
+      setDoc(doc(colRef, email), {
+        name: name,
+        weight: weight,
+        dateOfBirth: dateOfBirth,
+        heightInM: heightInM,
+        email: email,
+        gender: gender,
+        fysiotherapeutNummer: user.uid,
+      });
+    } else {
+      console.log("no user is signed in");
+      // No user is signed in.
+    }
+  });
 }
+
+// export async function createPatient(
+//   name,
+//   weight,
+//   dateOfBirth,
+//   heightInM,
+//   email,
+//   gender,
+//   fysiotherapeutNummer
+// ) {
+//   try {
+//     const patientsRef = doc(db, "fysio", fysiotherapeutNummer, "patients");
+
+//     await setDoc(doc(patientsRef), {
+//       id: id,
+//       name: name,
+//       weight: weight,
+//       dateOfBirth: dateOfBirth,
+//       heightInM: heightInM,
+//       email: email,
+//       gender: gender,
+//       fysiotherapeutNummer: fysiotherapeutNummer,
+//     });
+//   } catch {
+//     console.error("Error writing new message to Firebase Database", error);
+//   }
+// }
 
 // https://firebase.google.com/docs/firestore/manage-data/delete-data
 export async function deletePatient(id) {
@@ -177,9 +164,7 @@ export async function deletePatient(id) {
   // };
 }
 
-export async function getPatient() {
-  const patientRef = collection("patients").where();
-}
+export async function getPatient() {}
 
 /**--------------------------- OUDE CODE VOOR REFERENTIE --------------------------- */
 /** 
