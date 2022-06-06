@@ -104,81 +104,16 @@ export async function getSinglePatient(email, uid) {
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     return docSnap.data();
-
-    // console.log("Document data:", docSnap.data());
   } else {
-    // doc.data() will be undefined in this case
     console.log("No such document!");
   }
 }
 
 // https://firebase.google.com/docs/firestore/manage-data/delete-data
-export async function deletePatient(id) {
-  const patientRef = doc(db, "patients", id);
-  console.log(id);
-
-  // // db.collection("patients").document(id).delete();
-  // await deleteDoc(patientRef);
-  // // console.log("does this work");
-  await deleteDoc(patientRef);
-  console.log("werkt dit wel of niet");
-
-  // const handleDelete = async (id) => {
-  //   const taskDocRef = doc(db, "tasks", id);
-  //   try {
-  //     await deleteDoc(taskDocRef);
-  //   } catch (err) {
-  //     alert(err);
-  //   }
-  // };
+// Yes, the document you've mentioned is updated.
+// And no, deleting a document in Firestore does not delete its subcollections.
+// While deleting the document in Cloud Firestore, the subcollections won't be deleted automatically. You have to delete them manually instead.
+export async function deletePatient(email, uid) {
+  const docRef = doc(db, "fysio", uid, "patienten", email);
+  const docSnap = await deleteDoc(docRef);
 }
-
-export async function getPatient() {}
-
-/**--------------------------- OUDE CODE VOOR REFERENTIE --------------------------- */
-/** 
-// users
-export async function createUser(uid) {
-  await addDoc(collection(db, "users"), {
-    uid,
-  });
-}
-
-// exercises
-export async function updateExerciseScheme(
-  schemeId,
-  exercises,
-  name,
-  description
-) {
-  const docRef = await doc(db, "execise-scheme", schemeId);
-  updateDoc(docRef, {
-    name,
-    exercises,
-    description,
-    public: true,
-  });
-}
-export async function deleteExerciseScheme(schemeId) {
-  const docRef = doc(db, "execise-scheme", schemeId);
-  deleteDoc(docRef);
-}
-
-export async function createExerciseScheme(name, exercises, description) {
-  await addDoc(collection(db, "execise-scheme"), {
-    name,
-    exercises,
-    description,
-    public: true,
-  });
-}
-export async function getMyExercises() {
-  const docRef = await getDocs(collection(db, "execise-scheme"));
-
-  return docRef.docs.map((doc) => {
-    return { id: doc.id, ...doc.data() };
-  });
-}
-
-// patients
-*/
