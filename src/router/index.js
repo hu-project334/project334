@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import("../views/Patients.vue"),
     },
     {
-      path: "/patient",
+      path: "/patients/:name",
       name: "patient",
       component: () => import("../views/Patient.vue"),
     },
@@ -30,7 +30,7 @@ const router = createRouter({
       component: () => import("../components/forms/PatientCreatorForm.vue"),
     },
     {
-      path: "/exerciseResults",
+      path: "/patients/:name/exerciseResults",
       name: "exerciseResults",
       component: () => import("../views/ExerciseResults.vue"),
     },

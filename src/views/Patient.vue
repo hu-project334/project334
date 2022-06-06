@@ -1,14 +1,14 @@
 <template>
   <NavBarTop></NavBarTop>
 
-  <h1 class="title">{{ name }} {{ surName }}</h1>
+  <h1 class="title">{{ name }}</h1>
 
   <div class="container">
     <b>Patiënt gegevens</b>
     <table>
       <tr>
-        <td class="header_name"><b class="table_content" >Naam </b></td>
-        <td>{{ name }} {{ surName }}</td>
+        <td class="header_name"><b class="table_content">Naam </b></td>
+        <td>{{ name }}</td>
       </tr>
       <tr>
         <td class="header_name"><b>Gewicht </b></td>
@@ -23,8 +23,8 @@
         <td>{{ age }}</td>
       </tr>
       <tr>
-        <td class="header_name"><b>Patiënt nummer</b></td>
-        <td>{{ patientID }}</td>
+        <td class="header_name"><b> Email</b></td>
+        <td>{{ email }}</td>
       </tr>
     </table>
   </div>
@@ -49,28 +49,30 @@
 
   <button
     class="deletePatientBtn"
-    @click="deletePatientWithFireStore(patientID)"
+    @click="deletePatientWithFireStore(this.email)"
   >
     <b>Verwijder patiënt</b>
   </button>
 
-  <div style="margin-top: 80px;"></div>
+  <div style="margin-top: 80px"></div>
   <footer>
     <button class="backBtn" @click="goBackToPatientList()">
       <b>Terug</b>
     </button>
-    <button class="addCategory" @click="goToCategory()"><b>Categorie toevoegen</b></button>
+    <button class="addCategory" @click="goToCategory()">
+      <b>Categorie toevoegen</b>
+    </button>
   </footer>
 </template>
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import _ from "lodash";
-import patients from "../db/patients.json";
 import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
-import { deletePatient } from "../db/fdb";
+import { getSinglePatient, deletePatient } from "../db/fdb";
+import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 
 export default {
   name: "patients",
@@ -80,48 +82,54 @@ export default {
   },
   data() {
     return {
-      patientID: null,
       name: "",
-      surName: "",
       weight: null,
       age: "",
       heightInM: null,
       patients: null,
       categories: null,
+      gender: "",
+      email: "",
+      fysio: this.$store.getters.getUser.uid,
     };
   },
 
   mounted() {
-    this.categories = categories;
-    this.patients = patients;
-    this.patientID = this.$route.params.id;
     this.getPatientData();
+    this.categories = categories;
   },
 
   methods: {
-    getPatientData() {
-      let id = parseInt(this.patientID);
-      let patient = _.find(this.patients, { id: id });
+    async getPatientData() {
+      let email = this.$store.getters.getPatientEmail;
+      let uid = this.$store.getters.getUser.uid;
+
+      let patient = await getSinglePatient(email, uid).then((patient) => {
+        return patient;
+      });
+
       this.name = patient.name;
-      this.surName = patient.surName;
       this.weight = patient.weight;
       this.age = formatBirthDateToAge(patient.dateOfBirth);
       this.heightInM = patient.heightInM;
+      this.email = patient.email;
+      this.gender = patient.gender;
     },
-    deletePatientWithFireStore(id) {
-      deletePatient(id);
-      // let index = _.findIndex(this.patients, { id: id });
-      // this.patients.splice(index, 1);
-      // in database this should delete the patient
-      // this.$router.push({ name: "patients" });
+    deletePatientWithFireStore(email) {
+      deletePatient(email, this.fysio);
+      this.$router.push({ name: "patients" });
     },
     goBackToPatientList() {
       this.$router.push({ name: "patients" });
     },
     goToExerciseResults(category) {
-      //! fix params
-      this.$router.push({ name: "exerciseResults" });
+      let naam = deleteWhiteSpaceFromString(this.name);
+      this.$router.push({
+        name: "exerciseResults",
+        params: { name: naam },
+      });
     },
+
     goToCategory(category) {
       //! fix params
       this.$router.push({ name: "addCategorie" });
@@ -169,7 +177,7 @@ tr td {
   padding-left: 1%;
   width: 20%;
 }
-.table_content{
+.table_content {
   margin-right: 100px;
 }
 

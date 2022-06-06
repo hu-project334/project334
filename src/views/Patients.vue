@@ -14,7 +14,10 @@
             </p>
             <p class="text">{{ patient.email }}</p>
           </div>
-          <button class="seeResultsButton" @click="goToPatient(patient.id)">
+          <button
+            class="seeResultsButton"
+            @click="goToPatient(patient.name, patient.email)"
+          >
             <b> Ga naar patiënt</b>
           </button>
         </div>
@@ -43,6 +46,7 @@ import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
+import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 
 export default {
   name: "patients",
@@ -71,14 +75,16 @@ export default {
       // this.patients = getPatients();
 
       await getPatients(uid).then((results) => {
-        console.log(results);
         this.patients = results;
       });
-      console.log(this.patients);
     },
-
-    goToPatient(id) {
-      this.$router.push({ name: "patient", params: { id: id } });
+    goToPatient(naam, email) {
+      let changedName = deleteWhiteSpaceFromString(naam);
+      this.$store.commit("setPatientEmail", email);
+      this.$router.push({
+        name: "patient",
+        params: { name: changedName },
+      });
     },
     showPatientForm(event) {
       event.stopPropagation();

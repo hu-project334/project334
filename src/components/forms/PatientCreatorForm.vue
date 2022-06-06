@@ -113,7 +113,6 @@ export default {
     },
 
     createPatientWithFireStore(patient) {
-      console.log(patient);
       let newDate =
         patient.date.split("-")[2] +
         "-" +

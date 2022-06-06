@@ -58,7 +58,6 @@ export async function createFysio(name, email, uid) {
 }
 // https://firebase.google.com/docs/firestore/query-data/queries
 export async function getPatients(uid) {
-  console.log("komt die hier");
   let patientList = [];
   const docRef = doc(db, "fysio", uid);
   const colRef = collection(docRef, "patienten");
@@ -66,7 +65,6 @@ export async function getPatients(uid) {
   querySnapshot.forEach((doc) => {
     patientList.push(doc.data());
   });
-  console.log(patientList);
   return patientList;
 }
 
