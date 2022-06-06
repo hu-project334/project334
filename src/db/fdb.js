@@ -22,21 +22,12 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
+import store from "../store/userStore";
 
 const db = getFirestore();
 
 // dummy data
 async function dummyDataPatients(patientsRef, uid) {
-  // await setDoc(doc(patientsRef), {
-  //   id: 1,
-  //   name: "Alexander",
-  //   surName: "de Graaff",
-  //   weight: 70,
-  //   dateOfBirth: "22-06-2002",
-  //   heightInM: 1.82,
-  //   email: "alexander.d.graaff@gmail.com",
-  //   fysiotherapeutNummer: uid,
-  // });
   await setDoc(doc(patientsRef), {
     id: 2,
     name: "Milo",
@@ -51,27 +42,6 @@ async function dummyDataPatients(patientsRef, uid) {
 
 /**--------------------------- FUNCTIONS --------------------------- */
 
-// https://firebase.google.com/docs/firestore/query-data/queries
-export async function getPatients(uid) {
-  console.log("komt die hier");
-  // https://fireship.io/snippets/firestore-increment-tips/
-  let patientList = [];
-  // auth.onAuthStateChanged(async function (user) {
-  // if (user) {
-  const docRef = doc(db, "fysio", uid);
-  const colRef = collection(docRef, "patienten");
-  const querySnapshot = await getDocs(colRef);
-  querySnapshot.forEach((doc) => {
-    patientList.push(doc.data());
-  });
-  // }
-  // });
-  console.log(patientList);
-  return patientList;
-}
-
-// logged in fysio
-
 export async function createFysio(name, email, uid) {
   // https://stackoverflow.com/questions/49682327/how-to-update-a-single-firebase-firestore-document
   try {
@@ -85,6 +55,19 @@ export async function createFysio(name, email, uid) {
   } catch (error) {
     console.error("Error writing new message to Firebase Database", error);
   }
+}
+// https://firebase.google.com/docs/firestore/query-data/queries
+export async function getPatients(uid) {
+  console.log("komt die hier");
+  let patientList = [];
+  const docRef = doc(db, "fysio", uid);
+  const colRef = collection(docRef, "patienten");
+  const querySnapshot = await getDocs(colRef);
+  querySnapshot.forEach((doc) => {
+    patientList.push(doc.data());
+  });
+  console.log(patientList);
+  return patientList;
 }
 
 export async function addPatient(
@@ -116,32 +99,18 @@ export async function addPatient(
   });
 }
 
-// export async function createPatient(
-//   name,
-//   weight,
-//   dateOfBirth,
-//   heightInM,
-//   email,
-//   gender,
-//   fysiotherapeutNummer
-// ) {
-//   try {
-//     const patientsRef = doc(db, "fysio", fysiotherapeutNummer, "patients");
+export async function getSinglePatient(email, uid) {
+  const docRef = doc(db, "fysio", uid, "patienten", email);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data();
 
-//     await setDoc(doc(patientsRef), {
-//       id: id,
-//       name: name,
-//       weight: weight,
-//       dateOfBirth: dateOfBirth,
-//       heightInM: heightInM,
-//       email: email,
-//       gender: gender,
-//       fysiotherapeutNummer: fysiotherapeutNummer,
-//     });
-//   } catch {
-//     console.error("Error writing new message to Firebase Database", error);
-//   }
-// }
+    // console.log("Document data:", docSnap.data());
+  } else {
+    // doc.data() will be undefined in this case
+    console.log("No such document!");
+  }
+}
 
 // https://firebase.google.com/docs/firestore/manage-data/delete-data
 export async function deletePatient(id) {
