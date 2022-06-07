@@ -3,12 +3,6 @@ import { serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, 
 import { NotificationHandler } from './notification_handler.js'
 import * as THREE from 'three';
 
-let XsensDotSensor = null;
-
-function setGlobal(sensor){
-    XsensDotSensor = sensor
-}
-
 // =========================================================================
 //                            HELPER FUNCTIONS
 // =========================================================================
@@ -48,14 +42,14 @@ function angleQuaternion(start, end) {
 // =========================================================================
 
 async function startRTStream(XsensDotSensor) {
-    render3Dsensor()
+    render3Dsensor(XsensDotSensor)
     console.log("Real time streaming started")
     // Reset member variables
     XsensDotSensor.data = []
     XsensDotSensor.timeArr = []
     XsensDotSensor.rawTime = 0
 
-    let handlePayload = (event) => {
+    let handlePayload = (event, sensor) => {
         // parseCompleteEulerData(event)
         let normalize = (val, max, min) => { return (val - min) / (max - min); }
         let value = event.target.value;
@@ -71,12 +65,12 @@ async function startRTStream(XsensDotSensor) {
                         (timestampArr[timestampArr.length - 4] << 1));
 
         result = result / 1000
-        XsensDotSensor.timeArr.push(result)
-        if(XsensDotSensor.timeArr.length > 1){
-            if(XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1] > XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2]){
-                XsensDotSensor.rawTime += XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1] - XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2]
+        sensor.timeArr.push(result)
+        if(sensor.timeArr.length > 1){
+            if(sensor.timeArr[sensor.timeArr.length - 1] > sensor.timeArr[sensor.timeArr.length - 2]){
+                sensor.rawTime += sensor.timeArr[sensor.timeArr.length - 1] - sensor.timeArr[sensor.timeArr.length - 2]
             } else {
-                XsensDotSensor.rawTime += XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 2] - XsensDotSensor.timeArr[XsensDotSensor.timeArr.length - 1]
+                sensor.rawTime += sensor.timeArr[sensor.timeArr.length - 2] - sensor.timeArr[sensor.timeArr.length - 1]
             }
         }
 
@@ -118,27 +112,27 @@ async function startRTStream(XsensDotSensor) {
         z = normalize(parseIEEE754(z), 1, 0)
 
         // Filter data and store it in the member variables
-        let prevQuaternion = XsensDotSensor.quaternion
-        XsensDotSensor.quaternion = new THREE.Quaternion(x, y, z, w)
-        let prevRotation = XsensDotSensor.rotation
-        XsensDotSensor.rotation = new THREE.Euler().setFromQuaternion(XsensDotSensor.quaternion, "XYZ")
-        if (Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.x * 57.2957795)) == 180){
-            XsensDotSensor.rotation.x = prevRotation.x
-            XsensDotSensor.quaternion = prevQuaternion
+        let prevQuaternion = sensor.quaternion
+        sensor.quaternion = new THREE.Quaternion(x, y, z, w)
+        let prevRotation = sensor.rotation
+        sensor.rotation = new THREE.Euler().setFromQuaternion(sensor.quaternion, "XYZ")
+        if (Math.round(Math.abs(sensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(sensor.rotation.x * 57.2957795)) == 180){
+            sensor.rotation.x = prevRotation.x
+            sensor.quaternion = prevQuaternion
         }
-        if (Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(XsensDotSensor.rotation.y * 57.2957795)) == 180){
-            XsensDotSensor.rotation.y = prevRotation.y
-            XsensDotSensor.quaternion = prevQuaternion
+        if (Math.round(Math.abs(sensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(sensor.rotation.y * 57.2957795)) == 180){
+            sensor.rotation.y = prevRotation.y
+            sensor.quaternion = prevQuaternion
         }
-        if (Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(XsensDotSensor.rotation.z * 57.2957795)) == 180){
-            XsensDotSensor.rotation.z = prevRotation.z
-            XsensDotSensor.quaternion = prevQuaternion
+        if (Math.round(Math.abs(sensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(sensor.rotation.z * 57.2957795)) == 180){
+            sensor.rotation.z = prevRotation.z
+            sensor.quaternion = prevQuaternion
         }
 
-        let tmpArr = [XsensDotSensor.quaternion,
-                      XsensDotSensor.rotation,
-                     (XsensDotSensor.rawTime / 1000).toFixed(2)]
-        XsensDotSensor.data.push(tmpArr)
+        let tmpArr = [sensor.quaternion,
+                      sensor.rotation,
+                     (sensor.rawTime / 1000).toFixed(2)]
+        sensor.data.push(tmpArr)
     }
 
     // Set notifications for short payload
@@ -237,7 +231,7 @@ async function getSyncStatusSensor(XsensDotSensor) {
 }
 
 // 3D representation of sensor
-function render3Dsensor() {
+function render3Dsensor(XsensDotSensor) {
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
@@ -262,4 +256,4 @@ function render3Dsensor() {
 }
 
 // Exports
-export {startRTStream, stopRTStream, getSyncStatusSensor, setGlobal };
+export {startRTStream, stopRTStream, getSyncStatusSensor };

@@ -75,15 +75,22 @@ class XsensDot {
      * findAndConnect shows all nearby xsens sensors and connects to the chosen device
      */
     async findAndConnect() {
-        await this.request()
-        this.sensor_status = "connecting...";
-        await this.connect()
+        try {
+            await this.request()
+            this.sensor_status = "connecting...";
+            await this.connect()
 
-        await this.readDeviceName()
-        await this.getInitialBatteryLevel()
-        this.sensor_status = "online";
+            await this.readDeviceName()
+            await this.getInitialBatteryLevel()
+            this.sensor_status = "online";
 
-        await this.subCharChanged(this.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level);
+            await this.subCharChanged(this.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level);
+
+        } catch (error) {
+            this.sensor_status = "error";
+            console.error(error);
+            alert("Something went wrong please refresh this tab and try again.");
+        }
     }
 
     /**
@@ -175,70 +182,52 @@ class XsensDot {
     /**
      * readDeviceName reads the device name from the device_control information, returns it and prints it to the console
      */
-    readDeviceName() {
-        return this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
-        .then(value => {
-            let startOffset = 8;
-            let res = '';
-            for (let index = startOffset; index < (value.getUint8(7, true) + startOffset); index++) {
-                res += String.fromCharCode(value.getUint8(index, true));
-            }
-            this.device_name = res
-            return res;
-        })
-        .catch(error => { 
-            XsensDotSensor.changeSensorStatus("connection error")
-            console.error(error); 
-        });
-    }
+    async readDeviceName() {
+        let value = await this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
+
+        let startOffset = 8;
+        let res = '';
+        for (let index = startOffset; index < (value.getUint8(7, true) + startOffset); index++) {
+            res += String.fromCharCode(value.getUint8(index, true));
+        }
+        this.device_name = res
+        return this.device_name
+        }
 
     /**
      * blinkDeviceLED sends a command to the connected sensor to make its LED blink rapidly for a few seconds
      */
-    blinkDeviceLED() {
-        let dataViewObject
-        return this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
-        .then(value => { dataViewObject = value; }) // Get the current device control data and save it
-        .then(() => { return this.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix)); })
-        .then(service => { return service.getCharacteristic((prefix + serviceEnum.device_control + suffix)); })
-        .then(characteristic => {
-            dataViewObject.setUint8(0, 0x1); // Enable identify function on sensor
-            dataViewObject.setUint8(1, 0x01); // Set the identify bit
-            return characteristic.writeValue(dataViewObject); // Write the full object back to the sensor
-        })
-        .then(() => { console.log('Identifying sensor'); })
-        .catch(error => { 
-            this.sensor_status = "connection error";
-            console.error(error); 
-        });
+    async blinkDeviceLED() {
+        let dataViewObject = await this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
+
+        let service = await this.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix));
+        let characteristic = await service.getCharacteristic((prefix + serviceEnum.device_control + suffix));
+
+        dataViewObject.setUint8(0, 0x1); // Enable identify function on sensor
+        dataViewObject.setUint8(1, 0x01); // Set the identify bit
+        console.log("Blinking LED...")
+        await characteristic.writeValue(dataViewObject); // Write the full object back to the sensor
     }
 
     /**
      * getBatteryLevel function returns the current battery level and prints it to the console
      */
-    getInitialBatteryLevel() {
-        return this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
-        .then((value) => {
-            let batteryLevel = value.getUint8(0, true)
-            this.battery_level = batteryLevel
-            return batteryLevel
-     })
-        .catch((error) => { 
-            this.sensor_status = "connection error";
-            console.error(error); 
-        });
+    async getInitialBatteryLevel() {
+        let value = await this.getCharacteristicData(serviceEnum.battery_service, serviceEnum.battery_level)
+        let batteryLevel = value.getUint8(0, true)
+        this.battery_level = batteryLevel
+        return batteryLevel
     }
 
     /**
      * subCharChanged function allows you to add a listener function
      * to a specific bluetooth characteristic which is called when this characteristic changes.
      */
-    subCharChanged(listenerFunction, service, characteristic) {
-        return this.device.gatt.getPrimaryService((prefix + service + suffix))
-        .then(service => service.getCharacteristic((prefix + characteristic + suffix)))
-        .then(characteristic => characteristic.startNotifications())
-        .then(characteristic => characteristic.addEventListener('characteristicvaluechanged', listenerFunction))
-        .catch(error => { console.error(error); });
+    async subCharChanged(listenerFunction, serviceEnum, characteristicEnum) {
+        let service = await this.device.gatt.getPrimaryService((prefix + serviceEnum + suffix))
+        let characteristic = await service.getCharacteristic((prefix + characteristicEnum + suffix))
+        characteristic.startNotifications()
+        characteristic.addEventListener('characteristicvaluechanged', (event) => {listenerFunction(event, this)})
     }
 
     /**
@@ -319,16 +308,12 @@ class XsensDot {
         link.click();
     }
 
-    changeBatteryLevel(batteryLevel) {
-        this.battery_level = batteryLevel;
-    }
-
     /**
     * handleBatteryChanged is executed when the battery characteristic changes
     */
-    handleBatteryChanged(event) {
+    handleBatteryChanged(event, sensor) {
         const value = event.target.value
-        this.battery_level = value.getUint8(0, true)
+        sensor.battery_level = value.getUint8(0, true)
     }
 }
 
