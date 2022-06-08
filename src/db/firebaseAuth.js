@@ -16,7 +16,9 @@ export async function registerWithEmail(value) {
     .then((userCredential) => {
       let user = userCredential.user;
       store.commit("setUser", user);
+      createFysio("", user.email, user.uid);
       router.push({ path: "/patients" });
+
       return null;
     })
     .catch((error) => {
@@ -27,11 +29,11 @@ export async function registerWithEmail(value) {
 
 export async function login(value) {
   const auth = getAuth();
-
   return signInWithEmailAndPassword(auth, value.email, value.password)
     .then((userCredential) => {
       const user = userCredential.user;
       store.commit("setUser", user);
+      createFysio("", user.email, user.uid);
       router.push({ path: "/patients" });
 
       return { succes: true, errorMessage: "" };

@@ -1,7 +1,7 @@
 <template>
   <form class="form">
     <h3><b>Patiënt Toevoegen</b></h3>
-    <Form @submit="createPatientWithFireStore" :validation-schema="schema">
+    <Form @submit="handleRegister" :validation-schema="schema">
       <div class="form-group">
         <label for="email" style="font-weight: bold">Email</label>
         <Field name="email" type="email" class="form-control" />
@@ -9,38 +9,44 @@
       </div>
       <div class="form-group">
         <label for="naam" style="font-weight: bold">Naam</label>
-        <Field name="naam" type="name" class="form-control" />
+        <Field name="password" type="name" class="form-control" />
         <ErrorMessage name="naam" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="gewicht" style="font-weight: bold"> Gewicht (kg)</label>
-        <Field name="gewicht" type="number" class="form-control" />
+        <Field
+          name="gewicht" type="number" class="form-control"
+        />
         <ErrorMessage name="gewicht" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="lengte" style="font-weight: bold"> Lengte (m)</label>
-        <Field name="lengte" type="number" class="form-control" />
+        <Field
+          name="lengte" type="number" class="form-control"
+        />
         <ErrorMessage name="lengte" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="geslacht" style="font-weight: bold"> Geslacht</label>
-        <Field name="geslacht" type="name" class="form-control" />
+        <select name="geslacht" class="form-control">
+          <option> Man </option>
+          <option> Vrouw </option>
+          <option> Ander </option>
+        </select>
         <ErrorMessage name="geslacht" class="error-feedback" />
       </div>
       <div class="form-group">
         <label for="date" style="font-weight: bold"> Geboorte datum</label>
-        <Field name="date" type="date" class="form-control" />
+        <Field
+          name="date" type="date" class="form-control"
+        />
         <ErrorMessage name="date" class="error-feedback" />
       </div>
       <div id="submit_btn_cover">
-        <button class="registerButton" style="font-weight: bold">
-          <b>Voeg patient toe</b>
-        </button>
+        <button class="registerButton" style="font-weight: bold"><b>Voeg patient toe</b></button>
       </div>
     </Form>
-    <button class="returnButton" @click="goBackToPatients()">
-      <b>Terug</b>
-    </button>
+    <button class="returnButton" @click="goBackToPatients()"><b>Terug</b></button>
     <div v-if="firebaseError !== ''" id="errorText">{{ firebaseError }}</div>
 
     <div
@@ -55,8 +61,6 @@
 
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
-import { addPatient } from "@/db/fdb.js";
-
 import * as yup from "yup";
 export default {
   name: "Register",
@@ -79,14 +83,10 @@ export default {
         .string()
         .required("Dit veld is verplicht")
         .max(50, "Karakter limiet bereikt"),
-      geslacht: yup
-        .string()
-        .required("Dit veld is verplicht")
-        .max(50, "Karakter limiet bereikt"),
       gewicht: yup
         .number()
         .required("Dit veld is verplicht")
-        .typeError("Dit veld is verplicht"),
+        .max(50, "Karakter limiet bereikt"),
       date: yup
         .string()
         .required("Dit veld is verplicht")
@@ -94,9 +94,8 @@ export default {
       lengte: yup
         .number()
         .required("Dit veld is verplicht")
-        .lessThan(2.5, "Voer een valide lengte in")
+        .lessThan(3, "Voer een valide lengte in")
         .moreThan(0, "Voer een valide lengte in")
-        .typeError("Dit veld is verplicht"),
     });
     return {
       successful: false,
@@ -105,33 +104,20 @@ export default {
       schema,
     };
   },
-  mounted() {},
 
   methods: {
-    goBackToPatients() {
-      this.$emit("close");
+    handleRegister(user) {
+      this.message = "";
+      this.successful = false;
+      this.loading = true;
+      this.$emit("send", user);
+      // console.log(user);
+
+      this.successful = true;
+      this.loading = false;
     },
-
-    createPatientWithFireStore(patient) {
-      let newDate =
-        patient.date.split("-")[2] +
-        "-" +
-        patient.date.split("-")[1] +
-        "-" +
-        patient.date.split("-")[0];
-      // let fysioId = this.$store.getters.getUser.uid;
-      // fysioId
-
-      addPatient(
-        patient.naam,
-        patient.gewicht,
-        newDate,
-        patient.lengte,
-        patient.email,
-        patient.geslacht
-      );
-
-      this.goBackToPatients();
+    goBackToPatients() {
+      this.$emit("close")
     },
   },
 };
