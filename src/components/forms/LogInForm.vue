@@ -21,7 +21,9 @@
     </div>
     <div v-if="errorMessage !== ''" id="errorText">{{ errorMessage }}</div>
     <div id="submit_btn_cover">
-      <button class="logInButton" @click="submitForm()">Login</button>
+      <button class="logInButton" type="button" @click="submitForm()">
+        Login
+      </button>
       <button class="returnButton" @click="goBackToRegister()">Terug</button>
     </div>
   </form>
@@ -43,7 +45,7 @@ export default {
       this.$emit("send", this.userData);
     },
     goBackToRegister() {
-      this.$emit("close")
+      this.$emit("close");
     },
   },
 };
