@@ -96,6 +96,7 @@ export default {
 
   mounted() {
     this.getPatientData();
+    
     this.categories = categories;
   },
 

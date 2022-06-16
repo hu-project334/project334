@@ -115,3 +115,18 @@ export async function deletePatient(email, uid) {
   const docRef = doc(db, "fysio", uid, "patienten", email);
   const docSnap = await deleteDoc(docRef);
 }
+
+// https://medium.com/firebase-tips-tricks/how-to-list-all-subcollections-of-a-cloud-firestore-document-17f2bb80a166
+export async function addCategorie(uid, email, type) {
+  const docRef = doc(db, "fysio", uid, "patienten", email);
+  const colRef = collection(docRef, "excersizeCategory");
+  setDoc(doc(colRef, type), {
+    name: type,
+  });
+}
+
+// export async function getCategories(){
+//   const docRef = doc(db, "fysio", uid, "patienten", email);
+//   const colRef()
+
+// }
