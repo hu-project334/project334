@@ -117,7 +117,7 @@ export default {
       this.gender = patient.gender;
     },
     deletePatientWithFireStore(email) {
-      deletePatient(email, this.fysio);
+      deletePatient(email);
       this.$router.push({ name: "patients" });
     },
     goBackToPatientList() {
@@ -125,9 +125,10 @@ export default {
     },
     goToExerciseResults(category) {
       let docKey = this.route.params.name;
+      console.log(category);
       this.$router.push({
         name: "exerciseResults",
-        params: { name: docKey },
+        params: { name: docKey, category: category },
       });
     },
 

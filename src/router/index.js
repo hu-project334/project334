@@ -2,7 +2,8 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import store from "../store/userStore";
 
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL + `#`),
+  history: createWebHashHistory(),
+
   routes: [
     {
       path: "/",
@@ -30,17 +31,18 @@ const router = createRouter({
       component: () => import("../components/forms/PatientCreatorForm.vue"),
     },
     {
-      path: "/:name/exerciseResults",
+      path: "/:name/:category/exerciseResults",
       name: "exerciseResults",
       component: () => import("../views/ExerciseResults.vue"),
     },
+    ,
     {
       path: "/selectSensor",
       name: "selectSensor",
       component: () => import("../views/SelectSensor.vue"),
     },
     {
-      path: "/measureInfo",
+      path: "//measureInfo",
       name: "measureInfo",
       component: () => import("../views/MeasureInfo.vue"),
     },
@@ -58,6 +60,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
+  console.log(import.meta.env.BASE_URL);
   if (to.name !== "Register" && !store.getters.isLogedIn)
     return { name: "Register" };
 });

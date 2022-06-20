@@ -224,6 +224,7 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import { addCategorie } from "../db/fdb";
+import { useRoute } from "vue-router";
 
 export default {
   name: "Select Sensor",
@@ -231,7 +232,9 @@ export default {
     NavBarTop,
   },
   data() {
-    return {};
+    return {
+      route: useRoute(),
+    };
   },
 
   methods: {
@@ -240,11 +243,9 @@ export default {
     },
 
     addSelected(type) {
+      let docIdPatient = this.route.params.name;
       console.log(type);
-      let uid = this.$store.getters.getUser.uid;
-      let email = this.$store.getters.getPatientEmail;
-      console.log(email);
-      addCategorie(uid, email, type);
+      addCategorie(docIdPatient, type);
     },
   },
 };

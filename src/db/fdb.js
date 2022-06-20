@@ -92,13 +92,16 @@ export async function getSinglePatient(docKey) {
   return docSnap.data();
 }
 
-export async function deletePatient(email, uid) {
-  const docRef = doc(db, "fysio", uid, "patienten", email);
-  const docSnap = await deleteDoc(docRef);
+export async function deletePatient(email) {
+  console.log(email);
+  const colRef = collection(db, "patienten");
+  const q = query(colRef, where("email", "==", email));
+  await deleteDoc(q);
 }
 
-export async function addCategorie(uid, email, type) {
-  const docRef = doc(db, "fysio", uid, "patienten", email);
+export async function addCategorie(docIdPatient, type) {
+  console.log(docIdPatient);
+  const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
   setDoc(doc(colRef, type), {
     name: type,
