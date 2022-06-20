@@ -1,45 +1,8 @@
 /* eslint-disable */
-import { serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, syncMsgEnum, getKeyByValue } from './bluetooth_enums.js'
+import { serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, syncMsgEnum, getKeyByValue, payloadIDsEnum } from './bluetooth_enums.js'
 import { NotificationHandler } from './notification_handler.js'
+import { orientationQuaternionHandler, angleQuaternion } from './payload_handlers.js'
 import * as THREE from 'three';
-
-// =========================================================================
-//                            HELPER FUNCTIONS
-// =========================================================================
-
-function parseIEEE754(singleByteDataView){
-
-    let axisString = ""
-    for (let i = 0; i < 4; i++) {
-        let tmpValue = (singleByteDataView.getUint8(i, true) >>> 0).toString(2)
-        axisString =  ("0".repeat(8-tmpValue.length) + tmpValue) + axisString
-    }
-
-    let a = parseInt(axisString.charAt(0), 2)
-    let b = parseInt(axisString.substring(1,9), 2)
-    let c = parseInt("1"+axisString.substring(9), 2)
-
-    let result = ((-1)**a * c /( 1<<( axisString.length-9 - (b-127) ))).toFixed(2)
-    return result
-}
-
-// calculate angle between two quaternions
-function angleQuaternion(start, end) {
-    // let s2 = start.clone()
-    // let e2 = end.clone()
-
-    // let z = s2.multiply(e2.conjugate())
-    // let angleDifference = new THREE.Euler().setFromQuaternion(z)
-    // console.log([(angleDifference.x * 57.2957795).toFixed(0), (angleDifference.y * 57.2957795).toFixed(0), (angleDifference.z * 57.2957795).toFixed(0)])
-
-    let angle = 2 * Math.acos(start.dot(end) / (start.length() * end.length())) * 57.2957795
-    console.log(angle)
-    return angle
-}
-
-// =========================================================================
-//                            PUBLIC FUNCTIONS
-// =========================================================================
 
 async function startRTStream(XsensDotSensor) {
     render3Dsensor(XsensDotSensor)
@@ -49,106 +12,20 @@ async function startRTStream(XsensDotSensor) {
     XsensDotSensor.timeArr = []
     XsensDotSensor.rawTime = 0
 
-    let handlePayload = (event, sensor) => {
-        // parseCompleteEulerData(event)
-        let normalize = (val, max, min) => { return (val - min) / (max - min); }
-        let value = event.target.value;
-
-        // The first element from the event is 4 bits worth of time
-        let timestampArr = []
-        for (var i = 0; i < 4; i++){
-            timestampArr.push(value.getUint8(i, true))
-        }
-        var result = ((timestampArr[timestampArr.length - 24]) |
-                        (timestampArr[timestampArr.length - 2] << 16) |
-                        (timestampArr[timestampArr.length - 3] << 8) |
-                        (timestampArr[timestampArr.length - 4] << 1));
-
-        result = result / 1000
-        sensor.timeArr.push(result)
-        if(sensor.timeArr.length > 1){
-            if(sensor.timeArr[sensor.timeArr.length - 1] > sensor.timeArr[sensor.timeArr.length - 2]){
-                sensor.rawTime += sensor.timeArr[sensor.timeArr.length - 1] - sensor.timeArr[sensor.timeArr.length - 2]
-            } else {
-                sensor.rawTime += sensor.timeArr[sensor.timeArr.length - 2] - sensor.timeArr[sensor.timeArr.length - 1]
-            }
-        }
-
-        // Parse quaternion values
-        // Parse w
-        let offset = 4
-        const buffer = new ArrayBuffer(4);
-        let w = new DataView(buffer);
-        for (let i = 0; i < 4; i++) {
-            w.setInt8(i, value.getUint8(i + offset, true))
-        }
-        w = normalize(parseIEEE754(w), 1, 0)
-        offset += 4
-
-        // Parse x
-        const buffer_x = new ArrayBuffer(4);
-        let x = new DataView(buffer_x);
-        for (let i = 0; i < 4; i++) {
-            x.setInt8(i, value.getUint8(i + offset, true))
-        }
-        x = normalize(parseIEEE754(x), 1, 0)
-        offset += 4
-
-        // Parse y
-        const buffer_y = new ArrayBuffer(4);
-        let y = new DataView(buffer_y);
-        for (let i = 0; i < 4; i++) {
-            y.setInt8(i, value.getUint8(i + offset, true))
-        }
-        y = normalize(parseIEEE754(y), 1, 0)
-        offset += 4
-
-        // Parse z
-        const buffer_z = new ArrayBuffer(4);
-        let z = new DataView(buffer_z);
-        for (let i = 0; i < 4; i++) {
-            z.setInt8(i, value.getUint8(i + offset, true))
-        }
-        z = normalize(parseIEEE754(z), 1, 0)
-
-        // Filter data and store it in the member variables
-        let prevQuaternion = sensor.quaternion
-        sensor.quaternion = new THREE.Quaternion(x, y, z, w)
-        let prevRotation = sensor.rotation
-        sensor.rotation = new THREE.Euler().setFromQuaternion(sensor.quaternion, "XYZ")
-        if (Math.round(Math.abs(sensor.rotation.x * 57.2957795)) == 90 || Math.round(Math.abs(sensor.rotation.x * 57.2957795)) == 180){
-            sensor.rotation.x = prevRotation.x
-            sensor.quaternion = prevQuaternion
-        }
-        if (Math.round(Math.abs(sensor.rotation.y * 57.2957795)) == 90 || Math.round(Math.abs(sensor.rotation.y * 57.2957795)) == 180){
-            sensor.rotation.y = prevRotation.y
-            sensor.quaternion = prevQuaternion
-        }
-        if (Math.round(Math.abs(sensor.rotation.z * 57.2957795)) == 0 || Math.round(Math.abs(sensor.rotation.z * 57.2957795)) == 180){
-            sensor.rotation.z = prevRotation.z
-            sensor.quaternion = prevQuaternion
-        }
-
-        let tmpArr = [sensor.quaternion,
-                      sensor.rotation,
-                     (sensor.rawTime / 1000).toFixed(2)]
-        sensor.data.push(tmpArr)
-    }
-
     // Set notifications for short payload
-    await XsensDotSensor.subCharChanged(handlePayload, serviceEnum.measurement_service, serviceEnum.short_payload_length)
+    await XsensDotSensor.subCharChanged(orientationQuaternionHandler, serviceEnum.measurement_service, serviceEnum.short_payload_length)
 
     await XsensDotSensor.subCharChanged(NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
 
-        XsensDotSensor.data = []
-        XsensDotSensor.timeArr = []
-        XsensDotSensor.rawTime = 0
-        let buffer = new ArrayBuffer(3)
-        let dataViewObject = new DataView(buffer)
-        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
-        dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
-        dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
-        XsensDotSensor.verbose = false
+    XsensDotSensor.data = []
+    XsensDotSensor.timeArr = []
+    XsensDotSensor.rawTime = 0
+    let buffer = new ArrayBuffer(3)
+    let dataViewObject = new DataView(buffer)
+    dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+    dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
+    dataViewObject.setUint8(2, payloadIDsEnum.orientationQuaternion)
+    XsensDotSensor.verbose = false
     await XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
 }
 
@@ -161,7 +38,7 @@ async function stopRTStream(XsensDotSensor) {
     let dataViewObject = new DataView(buffer)
     dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
     dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
-    dataViewObject.setUint8(2, 0x05) // Set payload mode 16: complete euler
+    dataViewObject.setUint8(2, payloadIDsEnum.orientationQuaternion) // Set payload mode
     XsensDotSensor.verbose = false
     await XsensDotSensor.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{XsensDotSensor.verbose = true; return})
 
