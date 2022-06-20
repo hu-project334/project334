@@ -14,13 +14,17 @@
             </p>
             <p class="text">{{ patient.email }}</p>
           </div>
-          <button class="seeResultsButton" @click="goToPatient(patient.id)">
+          <button
+            class="seeResultsButton"
+            @click="goToPatient(patient.name, patient.email)"
+          >
             <b> Ga naar patiënt</b>
           </button>
         </div>
       </template>
     </main>
 
+    <div style="margin-top: 80px"></div>
     <footer>
       <button class="seeResultsButton" @click="showPatientForm">
         <b>Patiënt toevoegen</b>
@@ -42,7 +46,7 @@ import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
-
+import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 
 export default {
   name: "patients",
@@ -66,15 +70,21 @@ export default {
     this.getPatientsFromFireStore();
   },
   methods: {
-    getPatientsFromFireStore() {
+    async getPatientsFromFireStore() {
       let uid = this.$store.getters.getUser.uid;
-      getPatients(uid).then((results) => {
+      // this.patients = getPatients();
+
+      await getPatients(uid).then((results) => {
         this.patients = results;
       });
     },
-
-    goToPatient(id) {
-      this.$router.push({ name: "patient", params: { id: id } });
+    goToPatient(naam, email) {
+      let changedName = deleteWhiteSpaceFromString(naam);
+      this.$store.commit("setPatientEmail", email);
+      this.$router.push({
+        name: "patient",
+        params: { name: changedName },
+      });
     },
     showPatientForm(event) {
       event.stopPropagation();
@@ -124,7 +134,7 @@ p {
 
   margin-right: 5%;
   margin-left: 5%;
-  margin-bottom: 1%;
+  margin-bottom: 2%;
   width: 90%;
   padding: 1em;
   border: 1px solid white;
@@ -190,7 +200,7 @@ p {
 
 footer {
   display: flex;
-  position: sticky;
+  position: fixed;
   bottom: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;

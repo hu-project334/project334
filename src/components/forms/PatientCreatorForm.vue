@@ -55,7 +55,7 @@
 
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
-import { createPatient } from "@/db/fdb.js";
+import { addPatient } from "@/db/fdb.js";
 
 import * as yup from "yup";
 export default {
@@ -113,23 +113,22 @@ export default {
     },
 
     createPatientWithFireStore(patient) {
-      console.log(patient);
       let newDate =
         patient.date.split("-")[2] +
         "-" +
         patient.date.split("-")[1] +
         "-" +
         patient.date.split("-")[0];
-      let fysioId = this.$store.getters.getUser.uid;
+      // let fysioId = this.$store.getters.getUser.uid;
+      // fysioId
 
-      createPatient(
+      addPatient(
         patient.naam,
         patient.gewicht,
         newDate,
         patient.lengte,
         patient.email,
-        patient.geslacht,
-        fysioId
+        patient.geslacht
       );
 
       this.goBackToPatients();

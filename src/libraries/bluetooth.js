@@ -410,7 +410,7 @@ class XsensDot {
         dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
         dataViewObject.setUint8(2, payloadIDsEnum.orientationQuaternion)
         this.verbose = false
-        await this.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
+        await this.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {this.verbose = true; return})
     }
 
     async stopRTStream() {

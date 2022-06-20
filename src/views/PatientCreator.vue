@@ -1,35 +1,52 @@
 <template>
   <form class="form">
-    <h3><b>Registreer met email</b></h3>
+    <h3><b>Patiënt Toevoegen</b></h3>
     <Form @submit="handleRegister" :validation-schema="schema">
       <div class="form-group">
         <label for="email" style="font-weight: bold">Email</label>
-        <Field name="email" class="form-control" />
+        <Field name="email" type="email" class="form-control" />
         <ErrorMessage name="email" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="password" style="font-weight: bold">Wachtwoord</label>
-        <Field name="password" type="password" class="form-control" />
-        <ErrorMessage name="password" class="error-feedback" />
+        <label for="naam" style="font-weight: bold">Naam</label>
+        <Field name="password" type="name" class="form-control" />
+        <ErrorMessage name="naam" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="passwordConfirmation" style="font-weight: bold">
-          Herhaal wachtwoord</label
-        >
+        <label for="gewicht" style="font-weight: bold"> Gewicht (kg)</label>
         <Field
-          name="passwordConfirmation"
-          type="password"
-          class="form-control"
+          name="gewicht" type="number" class="form-control"
         />
-        <ErrorMessage name="passwordConfirmation" class="error-feedback" />
+        <ErrorMessage name="gewicht" class="error-feedback" />
+      </div>
+      <div class="form-group">
+        <label for="lengte" style="font-weight: bold"> Lengte (m)</label>
+        <Field
+          name="lengte" type="number" class="form-control"
+        />
+        <ErrorMessage name="lengte" class="error-feedback" />
+      </div>
+      <div class="form-group">
+        <label for="geslacht" style="font-weight: bold"> Geslacht</label>
+        <select name="geslacht" class="form-control">
+          <option> Man </option>
+          <option> Vrouw </option>
+          <option> Ander </option>
+        </select>
+        <ErrorMessage name="geslacht" class="error-feedback" />
+      </div>
+      <div class="form-group">
+        <label for="date" style="font-weight: bold"> Geboorte datum</label>
+        <Field
+          name="date" type="date" class="form-control"
+        />
+        <ErrorMessage name="date" class="error-feedback" />
       </div>
       <div id="submit_btn_cover">
-        <button class="registerButton"><b>Registreer</b></button>
+        <button class="registerButton" style="font-weight: bold"><b>Voeg patient toe</b></button>
       </div>
     </Form>
-    <button class="returnButton" @click="goBackToRegister()">
-      <b>Terug</b>
-    </button>
+    <button class="returnButton" @click="goBackToPatients()"><b>Terug</b></button>
     <div v-if="firebaseError !== ''" id="errorText">{{ firebaseError }}</div>
 
     <div
@@ -62,15 +79,23 @@ export default {
         .required("Dit veld is verplicht")
         .email("Email is ongeldig")
         .max(50, "Karakter limiet bereikt"),
-      password: yup
+      naam: yup
         .string()
         .required("Dit veld is verplicht")
-        .min(6, "Wachtwoord moet minimaal 6 karakters zijn")
-        .max(40, "Karakter limiet bereikt"),
-      passwordConfirmation: yup
+        .max(50, "Karakter limiet bereikt"),
+      gewicht: yup
+        .number()
+        .required("Dit veld is verplicht")
+        .max(50, "Karakter limiet bereikt"),
+      date: yup
         .string()
-        .oneOf([yup.ref("password"), null], "Wachtwoord komt niet overeen")
-        .required("Dit veld is verplicht"),
+        .required("Dit veld is verplicht")
+        .max(50, "Karakter limiet bereikt"),
+      lengte: yup
+        .number()
+        .required("Dit veld is verplicht")
+        .lessThan(3, "Voer een valide lengte in")
+        .moreThan(0, "Voer een valide lengte in")
     });
     return {
       successful: false,
@@ -86,11 +111,13 @@ export default {
       this.successful = false;
       this.loading = true;
       this.$emit("send", user);
+      // console.log(user);
+
       this.successful = true;
       this.loading = false;
     },
-    goBackToRegister() {
-      this.$emit("close");
+    goBackToPatients() {
+      this.$emit("close")
     },
   },
 };

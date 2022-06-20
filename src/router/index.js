@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import("../views/Patients.vue"),
     },
     {
-      path: "/patient/:id",
+      path: "/patients/:name",
       name: "patient",
       component: () => import("../views/Patient.vue"),
     },
@@ -30,9 +30,29 @@ const router = createRouter({
       component: () => import("../components/forms/PatientCreatorForm.vue"),
     },
     {
-      path: "/exerciseResults",
+      path: "/patients/:name/exerciseResults",
       name: "exerciseResults",
       component: () => import("../views/ExerciseResults.vue"),
+    },
+    {
+      path: "/selectSensor",
+      name: "selectSensor",
+      component: () => import("../views/SelectSensor.vue"),
+    },
+    {
+      path: "/measureInfo",
+      name: "measureInfo",
+      component: () => import("../views/MeasureInfo.vue"),
+    },
+    {
+      path: "/measure",
+      name: "measure",
+      component: () => import("../views/Measure.vue"),
+    },
+    {
+      path: "/addCategorie",
+      name: "addCategorie",
+      component: () => import("../views/AddCategorie.vue"),
     },
   ],
 });

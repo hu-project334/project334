@@ -8,27 +8,15 @@ Register.vue - base vue
   <input type="text" name="device name" placeholder="enter new device name" :value="device_name" @change="updateDeviceName">
   <p><button @click="identify()">identify device</button></p>
   <h2>Device name: {{ device_name }}</h2>
-  <h2>
-    Battery level: {{ batterylevel }}
-  </h2>
-  <h2>
-    Sensor status: {{ sensorstatus }}
-  </h2>
+  <h2>Battery level: {{ batterylevel }}</h2>
+  <h2>Sensor status: {{ sensorstatus }}</h2>
   <p><button @click="startDataExport()">Export data</button></p>
   <p><button @click="streamData()">Start real time streaming</button></p>
   <p><button @click="stopDataStream()">stop real time streaming</button></p>
-  <h2>
-    X: {{x}}
-  </h2>
-  <h2>
-    Y: {{y}}
-  </h2>
-  <h2>
-    Z: {{z}}
-  </h2>
-  <h2>
-    Biggest angle: {{ angle }}
-  </h2>
+  <h2>X: {{ x }}</h2>
+  <h2>Y: {{ y }}</h2>
+  <h2>Z: {{ z }}</h2>
+  <h2>Biggest angle: {{ angle }}</h2>
 </template>
 
 <script>
@@ -63,31 +51,31 @@ export default {
     this.sensorstatus = this.XsensDotSensor.sensor_status;
   },
   watch: {
-    'XsensDotSensor.device_name': {
+    "XsensDotSensor.device_name": {
       handler(newName) {
         this.device_name = newName;
       },
       deep: true,
     },
-    'XsensDotSensor.sensor_status': {
+    "XsensDotSensor.sensor_status": {
       handler(newStatus) {
         this.sensorstatus = newStatus;
       },
       deep: true,
     },
-    'XsensDotSensor.max_angle': {
+    "XsensDotSensor.max_angle": {
       handler(newAngle) {
         this.angle = newAngle;
       },
       deep: true,
     },
-    'XsensDotSensor.battery_level': {
+    "XsensDotSensor.battery_level": {
       handler(newBattery) {
         this.batterylevel = newBattery;
       },
       deep: true,
     },
-    'XsensDotSensor.rotation': {
+    "XsensDotSensor.rotation": {
       handler(newRotation) {
         if (newRotation == undefined) {
           return;
@@ -97,7 +85,7 @@ export default {
         this.z = (newRotation.z * 57.2957795).toFixed(2);
       },
       deep: true,
-    }
+    },
   },
   methods: {
     getData() {
