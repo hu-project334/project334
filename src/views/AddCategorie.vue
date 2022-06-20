@@ -6,7 +6,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker onder arm</b></div>
+            <div><b class="categoryTitle">Elleboog flexie &</b></div>
+            <div><b class="categoryTitle">extensie links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -14,7 +15,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter onder arm</b></div>
+            <div><b class="categoryTitle">Elleboog flexie &</b></div>
+            <div><b class="categoryTitle">extensie rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -22,7 +24,7 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker boven arm</b></div>
+            <div><b class="categoryTitle">Heup extensie links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -30,7 +32,7 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter boven arm</b></div>
+            <div><b class="categoryTitle">Heup extensie rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -38,7 +40,7 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker onder been</b></div>
+            <div><b class="categoryTitle">Heup flexie links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -46,7 +48,7 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter onder been</b></div>
+            <div><b class="categoryTitle">Heup flexie rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -54,7 +56,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker boven been</b></div>
+            <div><b class="categoryTitle">Knie extensie &</b></div>
+            <div><b class="categoryTitle">flexie links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -62,7 +65,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter boven been</b></div>
+            <div><b class="categoryTitle">Knie extensie &</b></div>
+            <div><b class="categoryTitle">flexie rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -70,7 +74,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Hoofd links/rechts</b></div>
+            <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
+            <div><b class="categoryTitle">links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -78,7 +83,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Hoofd voor/achter</b></div>
+            <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
+            <div><b class="categoryTitle">rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -86,8 +92,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker hand</b></div>
-            <div><b class="categoryTitle">links/rechts</b></div>
+            <div><b class="categoryTitle">Enkel plantairflexie</b></div>
+            <div><b class="categoryTitle">links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -95,8 +101,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker hand</b></div>
-            <div><b class="categoryTitle">benenden/boven</b></div>
+            <div><b class="categoryTitle">Enkel plantairflexie</b></div>
+            <div><b class="categoryTitle">rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -104,8 +110,7 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter hand</b></div>
-            <div><b class="categoryTitle">links/rechts</b></div>
+            <div><b class="categoryTitle">Shouder flexie links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -113,8 +118,7 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter hand</b></div>
-            <div><b class="categoryTitle">benenden/boven</b></div>
+            <div><b class="categoryTitle">Shouder flexie rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -122,8 +126,8 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Linker voet</b></div>
-            <div><b class="categoryTitle">voor/achter</b></div>
+            <div><b class="categoryTitle">Elleboog pronatie</b></div>
+            <div><b class="categoryTitle">links</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -131,16 +135,26 @@
 
     <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rechter voet</b></div>
-            <div><b class="categoryTitle">voor/achter</b></div>
+            <div><b class="categoryTitle">Elleboog pronatie</b></div>
+            <div><b class="categoryTitle">rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
     </div>
 
-    <div class="categoryBox" >
+    <div class="categoryBox">
         <div class="textBox">
-            <div><b class="categoryTitle">Rug voor/achter</b></div>
+            <div><b class="categoryTitle">Elleboog supinatie</b></div>
+            <div><b class="categoryTitle">links</b></div>
+            <div class="categorySubText">1 Xsens sensor vereist</div>
+        </div>
+        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+    </div>
+
+    <div class="categoryBox">
+        <div class="textBox">
+            <div><b class="categoryTitle">Elleboog supinatie</b></div>
+            <div><b class="categoryTitle">rechts</b></div>
             <div class="categorySubText">1 Xsens sensor vereist</div>
         </div>
         <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
@@ -258,7 +272,6 @@ footer {
   padding-top: 1rem;
   padding-bottom: 1rem;
   width: 100%;
-  background-color: #f8f9fa;
-  border-top:1px solid black;
+  background-color: #f4f4f4;
 }
 </style>
