@@ -87,9 +87,13 @@ class XsensDot {
             await this.subCharChanged(this.handleBatteryChanged, serviceEnum.battery_service, serviceEnum.battery_level);
 
         } catch (error) {
-            this.sensor_status = "error";
+            console.log(error.name)
+            console.log(error.code)
             console.error(error);
-            alert("Something went wrong please refresh this tab and try again.");
+            if (error.name == 'NetworkError') {
+                this.sensor_status = "error";
+                alert("Something went wrong please refresh this tab and try again.");
+            }
         }
     }
 
@@ -198,15 +202,20 @@ class XsensDot {
      * blinkDeviceLED sends a command to the connected sensor to make its LED blink rapidly for a few seconds
      */
     async blinkDeviceLED() {
-        let dataViewObject = await this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
+        try {
+            let dataViewObject = await this.getCharacteristicData(serviceEnum.configuration_service, serviceEnum.device_control)
 
-        let service = await this.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix));
-        let characteristic = await service.getCharacteristic((prefix + serviceEnum.device_control + suffix));
+            let service = await this.device.gatt.getPrimaryService((prefix + serviceEnum.configuration_service + suffix));
+            let characteristic = await service.getCharacteristic((prefix + serviceEnum.device_control + suffix));
 
-        dataViewObject.setUint8(0, 0x1); // Enable identify function on sensor
-        dataViewObject.setUint8(1, 0x01); // Set the identify bit
-        console.log("Blinking LED...")
-        await characteristic.writeValue(dataViewObject); // Write the full object back to the sensor
+            dataViewObject.setUint8(0, 0x1); // Enable identify function on sensor
+            dataViewObject.setUint8(1, 0x01); // Set the identify bit
+            console.log("Blinking LED...")
+            await characteristic.writeValue(dataViewObject); // Write the full object back to the sensor
+        } catch (error) {
+            console.error(error)
+            console.log(error.name)
+        }
     }
 
     /**
@@ -273,6 +282,7 @@ class XsensDot {
 
     /**
      * downloadDataToCSV writes the internal data array to a csv file and downloads it to the filesystem
+     * this function currently only works when you've got quaternion data, euler data and time data
      */
     downloadDataToCSV(){
         let csvContent = "data:text/csv;charset=utf-8,"
