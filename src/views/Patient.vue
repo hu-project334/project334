@@ -84,7 +84,7 @@ import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
 import { getSinglePatient, deletePatient } from "../db/fdb";
-import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
+// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
@@ -105,15 +105,12 @@ export default {
       heightInM: null,
       patients: null,
       categories: null,
-<<<<<<< HEAD
       showFormDelete: false,
       showFormEdit: false,
-=======
       gender: "",
       email: "",
       fysio: this.$store.getters.getUser.uid,
       route: useRoute(),
->>>>>>> feature-firestore-categorie-results
     };
   },
 
@@ -138,18 +135,9 @@ export default {
       this.gender = patient.gender;
     },
     deletePatientWithFireStore() {
-<<<<<<< HEAD
-      deletePatient(this.patientID);
-      this.$router.push({ name: "patients" });
-      // let index = _.findIndex(this.patients, { id: id });
-      // this.patients.splice(index, 1);
-      // in database this should delete the patient
-      // this.$router.push({ name: "patients" });
-=======
       let docKey = this.route.params.name;
       deletePatient(docKey);
       this.$router.push({ name: "patients" });
->>>>>>> feature-firestore-categorie-results
     },
     goBackToPatientList() {
       this.$router.push({ name: "patients" });
@@ -193,10 +181,10 @@ export default {
       this.errorMessage = "";
       return;
     },
-    editPatient(){
+    editPatient() {
       this.closeForm();
       // Edit de patient's gegevens
-    }
+    },
   },
 };
 </script>
