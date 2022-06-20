@@ -73,6 +73,7 @@ import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
 import { getSinglePatient, deletePatient } from "../db/fdb";
 import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
+import { useRoute } from "vue-router";
 
 export default {
   name: "patients",
@@ -91,23 +92,22 @@ export default {
       gender: "",
       email: "",
       fysio: this.$store.getters.getUser.uid,
+      route: useRoute(),
     };
   },
 
   mounted() {
     this.getPatientData();
-    
+
     this.categories = categories;
   },
 
   methods: {
     async getPatientData() {
-      let email = this.$store.getters.getPatientEmail;
-      let uid = this.$store.getters.getUser.uid;
-
-      let patient = await getSinglePatient(email, uid).then((patient) => {
-        return patient;
-      });
+      const docKey = this.route.params.name;
+      console.log(docKey);
+      let patient = await getSinglePatient(docKey);
+      console.log(patient);
 
       this.name = patient.name;
       this.weight = patient.weight;
@@ -124,16 +124,20 @@ export default {
       this.$router.push({ name: "patients" });
     },
     goToExerciseResults(category) {
-      let naam = deleteWhiteSpaceFromString(this.name);
+      let docKey = this.route.params.name;
       this.$router.push({
         name: "exerciseResults",
-        params: { name: naam },
+        params: { name: docKey },
       });
     },
 
     goToCategory(category) {
-      //! fix params
-      this.$router.push({ name: "addCategorie" });
+      const name = this.route.params.name;
+      this.$router.push({
+        name: "addCategorie",
+        params: { name: name },
+      });
+      // this.$router.push({ name: "addCategorie" });
     },
   },
 };

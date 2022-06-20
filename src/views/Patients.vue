@@ -5,7 +5,7 @@
     <h1 class="title">Patiënten</h1>
 
     <main>
-      <template v-for="patient in patients" :key="patient">
+      <template v-for="[docKey, patient] in patients" :key="patient">
         <div class="patient">
           <i class="bi bi-person-square userIcon"></i>
           <div class="patient-text-holder">
@@ -14,10 +14,7 @@
             </p>
             <p class="text">{{ patient.email }}</p>
           </div>
-          <button
-            class="seeResultsButton"
-            @click="goToPatient(patient.name, patient.email)"
-          >
+          <button class="seeResultsButton" @click="goToPatient(docKey)">
             <b> Ga naar patiënt</b>
           </button>
         </div>
@@ -46,7 +43,7 @@ import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
-import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
+// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 
 export default {
   name: "patients",
@@ -78,12 +75,12 @@ export default {
         this.patients = results;
       });
     },
-    goToPatient(naam, email) {
-      let changedName = deleteWhiteSpaceFromString(naam);
-      this.$store.commit("setPatientEmail", email);
+    goToPatient(docKey) {
+      // let changedName = deleteWhiteSpaceFromString(naam);
+      // this.$store.commit("setPatientEmail", email);
       this.$router.push({
         name: "patient",
-        params: { name: changedName },
+        params: { name: docKey },
       });
     },
     showPatientForm(event) {

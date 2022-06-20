@@ -30,7 +30,7 @@ const router = createRouter({
       component: () => import("../components/forms/PatientCreatorForm.vue"),
     },
     {
-      path: "/patients/:name/exerciseResults",
+      path: "/:name/exerciseResults",
       name: "exerciseResults",
       component: () => import("../views/ExerciseResults.vue"),
     },
@@ -50,7 +50,7 @@ const router = createRouter({
       component: () => import("../views/Measure.vue"),
     },
     {
-      path: "/addCategorie",
+      path: "/:name/addCategorie",
       name: "addCategorie",
       component: () => import("../views/AddCategorie.vue"),
     },
