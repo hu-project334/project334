@@ -92,11 +92,10 @@ export async function getSinglePatient(docKey) {
   return docSnap.data();
 }
 
-export async function deletePatient(email) {
-  console.log(email);
-  const colRef = collection(db, "patienten");
-  const q = query(colRef, where("email", "==", email));
-  await deleteDoc(q);
+export async function deletePatient(docKey) {
+  console.log(docKey);
+  const docRef = doc(db, "patienten", docKey);
+  await deleteDoc(docRef);
 }
 
 export async function addCategorie(docIdPatient, type) {

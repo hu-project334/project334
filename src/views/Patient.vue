@@ -47,10 +47,7 @@
     </div>
   </template>
 
-  <button
-    class="deletePatientBtn"
-    @click="deletePatientWithFireStore(this.email)"
-  >
+  <button class="deletePatientBtn" @click="deletePatientWithFireStore()">
     <b>Verwijder patiënt</b>
   </button>
 
@@ -116,8 +113,9 @@ export default {
       this.email = patient.email;
       this.gender = patient.gender;
     },
-    deletePatientWithFireStore(email) {
-      deletePatient(email);
+    deletePatientWithFireStore() {
+      let docKey = this.route.params.name;
+      deletePatient(docKey);
       this.$router.push({ name: "patients" });
     },
     goBackToPatientList() {
