@@ -5,7 +5,7 @@ Register.vue - base vue
 
   <p><button @click="getData()">connect</button></p>
   <p><button @click="sync()">synchronize</button></p>
-  <input type="text" name="device name" placeholder="enter new device name"><br><br>
+  <input type="text" name="device name" placeholder="enter new device name" :value="device_name" @change="updateDeviceName">
   <p><button @click="identify()">identify device</button></p>
   <h2>Device name: {{ device_name }}</h2>
   <h2>
@@ -117,6 +117,9 @@ export default {
     },
     stopDataStream() {
       this.XsensDotSensor.stopRTStream();
+    },
+    updateDeviceName(e) {
+      this.XsensDotSensor.writeDeviceName(e.target.value.trim())
     },
   },
 };
