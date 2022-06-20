@@ -5,7 +5,7 @@
     <h1 class="title">Patiënten</h1>
 
     <main>
-      <template v-for="patient in patients" :key="patient">
+      <template v-for="[docKey, patient] in patients" :key="patient">
         <div class="patient">
           <i class="bi bi-person-square userIcon"></i>
           <div class="patient-text-holder">
@@ -14,14 +14,14 @@
             </p>
             <p class="text">{{ patient.email }}</p>
           </div>
-          <button class="seeResultsButton" @click="goToPatient(patient.id)">
+          <button class="seeResultsButton" @click="goToPatient(docKey)">
             <b> Ga naar patiënt</b>
           </button>
         </div>
       </template>
     </main>
 
-    <div style="margin-top: 80px;"></div>
+    <div style="margin-top: 80px"></div>
     <footer>
       <button class="seeResultsButton" @click="showPatientForm">
         <b>Patiënt toevoegen</b>
@@ -43,7 +43,7 @@ import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
-
+// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 
 export default {
   name: "patients",
@@ -67,15 +67,21 @@ export default {
     this.getPatientsFromFireStore();
   },
   methods: {
-    getPatientsFromFireStore() {
+    async getPatientsFromFireStore() {
       let uid = this.$store.getters.getUser.uid;
-      getPatients(uid).then((results) => {
+      // this.patients = getPatients();
+
+      await getPatients(uid).then((results) => {
         this.patients = results;
       });
     },
-
-    goToPatient(id) {
-      this.$router.push({ name: "patient", params: { id: id } });
+    goToPatient(docKey) {
+      // let changedName = deleteWhiteSpaceFromString(naam);
+      // this.$store.commit("setPatientEmail", email);
+      this.$router.push({
+        name: "patient",
+        params: { name: docKey },
+      });
     },
     showPatientForm(event) {
       event.stopPropagation();

@@ -8,7 +8,7 @@
       <b>Patiënt gegevens</b>
       <table>
         <tr>
-          <td class="header_name"><b class="table_content" >Naam </b></td>
+          <td class="header_name"><b class="table_content">Naam </b></td>
           <td>{{ name }} {{ surName }}</td>
         </tr>
         <tr>
@@ -28,7 +28,9 @@
           <td>{{ patientID }}</td>
         </tr>
       </table>
-      <button class="editButton" @click="showEditForm"><b>Gegevens aanpassen</b></button>
+      <button class="editButton" @click="showEditForm">
+        <b>Gegevens aanpassen</b>
+      </button>
     </div>
 
     <template v-for="category in categories" :key="category">
@@ -49,19 +51,18 @@
       </div>
     </template>
 
-    <button
-      class="deletePatientBtn"
-      @click="showDeleteForm"
-    >
+    <button class="deletePatientBtn" @click="showDeleteForm">
       <b>Verwijder patiënt</b>
     </button>
 
-    <div style="margin-top: 80px;"></div>
+    <div style="margin-top: 80px"></div>
     <footer>
       <button class="backBtn" @click="goBackToPatientList()">
         <b>Terug</b>
       </button>
-      <button class="addCategory" @click="goToCategory()"><b>Categorie toevoegen</b></button>
+      <button class="addCategory" @click="goToCategory()">
+        <b>Categorie toevoegen</b>
+      </button>
     </footer>
   </div>
   <DeleteForm
@@ -79,11 +80,12 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import _ from "lodash";
-import patients from "../db/patients.json";
 import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
-import { deletePatient } from "../db/fdb";
+import { getSinglePatient, deletePatient } from "../db/fdb";
+import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
+import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
 
@@ -97,54 +99,77 @@ export default {
   },
   data() {
     return {
-      patientID: null,
       name: "",
-      surName: "",
       weight: null,
       age: "",
       heightInM: null,
       patients: null,
       categories: null,
+<<<<<<< HEAD
       showFormDelete: false,
       showFormEdit: false,
+=======
+      gender: "",
+      email: "",
+      fysio: this.$store.getters.getUser.uid,
+      route: useRoute(),
+>>>>>>> feature-firestore-categorie-results
     };
   },
 
   mounted() {
-    this.categories = categories;
-    this.patients = patients;
-    this.patientID = this.$route.params.id;
     this.getPatientData();
+
+    this.categories = categories;
   },
 
   methods: {
-    getPatientData() {
-      let id = parseInt(this.patientID);
-      let patient = _.find(this.patients, { id: id });
+    async getPatientData() {
+      const docKey = this.route.params.name;
+      console.log(docKey);
+      let patient = await getSinglePatient(docKey);
+      console.log(patient);
+
       this.name = patient.name;
-      this.surName = patient.surName;
       this.weight = patient.weight;
       this.age = formatBirthDateToAge(patient.dateOfBirth);
       this.heightInM = patient.heightInM;
+      this.email = patient.email;
+      this.gender = patient.gender;
     },
     deletePatientWithFireStore() {
+<<<<<<< HEAD
       deletePatient(this.patientID);
       this.$router.push({ name: "patients" });
       // let index = _.findIndex(this.patients, { id: id });
       // this.patients.splice(index, 1);
       // in database this should delete the patient
       // this.$router.push({ name: "patients" });
+=======
+      let docKey = this.route.params.name;
+      deletePatient(docKey);
+      this.$router.push({ name: "patients" });
+>>>>>>> feature-firestore-categorie-results
     },
     goBackToPatientList() {
       this.$router.push({ name: "patients" });
     },
     goToExerciseResults(category) {
-      //! fix params
-      this.$router.push({ name: "exerciseResults" });
+      let docKey = this.route.params.name;
+      console.log(category);
+      this.$router.push({
+        name: "exerciseResults",
+        params: { name: docKey, category: category },
+      });
     },
+
     goToCategory(category) {
-      //! fix params
-      this.$router.push({ name: "addCategorie" });
+      const name = this.route.params.name;
+      this.$router.push({
+        name: "addCategorie",
+        params: { name: name },
+      });
+      // this.$router.push({ name: "addCategorie" });
     },
     blurrStyle() {
       if (this.showFormDelete | this.showFormEdit) {
@@ -215,7 +240,7 @@ tr td {
   padding-left: 1%;
   width: 20%;
 }
-.table_content{
+.table_content {
   margin-right: 100px;
 }
 

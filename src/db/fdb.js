@@ -17,22 +17,17 @@ import {
   where,
   getDoc,
   query,
+  orderBy,
+  limit,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+const auth = getAuth(); // Wordt gebruikt in testPatient functie
+import store from "../store/userStore";
 
 const db = getFirestore();
 
 // dummy data
 async function dummyDataPatients(patientsRef, uid) {
-  // await setDoc(doc(patientsRef), {
-  //   id: 1,
-  //   name: "Alexander",
-  //   surName: "de Graaff",
-  //   weight: 70,
-  //   dateOfBirth: "22-06-2002",
-  //   heightInM: 1.82,
-  //   email: "alexander.d.graaff@gmail.com",
-  //   fysiotherapeutNummer: uid,
-  // });
   await setDoc(doc(patientsRef), {
     id: 2,
     name: "Milo",
@@ -47,35 +42,22 @@ async function dummyDataPatients(patientsRef, uid) {
 
 /**--------------------------- FUNCTIONS --------------------------- */
 
-// https://firebase.google.com/docs/firestore/query-data/queries
-export async function getPatients(uid) {
-  // https://fireship.io/snippets/firestore-increment-tips/
+export async function createFysio(name, email, uid) {
+  // https://stackoverflow.com/questions/49682327/how-to-update-a-single-firebase-firestore-document
+  try {
+    const fysioRef = collection(db, "fysio");
 
-  // const patientsRef = collection(db, "patients");
-  // dummyDataPatients(patientsRef, uid);
-
-  const q = query(
-    collection(db, "patients"),
-    where("fysiotherapeutNummer", "==", uid)
-  );
-  let patientList = [];
-
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach((doc) => {
-    // console.log(doc.id);
-
-    // documentID  =doc.id   user= doc.data()
-    //  user.id = documentID
-    // console.log(doc.id, " => ", doc.data());
-
-    patientList.push(doc.data());
-    // console.log(doc.id, " => ", doc.data());
-  });
-  return patientList;
+    await setDoc(doc(fysioRef, uid), {
+      userID: uid,
+      name: name,
+      email: email,
+    });
+  } catch (error) {
+    console.error("Error writing new message to Firebase Database", error);
+  }
 }
 
-export async function createPatient(
-  id,
+export async function addPatient(
   name,
   weight,
   dateOfBirth,
@@ -84,90 +66,61 @@ export async function createPatient(
   gender,
   fysiotherapeutNummer
 ) {
-  const patientsRef = collection(db, "patients");
-  // where id is not id in patientID
-  console.log(email);
-  await setDoc(doc(patientsRef), {
-    id: id,
-    name: name,
-    weight: weight,
-    dateOfBirth: dateOfBirth,
-    heightInM: heightInM,
-    email: email,
-    gender: gender,
-    fysiotherapeutNummer: fysiotherapeutNummer,
+  // voor het verkrijgen van de user id: https://stackoverflow.com/a/37901056
+
+  try {
+    // const docRef = doc(db, "fysio", user.uid);
+    const colRef = collection(db, "patienten");
+    setDoc(doc(colRef), {
+      name: name,
+      weight: weight,
+      dateOfBirth: dateOfBirth,
+      heightInM: heightInM,
+      email: email,
+      gender: gender,
+      fysiotherapeutNummer: fysiotherapeutNummer,
+    });
+  } catch (error) {
+    console.error("Error creating patient", error);
+  }
+}
+
+export async function getSinglePatient(docKey) {
+  const docRef = doc(db, "patienten", docKey);
+  // const docRef = doc(db, "fysio", uid, "patienten", email);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data();
+}
+
+export async function deletePatient(docKey) {
+  console.log(docKey);
+  const docRef = doc(db, "patienten", docKey);
+  await deleteDoc(docRef);
+}
+
+export async function addCategorie(docIdPatient, type) {
+  console.log(docIdPatient);
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  setDoc(doc(colRef, type), {
+    name: type,
   });
 }
 
-// https://firebase.google.com/docs/firestore/manage-data/delete-data
-export async function deletePatient(id) {
-  const patientRef = doc(db, "patients", id);
-  console.log(id);
+// https://firebase.google.com/docs/firestore/query-data/queries
+export async function getPatients(uid) {
+  const map = new Map();
+  try {
+    const colRef = collection(db, "patienten");
+    const q = query(colRef, where("fysiotherapeutNummer", "==", uid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      map.set(doc.id, doc.data());
+    });
+    return map;
 
-  // // db.collection("patients").document(id).delete();
-  // await deleteDoc(patientRef);
-  // // console.log("does this work");
-  await deleteDoc(patientRef);
-  console.log("werkt dit wel of niet");
-
-  // const handleDelete = async (id) => {
-  //   const taskDocRef = doc(db, "tasks", id);
-  //   try {
-  //     await deleteDoc(taskDocRef);
-  //   } catch (err) {
-  //     alert(err);
-  //   }
-  // };
+    // return list;
+  } catch (error) {
+    console.error("Error getting objects from Firebase Database", error);
+  }
 }
-
-export async function getPatient() {
-  const patientRef = collection("patients").where();
-}
-
-/**--------------------------- OUDE CODE VOOR REFERENTIE --------------------------- */
-/** 
-// users
-export async function createUser(uid) {
-  await addDoc(collection(db, "users"), {
-    uid,
-  });
-}
-
-// exercises
-export async function updateExerciseScheme(
-  schemeId,
-  exercises,
-  name,
-  description
-) {
-  const docRef = await doc(db, "execise-scheme", schemeId);
-  updateDoc(docRef, {
-    name,
-    exercises,
-    description,
-    public: true,
-  });
-}
-export async function deleteExerciseScheme(schemeId) {
-  const docRef = doc(db, "execise-scheme", schemeId);
-  deleteDoc(docRef);
-}
-
-export async function createExerciseScheme(name, exercises, description) {
-  await addDoc(collection(db, "execise-scheme"), {
-    name,
-    exercises,
-    description,
-    public: true,
-  });
-}
-export async function getMyExercises() {
-  const docRef = await getDocs(collection(db, "execise-scheme"));
-
-  return docRef.docs.map((doc) => {
-    return { id: doc.id, ...doc.data() };
-  });
-}
-
-// patients
-*/

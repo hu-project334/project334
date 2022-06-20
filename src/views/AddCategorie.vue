@@ -1,180 +1,258 @@
 <template>
-    <nav-bar-top></nav-bar-top>
-    <h1 class="title">Meet categorie toevoegen</h1>
+  <nav-bar-top></nav-bar-top>
+  <h1 class="title">Meet categorie toevoegen</h1>
 
-    <!-- MOET DYNAMISC -->
+  <!-- MOET DYNAMISC -->
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Elleboog flexie &</b></div>
-            <div><b class="categoryTitle">extensie links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Elleboog flexie &</b></div>
+      <div><b class="categoryTitle">extensie links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('elleboog-flexie-extensie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Elleboog flexie &</b></div>
-            <div><b class="categoryTitle">extensie rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Elleboog flexie &</b></div>
+      <div><b class="categoryTitle">extensie rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('elleboog-flexie-extensie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Heup extensie links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Heup extensie links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('heup-extensie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Heup extensie rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Heup extensie rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('heup-extensie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Heup flexie links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Heup flexie links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('heup-flexie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Heup flexie rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Heup flexie rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('heup-flexie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Knie extensie &</b></div>
-            <div><b class="categoryTitle">flexie links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Knie extensie &</b></div>
+      <div><b class="categoryTitle">flexie links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('knie-extensie-flexie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Knie extensie &</b></div>
-            <div><b class="categoryTitle">flexie rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Knie extensie &</b></div>
+      <div><b class="categoryTitle">flexie rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('knie-extensie-flexie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
-            <div><b class="categoryTitle">links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
+      <div><b class="categoryTitle">links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('enkel-dorsaalflexie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
-            <div><b class="categoryTitle">rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
+      <div><b class="categoryTitle">rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('enkel-dorsaalflexie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Enkel plantairflexie</b></div>
-            <div><b class="categoryTitle">links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Enkel plantairflexie</b></div>
+      <div><b class="categoryTitle">links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('enkel-plantairflexie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Enkel plantairflexie</b></div>
-            <div><b class="categoryTitle">rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Enkel plantairflexie</b></div>
+      <div><b class="categoryTitle">rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('enkel-plantairflexie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Shouder flexie links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Shouder flexie links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('shouder-flexie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Shouder flexie rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Shouder flexie rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('shouder-flexie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Elleboog pronatie</b></div>
-            <div><b class="categoryTitle">links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Elleboog pronatie</b></div>
+      <div><b class="categoryTitle">links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('elleboog-pronatie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Elleboog pronatie</b></div>
-            <div><b class="categoryTitle">rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Elleboog pronatie</b></div>
+      <div><b class="categoryTitle">rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('elleboog-pronatie-rechts')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Elleboog supinatie</b></div>
-            <div><b class="categoryTitle">links</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Elleboog supinatie</b></div>
+      <div><b class="categoryTitle">links</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('elleboog-supinatie-links')"
+    />
+  </div>
 
-    <div class="categoryBox">
-        <div class="textBox">
-            <div><b class="categoryTitle">Elleboog supinatie</b></div>
-            <div><b class="categoryTitle">rechts</b></div>
-            <div class="categorySubText">1 Xsens sensor vereist</div>
-        </div>
-        <img class="addImage" src="@/assets/add.png"  @click="addSelected()"/>
+  <div class="categoryBox">
+    <div class="textBox">
+      <div><b class="categoryTitle">Elleboog supinatie</b></div>
+      <div><b class="categoryTitle">rechts</b></div>
+      <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
+    <img
+      class="addImage"
+      src="@/assets/add.png"
+      @click="addSelected('elleboog-supinatie-rechts')"
+    />
+  </div>
 
-
-    <!-- EINDE MOET DYNAMISC -->
-    <div style="margin-top: 80px;"></div>
-    <footer>
-        <button class="backBtn" @click="goBackToPatient()"><b>Terug</b></button>
-    </footer>
+  <!-- EINDE MOET DYNAMISC -->
+  <div style="margin-top: 80px"></div>
+  <footer>
+    <button class="backBtn" @click="goBackToPatient()"><b>Terug</b></button>
+  </footer>
 </template>
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
+import { addCategorie } from "../db/fdb";
+import { useRoute } from "vue-router";
 
 export default {
   name: "Select Sensor",
   components: {
     NavBarTop,
+  },
+  data() {
+    return {
+      route: useRoute(),
+    };
   },
 
   methods: {
@@ -182,15 +260,16 @@ export default {
       this.$router.push({ name: "patient" });
     },
 
-    addSelected() {
-
+    addSelected(type) {
+      let docIdPatient = this.route.params.name;
+      console.log(type);
+      addCategorie(docIdPatient, type);
     },
   },
 };
 </script>
 
 <style scoped>
-
 .title {
   color: white;
   margin-bottom: 3%;
@@ -233,15 +312,15 @@ export default {
 }
 
 .categoryTitle {
-  color: black; 
+  color: black;
   font-size: 1.5em;
   display: inline;
 }
 
 .categorySubText {
-    color: black; 
-    margin-bottom: 0px; 
-    display: inline;
+  color: black;
+  margin-bottom: 0px;
+  display: inline;
 }
 
 /* buttons */

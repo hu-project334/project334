@@ -6,8 +6,8 @@ import { getFirestore } from "firebase/firestore";
 import store from "./store/userStore.js";
 import VueChartkick from "vue-chartkick";
 import "chartkick/chart.js";
-import Chartkick from "chartkick"
-Chartkick.configure({language: "de"})
+import Chartkick from "chartkick";
+Chartkick.configure({ language: "de" });
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmQhTuTywz-0SzS3ap66NYlQqt459CJy4",
@@ -26,9 +26,11 @@ import "bootstrap";
 import "mdb-ui-kit";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-
-
 // Initialize Firebase
 initializeApp(firebaseConfig);
+
 getFirestore();
 createApp(App).use(router).use(store).use(VueChartkick).mount("#app");
+
+
+

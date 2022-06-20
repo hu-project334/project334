@@ -4,7 +4,7 @@
     <Form @submit="handleRegister" :validation-schema="schema">
       <div class="form-group">
         <label for="email" style="font-weight: bold">Email</label>
-        <Field name="email" type="email" class="form-control" />
+        <Field name="email" class="form-control" />
         <ErrorMessage name="email" class="error-feedback" />
       </div>
       <div class="form-group">
@@ -13,7 +13,9 @@
         <ErrorMessage name="password" class="error-feedback" />
       </div>
       <div class="form-group">
-        <label for="passwordConfirmation" style="font-weight: bold"> Herhaal wachtwoord</label>
+        <label for="passwordConfirmation" style="font-weight: bold">
+          Herhaal wachtwoord</label
+        >
         <Field
           name="passwordConfirmation"
           type="password"
@@ -25,7 +27,9 @@
         <button class="registerButton"><b>Registreer</b></button>
       </div>
     </Form>
-    <button class="returnButton" @click="goBackToRegister()"><b>Terug</b></button>
+    <button class="returnButton" @click="goBackToRegister()">
+      <b>Terug</b>
+    </button>
     <div v-if="firebaseError !== ''" id="errorText">{{ firebaseError }}</div>
 
     <div
@@ -86,7 +90,7 @@ export default {
       this.loading = false;
     },
     goBackToRegister() {
-      this.$emit("close")
+      this.$emit("close");
     },
   },
 };

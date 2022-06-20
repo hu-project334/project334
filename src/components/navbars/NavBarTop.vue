@@ -3,12 +3,13 @@
   <nav class="navbar1">
     <!-- Container wrapper -->
     <div class="container-fluid1">
-      <button @click="goBackToHome()"><img
-        src="@/assets/beeldmerk.png"
-        height="40"
-        alt="hu logo"
-        loading="lazy"
-      />
+      <button @click="goBackToHome()">
+        <img
+          src="@/assets/beeldmerk.png"
+          height="40"
+          alt="hu logo"
+          loading="lazy"
+        />
       </button>
       <div class="item-left-side">
         <p class="userName">
@@ -36,13 +37,13 @@
             aria-labelledby="navbarDropdownMenuAvatar"
           >
             <li>
-              <a class="dropdown-item">My profile</a>
+              <a class="dropdown-item">Mijn profiel</a>
             </li>
             <li>
               <a class="dropdown-item">Settings</a>
             </li>
             <li>
-              <a @click="logOut()" class="dropdown-item">Logout</a>
+              <a @click="logOut()" class="dropdown-item">Log uit</a>
             </li>
             <li>
               <a @click="goToDevelop()" class="dropdown-item">Development</a>
@@ -154,7 +155,7 @@ export default {
   color: red;
 }
 
-button{
+button {
   border: none;
   background-color: #f8f9fa;
   color: red;
