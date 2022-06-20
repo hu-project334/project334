@@ -1,5 +1,7 @@
 /* eslint-disable */
-import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, syncMsgEnum, getKeyByValue } from './bluetooth_enums.js'
+import { prefix, suffix, serviceEnum, recMsgEnum, recMsgTypeEnum, msgAckEnum, notificationEnum, syncMsgEnum, getKeyByValue, payloadIDsEnum } from './bluetooth_enums.js'
+import { orientationQuaternionHandler, angleQuaternion } from './payload_handlers.js'
+import { notification_handler } from './notification_handler.js'
 import * as THREE from 'three';
 
 // =========================================================================
@@ -25,6 +27,7 @@ class XsensDot {
         this.minQuat = undefined
         this.maxQuat = undefined
         this.ackEnum = recMsgEnum
+        this.NotificationHandler = new notification_handler();
     }
 
     /**
@@ -325,7 +328,116 @@ class XsensDot {
         const value = event.target.value
         sensor.battery_level = value.getUint8(0, true)
     }
+
+    /**
+     * syncSensor tries to synchronize the internal clock with other xsens sensors in the vicinity
+     */
+    async syncSensor() {
+        console.log("Synchronization started")
+
+        this.NotificationHandler.setCallback(notificationEnum.syncStatus, (event) => {
+            let value = event.target.value
+            let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
+            console.log(`Device is: ${status}`)
+        })
+
+        await this.subCharChanged(this.NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+        // WARNING!!! There is a mac address hardcoded here! This is due to the WebBluetooth not exposing mac address,
+        // a feature is needed to save the mac address to the device object so it can be passed dynamically
+        let dataViewObject = this.createMessageObject(recMsgTypeEnum.sync_message, 6, syncMsgEnum.startSync, [0x4E,0x02,0x00,0xCD,0x22,0xD4])
+        await this.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+
+        await this.device.gatt.disconnect()
+        this.sensor_status = "synchronizing";
+
+        setTimeout(async () => {
+            console.log("Attempting to connect to device")
+            await this.device.gatt.connect()
+
+            console.log("Connection re-established")
+            this.sensor_status = "online";
+            await this.subCharChanged(this.NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+            let dataViewObject = this.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
+            await this.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+
+        }, 14000) // End of setTimeout
+    }
+
+    /**
+     * getSyncStatusSensor get the sensor its sync status and if it is not synced calls the sync function
+     */
+    async getSyncStatusSensor() {
+
+        this.NotificationHandler.setCallback(notificationEnum.syncStatus, async (event) => {
+            let value = event.target.value
+            let status = getKeyByValue(msgAckEnum, value.getUint8(3, false))
+            console.log(`Device is: ${status}`)
+            if (value.getUint8(3, false) == msgAckEnum.synced) {
+                let dataViewObject = this.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.stopSync, []);
+                await this.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+                console.log("Sync stopped")
+            } else if (value.getUint8(3, false) == msgAckEnum['un-synced']) {
+                this.syncSensor()
+            }
+        })
+
+        await this.subCharChanged(this.NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+        let dataViewObject = this.createMessageObject(recMsgTypeEnum.sync_message, 0, syncMsgEnum.getSyncStatus, []);
+        await this.writeCharacteristicData(serviceEnum.message_service, serviceEnum.message_control, dataViewObject)
+    }
+
+    async startRTStream() {
+        console.log("Real time streaming started")
+        // Reset member variables
+        this.data = []
+        this.timeArr = []
+        this.rawTime = 0
+
+        // Set notifications for short payload
+        await this.subCharChanged(orientationQuaternionHandler, serviceEnum.measurement_service, serviceEnum.short_payload_length)
+
+        await this.subCharChanged(this.NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+        this.data = []
+        this.timeArr = []
+        this.rawTime = 0
+        let buffer = new ArrayBuffer(3)
+        let dataViewObject = new DataView(buffer)
+        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+        dataViewObject.setUint8(1, 0x01) // Set start or stop 1: start 0: stop
+        dataViewObject.setUint8(2, payloadIDsEnum.orientationQuaternion)
+        this.verbose = false
+        await this.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(() => {XsensDotSensor.verbose = true; return})
+    }
+
+    async stopRTStream() {
+        console.log("Real time streaming stopped")
+        await this.subCharChanged(this.NotificationHandler.handleNotification, serviceEnum.message_service, serviceEnum.message_notification)
+
+        let buffer = new ArrayBuffer(3)
+        let dataViewObject = new DataView(buffer)
+        dataViewObject.setUint8(0, 0x01) // Set type of control 1: measurement
+        dataViewObject.setUint8(1, 0x00) // Set start or stop 1: start 0: stop
+        dataViewObject.setUint8(2, payloadIDsEnum.orientationQuaternion) // Set payload mode
+        this.verbose = false
+        await this.writeCharacteristicData(serviceEnum.measurement_service, serviceEnum.control, dataViewObject).then(()=>{this.verbose = true; return})
+
+        let firstIndex
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i][0].x != 0 && this.data[i][0].y != 0 && this.data[i][0].z != 0 && this.data[i][0].w != 0) {
+                firstIndex = i
+                break
+            }
+        }
+
+        this.max_angle = angleQuaternion(this.data[firstIndex][0], this.data[this.data.length - 1][0]).toFixed(2)
+        console.log(`Quat angle: ${this.max_angle}`)
+        console.log("Recording duurde:", (this.rawTime / 1000).toFixed(2), "seconden")
+    }
+
 }
 
-// let XsensDotSensor = new XsensDot();
 export { XsensDot  };

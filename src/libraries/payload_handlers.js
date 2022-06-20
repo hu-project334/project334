@@ -137,7 +137,6 @@ function orientationQuaternionHandler(event, sensor) {
                   sensor.rotation,
                  (sensor.rawTime / 1000).toFixed(2)]
     sensor.data.push(tmpArr)
-    console.log(sensor.rotation)
 }
 
 export { orientationQuaternionHandler, angleQuaternion }
