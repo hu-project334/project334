@@ -102,9 +102,26 @@ export async function addCategorie(docIdPatient, type) {
   console.log(docIdPatient);
   const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
+  const map = new Map();
   setDoc(doc(colRef, type), {
     name: type,
+    results: {
+      200322: { beweging: 170, norm: 3 },
+      210322: { beweging: 60, norm: 98 },
+      220322: { beweging: 30, norm: 50 },
+      310522: { beweging: 30, norm: 50 },
+    },
   });
+}
+
+export async function gettCategoryRrsults(docIdPatient, excersizeCategory) {
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const docRef2 = doc(colRef, excersizeCategory);
+
+  const docSnap = await getDoc(docRef2);
+  console.log(docSnap.data());
+  return docSnap.data();
 }
 
 // https://firebase.google.com/docs/firestore/query-data/queries

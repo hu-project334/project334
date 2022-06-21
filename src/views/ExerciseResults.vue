@@ -37,7 +37,7 @@
       <b>Verwijder categorie</b>
     </button>
 
-    <div style="margin-top: 80px;"></div>
+    <div style="margin-top: 80px"></div>
     <footer>
       <button class="backBtn" @click="goBackToPatient()"><b>Terug</b></button>
       <button class="addMeasurement" @click="addMeasurement()">
