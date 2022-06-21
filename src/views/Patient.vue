@@ -33,16 +33,16 @@
       </button>
     </div>
 
-    <template v-for="[docKeyCategory, category] in categories" :key="category">
+    <template v-for="[name, results] in categories" :key="docKeyCategory">
       <div class="category">
         <div class="text-holder">
           <p>
-            <b>{{ category.name }} </b>
+            <b>{{ name }} </b>
           </p>
           <!-- <p>Laatste meting: {{ category.lastMeasure }}</p> -->
         </div>
         <!-- TOO set param for patient -> category -> results -->
-        <button class="see-results" @click="goToExerciseResults(category.name)">
+        <button class="see-results" @click="goToExerciseResults(name)">
           Bekijk
         </button>
       </div>
@@ -108,12 +108,14 @@ export default {
       email: "",
       fysio: this.$store.getters.getUser.uid,
       route: useRoute(),
+      patientID: null,
     };
   },
 
   mounted() {
     this.getPatientData();
     this.getCategories();
+    console.log(this.categories);
   },
 
   methods: {
@@ -123,6 +125,7 @@ export default {
       console.log(docIdPatient);
       let categories = await getCategories(docIdPatient);
       this.categories = categories;
+      console.log(this.categories);
     },
     async getPatientData() {
       const docKey = this.route.params.name;
@@ -153,7 +156,7 @@ export default {
       });
     },
 
-    goToCategory(category) {
+    goToCategory() {
       const name = this.route.params.name;
       this.$router.push({
         name: "addCategorie",

@@ -2,15 +2,11 @@
   <div :style="blurrStyle()">
     <nav-bar-top></nav-bar-top>
 
-    <!-- //! is not dynamic yet -->
     <h1 class="title">Rechter onder arm</h1>
-    <!-- //! graph has to be installed and used -->
     <main>
       <div class="result_container">
         <b>Meest recente metingen </b>
-        <movement-percentage-in-time
-          :dataProp="graphResults"
-        ></movement-percentage-in-time>
+        <movement-percentage-in-time></movement-percentage-in-time>
       </div>
 
       <div class="recent_results">
@@ -21,13 +17,14 @@
             <th>Beweging (graden)</th>
             <th>Vergeleken tot de norm i (%)</th>
           </tr>
-          <template v-for="result in results" :key="result">
+          <template v-for="(obj, pos) in results" :key="result">
+            <!-- <template v-for="(obj2, pos2) in obj" :key="pos2"> -->
             <tr>
-              <!-- //! not dynamic yet firestore is needed -->
-              <td>{{ result.date }}</td>
-              <td>{{ result.MovementInDegree }}</td>
-              <td>{{ result.comparedToNorm }}</td>
+              <td>{{ unixToDateTime(pos) }}</td>
+              <td>{{ obj.beweging }}</td>
+              <td>{{ obj.norm }}</td>
             </tr>
+            <!-- </template> -->
           </template>
         </table>
       </div>
@@ -53,12 +50,17 @@
 </template>
 
 <script>
+import { unixToDateTime } from "../Controllers/unix.js";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import MovementPercentageInTime from "../components/tiles/charts/MovementPercentageInTime.vue";
-import results from "../db/results.json";
-import { ReformatArrayList } from "../Controllers/ReformatArrayList.js";
+// import results from "../db/results.json";
+import { unixToDateTimeReverse } from "../Controllers/graphController.js";
 import DeleteForm from "../components/forms/DeleteForm.vue";
-import { getCategoryResults, deleteCategory } from "../db/fdb";
+import {
+  getCategoryResults,
+  deleteCategory,
+  addResultToCategory,
+} from "../db/fdb";
 import { useRoute } from "vue-router";
 
 export default {
@@ -75,10 +77,26 @@ export default {
       graphResults: null,
       showForm: false,
       route: useRoute(),
+      unixToDateTime,
     };
   },
 
   methods: {
+    // returnGraphData() {
+
+    // },
+    async getCategoryResults() {
+      let docIdPatient = this.route.params.name;
+      let docIdCategory = this.route.params.category;
+
+      // await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
+
+      this.results = await getCategoryResults(docIdPatient, docIdCategory);
+      // console.log(unixToDateTimeReverse(1655844129));
+
+      this.results = results;
+      // this.graphResults = this.results;
+    },
     goBackToPatient() {
       this.$router.push({ name: "patient" });
     },
@@ -90,9 +108,6 @@ export default {
       let docIdCategory = this.route.params.category;
       console.log(docIdCategory);
       await deleteCategory(docIdPatient, docIdCategory);
-
-      //! delete category from the patient with firestore and than route to categories
-      // this.$router.push({name:"patient"}) and params
 
       this.$router.push({ name: "patient" });
     },
@@ -115,12 +130,14 @@ export default {
     },
   },
   mounted() {
-    // getCategoryResults();
+    this.getCategoryResults();
+
+    // unixToDateTime(1655844129);
     // this.results = results;
 
     // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
-    this.graphResults = ReformatArrayList(results);
-    console.log(this.graphResults);
+    // this.graphResults = ReformatArrayList(results);
+    // console.log(this.graphResults);
   },
 };
 </script>

@@ -19,10 +19,12 @@ import {
   query,
   orderBy,
   limit,
+  arrayUnion,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
 import store from "../store/userStore";
+import { getUnixOfToday } from "../controllers/unix";
 
 const db = getFirestore();
 
@@ -88,7 +90,7 @@ export async function addPatient(
 export async function getSinglePatient(docKey) {
   const docRef = doc(db, "patienten", docKey);
   // const docRef = doc(db, "fysio", uid, "patienten", email);
-  const docSnap = await getDoc(docRef);
+  // const docSnap = await getDoc(docRef);
   return docSnap.data();
 }
 
@@ -102,29 +104,37 @@ export async function addCategorie(docIdPatient, type) {
   console.log(docIdPatient);
   const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
-  const map = new Map();
   setDoc(doc(colRef, type), {
     name: type,
     results: {
-      200322: { beweging: 170, norm: 3 },
-      210322: { beweging: 60, norm: 98 },
-      220322: { beweging: 30, norm: 50 },
-      310522: { beweging: 30, norm: 50 },
+      1655839884: { beweging: 170, norm: 3 },
+      1655840016: { beweging: 140, norm: 97 },
+      1655840085: { beweging: 120, norm: 40 },
     },
+  });
+}
+
+export async function addResultToCategory(docIdPatient, type, beweging, norm) {
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const docRef2 = doc(colRef, type);
+
+  await updateDoc(docRef2, {
+    results: arrayUnion(getUnixOfToday(), { beweging, norm }),
   });
 }
 
 export async function getCategories(docIdPatient) {
   try {
     console.log(docIdPatient);
-    const map = new Map();
+    let map = new Map();
     const docRef = doc(db, "patienten", docIdPatient);
     const colRef = collection(docRef, "excersizeCategory");
     const querySnapshot = await getDocs(colRef);
     querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-      map.set(doc.id, doc.data());
+      map.set(doc.data().name, doc.data().results);
     });
+    console.log(map);
     return map;
   } catch (error) {
     console.error("Error getting categories", error);
@@ -137,8 +147,8 @@ export async function getCategoryResults(docIdPatient, excersizeCategory) {
   const docRef2 = doc(colRef, excersizeCategory);
 
   const docSnap = await getDoc(docRef2);
-  console.log(docSnap.data());
-  return docSnap.data();
+  console.log(docSnap.data().results);
+  return docSnap.data().results;
 }
 
 export async function deleteCategory(docIdPatient, excersizeCategory) {
