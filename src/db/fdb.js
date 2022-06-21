@@ -56,17 +56,6 @@ export async function createFysio(name, email, uid) {
     console.error("Error writing new message to Firebase Database", error);
   }
 }
-// https://firebase.google.com/docs/firestore/query-data/queries
-export async function getPatients(uid) {
-  let patientList = [];
-  const docRef = doc(db, "fysio", uid);
-  const colRef = collection(docRef, "patienten");
-  const querySnapshot = await getDocs(colRef);
-  querySnapshot.forEach((doc) => {
-    patientList.push(doc.data());
-  });
-  return patientList;
-}
 
 export async function addPatient(
   name,
@@ -74,44 +63,81 @@ export async function addPatient(
   dateOfBirth,
   heightInM,
   email,
-  gender
+  gender,
+  fysiotherapeutNummer
 ) {
   // voor het verkrijgen van de user id: https://stackoverflow.com/a/37901056
-  auth.onAuthStateChanged(function (user) {
-    if (user) {
-      const docRef = doc(db, "fysio", user.uid);
-      const colRef = collection(docRef, "patienten");
-      setDoc(doc(colRef, email), {
-        name: name,
-        weight: weight,
-        dateOfBirth: dateOfBirth,
-        heightInM: heightInM,
-        email: email,
-        gender: gender,
-        fysiotherapeutNummer: user.uid,
-      });
-    } else {
-      console.log("no user is signed in");
-      // No user is signed in.
-    }
-  });
-}
 
-export async function getSinglePatient(email, uid) {
-  const docRef = doc(db, "fysio", uid, "patienten", email);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return docSnap.data();
-  } else {
-    console.log("No such document!");
+  try {
+    // const docRef = doc(db, "fysio", user.uid);
+    const colRef = collection(db, "patienten");
+    setDoc(doc(colRef), {
+      name: name,
+      weight: weight,
+      dateOfBirth: dateOfBirth,
+      heightInM: heightInM,
+      email: email,
+      gender: gender,
+      fysiotherapeutNummer: fysiotherapeutNummer,
+    });
+  } catch (error) {
+    console.error("Error creating patient", error);
   }
 }
 
-// https://firebase.google.com/docs/firestore/manage-data/delete-data
-// Yes, the document you've mentioned is updated.
-// And no, deleting a document in Firestore does not delete its subcollections.
-// While deleting the document in Cloud Firestore, the subcollections won't be deleted automatically. You have to delete them manually instead.
-export async function deletePatient(email, uid) {
-  const docRef = doc(db, "fysio", uid, "patienten", email);
-  const docSnap = await deleteDoc(docRef);
+export async function getSinglePatient(docKey) {
+  const docRef = doc(db, "patienten", docKey);
+  // const docRef = doc(db, "fysio", uid, "patienten", email);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data();
+}
+
+export async function deletePatient(docKey) {
+  console.log(docKey);
+  const docRef = doc(db, "patienten", docKey);
+  await deleteDoc(docRef);
+}
+
+export async function addCategorie(docIdPatient, type) {
+  console.log(docIdPatient);
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const map = new Map();
+  setDoc(doc(colRef, type), {
+    name: type,
+    results: {
+      200322: { beweging: 170, norm: 3 },
+      210322: { beweging: 60, norm: 98 },
+      220322: { beweging: 30, norm: 50 },
+      310522: { beweging: 30, norm: 50 },
+    },
+  });
+}
+
+export async function gettCategoryRrsults(docIdPatient, excersizeCategory) {
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const docRef2 = doc(colRef, excersizeCategory);
+
+  const docSnap = await getDoc(docRef2);
+  console.log(docSnap.data());
+  return docSnap.data();
+}
+
+// https://firebase.google.com/docs/firestore/query-data/queries
+export async function getPatients(uid) {
+  const map = new Map();
+  try {
+    const colRef = collection(db, "patienten");
+    const q = query(colRef, where("fysiotherapeutNummer", "==", uid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      map.set(doc.id, doc.data());
+    });
+    return map;
+
+    // return list;
+  } catch (error) {
+    console.error("Error getting objects from Firebase Database", error);
+  }
 }

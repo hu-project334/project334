@@ -64,7 +64,6 @@ export async function RegisterWithGoogle() {
   signInWithPopup(auth, provider)
     .then((result) => {
       const user = result.user;
-
       createFysio(user.displayName, user.email, user.uid);
 
       // getPatients(user.uid);
