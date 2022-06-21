@@ -119,7 +119,7 @@ export default {
         patient.date.split("-")[1] +
         "-" +
         patient.date.split("-")[0];
-      // let fysioId = this.$store.getters.getUser.uid;
+      let fysioId = this.$store.getters.getUser.uid;
       // fysioId
 
       addPatient(
@@ -128,7 +128,8 @@ export default {
         newDate,
         patient.lengte,
         patient.email,
-        patient.geslacht
+        patient.geslacht,
+        fysioId
       );
 
       this.goBackToPatients();

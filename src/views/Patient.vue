@@ -1,68 +1,80 @@
 <template>
-  <NavBarTop></NavBarTop>
+  <div :style="blurrStyle()">
+    <NavBarTop></NavBarTop>
 
-  <h1 class="title">{{ name }}</h1>
+    <h1 class="title">{{ name }} {{ surName }}</h1>
 
-  <div class="container">
-    <b>Patiënt gegevens</b>
-    <table>
-      <tr>
-        <td class="header_name"><b class="table_content">Naam </b></td>
-        <td>{{ name }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>Gewicht </b></td>
-        <td>{{ weight }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>Lengte </b></td>
-        <td>{{ heightInM }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b>leeftijd </b></td>
-        <td>{{ age }}</td>
-      </tr>
-      <tr>
-        <td class="header_name"><b> Email</b></td>
-        <td>{{ email }}</td>
-      </tr>
-    </table>
-  </div>
-
-  <template v-for="category in categories" :key="category">
-    <div class="category">
-      <div class="text-holder">
-        <p>
-          <b>{{ category.category }} </b>
-        </p>
-        <p>Laatste meting: {{ category.lastMeasure }}</p>
-      </div>
-      <!-- TOO set param for patient -> category -> results -->
-      <button
-        class="see-results"
-        @click="goToExerciseResults(category.category)"
-      >
-        Bekijk
+    <div class="container">
+      <b>Patiënt gegevens</b>
+      <table>
+        <tr>
+          <td class="header_name"><b class="table_content">Naam </b></td>
+          <td>{{ name }} {{ surName }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Gewicht </b></td>
+          <td>{{ weight }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Lengte </b></td>
+          <td>{{ heightInM }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>leeftijd </b></td>
+          <td>{{ age }}</td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Patiënt nummer</b></td>
+          <td>{{ patientID }}</td>
+        </tr>
+      </table>
+      <button class="editButton" @click="showEditForm">
+        <b>Gegevens aanpassen</b>
       </button>
     </div>
-  </template>
 
-  <button
-    class="deletePatientBtn"
-    @click="deletePatientWithFireStore(this.email)"
-  >
-    <b>Verwijder patiënt</b>
-  </button>
+    <template v-for="category in categories" :key="category">
+      <div class="category">
+        <div class="text-holder">
+          <p>
+            <b>{{ category.category }} </b>
+          </p>
+          <p>Laatste meting: {{ category.lastMeasure }}</p>
+        </div>
+        <!-- TOO set param for patient -> category -> results -->
+        <button
+          class="see-results"
+          @click="goToExerciseResults(category.category)"
+        >
+          Bekijk
+        </button>
+      </div>
+    </template>
 
-  <div style="margin-top: 80px"></div>
-  <footer>
-    <button class="backBtn" @click="goBackToPatientList()">
-      <b>Terug</b>
+    <button class="deletePatientBtn" @click="showDeleteForm">
+      <b>Verwijder patiënt</b>
     </button>
-    <button class="addCategory" @click="goToCategory()">
-      <b>Categorie toevoegen</b>
-    </button>
-  </footer>
+
+    <div style="margin-top: 80px"></div>
+    <footer>
+      <button class="backBtn" @click="goBackToPatientList()">
+        <b>Terug</b>
+      </button>
+      <button class="addCategory" @click="goToCategory()">
+        <b>Categorie toevoegen</b>
+      </button>
+    </footer>
+  </div>
+  <DeleteForm
+    @close="closeForm"
+    @delete="deletePatientWithFireStore"
+    v-if="showFormDelete && !showFormEdit"
+  ></DeleteForm>
+  <EditForm
+    @close="closeForm"
+    @edit="editPatient"
+    v-if="showFormEdit && !showFormDelete"
+  ></EditForm>
 </template>
 
 <script>
@@ -72,13 +84,18 @@ import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
 import { getSinglePatient, deletePatient } from "../db/fdb";
-import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
+// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
+import { useRoute } from "vue-router";
+import DeleteForm from "../components/forms/DeleteForm.vue";
+import EditForm from "../components/forms/EditPatientForm.vue";
 
 export default {
   name: "patients",
   components: {
     NavBarTop,
     LinkButton,
+    DeleteForm,
+    EditForm,
   },
   data() {
     return {
@@ -88,25 +105,27 @@ export default {
       heightInM: null,
       patients: null,
       categories: null,
+      showFormDelete: false,
+      showFormEdit: false,
       gender: "",
       email: "",
       fysio: this.$store.getters.getUser.uid,
+      route: useRoute(),
     };
   },
 
   mounted() {
     this.getPatientData();
+
     this.categories = categories;
   },
 
   methods: {
     async getPatientData() {
-      let email = this.$store.getters.getPatientEmail;
-      let uid = this.$store.getters.getUser.uid;
-
-      let patient = await getSinglePatient(email, uid).then((patient) => {
-        return patient;
-      });
+      const docKey = this.route.params.name;
+      console.log(docKey);
+      let patient = await getSinglePatient(docKey);
+      console.log(patient);
 
       this.name = patient.name;
       this.weight = patient.weight;
@@ -115,24 +134,56 @@ export default {
       this.email = patient.email;
       this.gender = patient.gender;
     },
-    deletePatientWithFireStore(email) {
-      deletePatient(email, this.fysio);
+    deletePatientWithFireStore() {
+      let docKey = this.route.params.name;
+      deletePatient(docKey);
       this.$router.push({ name: "patients" });
     },
     goBackToPatientList() {
       this.$router.push({ name: "patients" });
     },
     goToExerciseResults(category) {
-      let naam = deleteWhiteSpaceFromString(this.name);
+      let docKey = this.route.params.name;
+      console.log(category);
       this.$router.push({
         name: "exerciseResults",
-        params: { name: naam },
+        params: { name: docKey, category: category },
       });
     },
 
     goToCategory(category) {
-      //! fix params
-      this.$router.push({ name: "addCategorie" });
+      const name = this.route.params.name;
+      this.$router.push({
+        name: "addCategorie",
+        params: { name: name },
+      });
+      // this.$router.push({ name: "addCategorie" });
+    },
+    blurrStyle() {
+      if (this.showFormDelete | this.showFormEdit) {
+        let style = "filter: blur(24px); opacity: 0.6;";
+        return style;
+      } else {
+        return "";
+      }
+    },
+    showDeleteForm(event) {
+      event.stopPropagation();
+      this.showFormDelete = true;
+    },
+    showEditForm(event) {
+      event.stopPropagation();
+      this.showFormEdit = true;
+    },
+    closeForm() {
+      this.showFormDelete = false;
+      this.showFormEdit = false;
+      this.errorMessage = "";
+      return;
+    },
+    editPatient() {
+      this.closeForm();
+      // Edit de patient's gegevens
     },
   },
 };
@@ -220,7 +271,7 @@ tr td {
   padding: 0.5rem;
   background-color: #e6302b;
   margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: white;
   border: none;
 }
@@ -241,6 +292,22 @@ tr td {
 }
 
 .addCategory:hover {
+  background: #0161b6;
+  border: none;
+}
+
+.editButton {
+  width: 100%;
+  background-color: #0275d8;
+  border-radius: 10px;
+  color: #f8f9fa;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border: none;
+  margin-top: 0.5rem;
+}
+
+.editButton:hover {
   background: #0161b6;
   border: none;
 }
@@ -271,6 +338,6 @@ footer {
   padding-top: 1rem;
   padding-bottom: 1rem;
   width: 100%;
-  background-color: #f8f9fa;
+  background-color: #f4f4f4;
 }
 </style>

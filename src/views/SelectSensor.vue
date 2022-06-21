@@ -141,6 +141,6 @@ footer {
   padding-top: 1rem;
   padding-bottom: 1rem;
   width: 100%;
-  background-color: #f8f9fa;
+  background-color: #f4f4f4;
 }
 </style>
