@@ -33,19 +33,16 @@
       </button>
     </div>
 
-    <template v-for="category in categories" :key="category">
+    <template v-for="[docKeyCategory, category] in categories" :key="category">
       <div class="category">
         <div class="text-holder">
           <p>
-            <b>{{ category.category }} </b>
+            <b>{{ category.name }} </b>
           </p>
-          <p>Laatste meting: {{ category.lastMeasure }}</p>
+          <!-- <p>Laatste meting: {{ category.lastMeasure }}</p> -->
         </div>
         <!-- TOO set param for patient -> category -> results -->
-        <button
-          class="see-results"
-          @click="goToExerciseResults(category.category)"
-        >
+        <button class="see-results" @click="goToExerciseResults(category.name)">
           Bekijk
         </button>
       </div>
@@ -80,10 +77,10 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import _ from "lodash";
-import categories from "../db/exerciseCategories.json";
+// import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
-import { getSinglePatient, deletePatient } from "../db/fdb";
+import { getSinglePatient, deletePatient, getCategories } from "../db/fdb";
 // import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
@@ -116,16 +113,21 @@ export default {
 
   mounted() {
     this.getPatientData();
-
-    this.categories = categories;
+    this.getCategories();
   },
 
   methods: {
+    // TODO fix
+    async getCategories() {
+      const docIdPatient = this.route.params.name;
+      console.log(docIdPatient);
+      let categories = await getCategories(docIdPatient);
+      this.categories = categories;
+    },
     async getPatientData() {
       const docKey = this.route.params.name;
       console.log(docKey);
       let patient = await getSinglePatient(docKey);
-      console.log(patient);
 
       this.name = patient.name;
       this.weight = patient.weight;

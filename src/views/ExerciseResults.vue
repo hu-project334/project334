@@ -58,6 +58,8 @@ import MovementPercentageInTime from "../components/tiles/charts/MovementPercent
 import results from "../db/results.json";
 import { ReformatArrayList } from "../Controllers/ReformatArrayList.js";
 import DeleteForm from "../components/forms/DeleteForm.vue";
+import { getCategoryResults, deleteCategory } from "../db/fdb";
+import { useRoute } from "vue-router";
 
 export default {
   name: "Exercise results",
@@ -72,6 +74,7 @@ export default {
       results: null,
       graphResults: null,
       showForm: false,
+      route: useRoute(),
     };
   },
 
@@ -82,9 +85,15 @@ export default {
     addMeasurement() {
       this.$router.push({ name: "measureInfo" });
     },
-    deleteCategory() {
+    async deleteCategory() {
+      let docIdPatient = this.route.params.name;
+      let docIdCategory = this.route.params.category;
+      console.log(docIdCategory);
+      await deleteCategory(docIdPatient, docIdCategory);
+
       //! delete category from the patient with firestore and than route to categories
       // this.$router.push({name:"patient"}) and params
+
       this.$router.push({ name: "patient" });
     },
     blurrStyle() {
@@ -106,7 +115,9 @@ export default {
     },
   },
   mounted() {
-    this.results = results;
+    // getCategoryResults();
+    // this.results = results;
+
     // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
     this.graphResults = ReformatArrayList(results);
     console.log(this.graphResults);

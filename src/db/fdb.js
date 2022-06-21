@@ -114,7 +114,24 @@ export async function addCategorie(docIdPatient, type) {
   });
 }
 
-export async function gettCategoryRrsults(docIdPatient, excersizeCategory) {
+export async function getCategories(docIdPatient) {
+  try {
+    console.log(docIdPatient);
+    const map = new Map();
+    const docRef = doc(db, "patienten", docIdPatient);
+    const colRef = collection(docRef, "excersizeCategory");
+    const querySnapshot = await getDocs(colRef);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      map.set(doc.id, doc.data());
+    });
+    return map;
+  } catch (error) {
+    console.error("Error getting categories", error);
+  }
+}
+
+export async function getCategoryResults(docIdPatient, excersizeCategory) {
   const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
   const docRef2 = doc(colRef, excersizeCategory);
@@ -122,6 +139,13 @@ export async function gettCategoryRrsults(docIdPatient, excersizeCategory) {
   const docSnap = await getDoc(docRef2);
   console.log(docSnap.data());
   return docSnap.data();
+}
+
+export async function deleteCategory(docIdPatient, excersizeCategory) {
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const docRef2 = doc(colRef, excersizeCategory);
+  await deleteDoc(docRef2);
 }
 
 // https://firebase.google.com/docs/firestore/query-data/queries
