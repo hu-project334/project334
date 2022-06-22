@@ -81,7 +81,7 @@ body:before {
 }
 
 .form {
-  position: absolute;
+  position: fixed;
   top: 40%;
   right: 0;
   left: 0;

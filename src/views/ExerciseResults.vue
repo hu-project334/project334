@@ -37,7 +37,7 @@
       <b>Verwijder categorie</b>
     </button>
 
-    <div style="margin-top: 80px;"></div>
+    <div style="margin-top: 80px"></div>
     <footer>
       <button class="backBtn" @click="goBackToPatient()"><b>Terug</b></button>
       <button class="addMeasurement" @click="addMeasurement()">
@@ -109,7 +109,6 @@ export default {
     this.results = results;
     // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
     this.graphResults = ReformatArrayList(results);
-    console.log(this.graphResults);
   },
 };
 </script>
