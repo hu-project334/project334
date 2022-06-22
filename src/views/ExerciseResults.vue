@@ -94,6 +94,8 @@ export default {
       this.results = await getCategoryResults(docIdPatient, docIdCategory);
       // console.log(unixToDateTimeReverse(1655844129));
 
+      console.log(this.results); // returned een proxy waar ik geen map functies op kan toepassen
+
       this.results = results;
       // this.graphResults = this.results;
     },

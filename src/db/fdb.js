@@ -90,7 +90,7 @@ export async function addPatient(
 export async function getSinglePatient(docKey) {
   const docRef = doc(db, "patienten", docKey);
   // const docRef = doc(db, "fysio", uid, "patienten", email);
-  // const docSnap = await getDoc(docRef);
+  const docSnap = await getDoc(docRef);
   return docSnap.data();
 }
 
