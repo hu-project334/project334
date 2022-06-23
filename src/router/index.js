@@ -41,7 +41,7 @@ const router = createRouter({
       component: () => import("../views/SelectSensor.vue"),
     },
     {
-      path: "//measureInfo",
+      path: "/:name/:category/measureInfo",
       name: "measureInfo",
       component: () => import("../views/MeasureInfo.vue"),
     },

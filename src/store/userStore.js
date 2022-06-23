@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     user: "",
     patientEmail: "",
+    XsenseDotObject: null,
   },
   getters: {
     getUser() {
@@ -15,17 +16,16 @@ export default new Vuex.Store({
     isLogedIn() {
       return localStorage.getItem("user") !== null;
     },
-    getPatientEmail() {
-      return JSON.parse(localStorage.getItem("patientEmail"));
-
-      // using localstorage to save patient email for fdb function temporary solution
-      // return state.patientEmail;
-    },
   },
+
   mutations: {
     changeProfilePicture(state, photoUrl) {
       state.user.photoUrl = photoUrl;
     },
+    setXsenseDotObject(state, XsenseDotObject) {
+      state.XsenseDotObject = XsenseDotObject;
+    },
+
     setPatientEmail(state, email) {
       // using localstorage to save patient email for fdb function temporary solution
       localStorage.removeItem("patientEmail");

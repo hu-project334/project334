@@ -19,9 +19,12 @@ import {
   query,
   orderBy,
   limit,
+  arrayUnion,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
+import store from "../store/userStore";
+import { getUnixOfToday } from "../controllers/unix";
 
 const db = getFirestore();
 
@@ -90,23 +93,52 @@ export async function addCategorie(docIdPatient, type) {
   const map = new Map();
   setDoc(doc(colRef, type), {
     name: type,
-    results: {
-      200322: { beweging: 170, norm: 3 },
-      210322: { beweging: 60, norm: 98 },
-      220322: { beweging: 30, norm: 50 },
-      310522: { beweging: 30, norm: 50 },
-    },
+    results: [],
   });
 }
 
-export async function gettCategoryRrsults(docIdPatient, excersizeCategory) {
+export async function addResultToCategory(docIdPatient, type, beweging, norm) {
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const docRef2 = doc(colRef, type);
+
+  await updateDoc(docRef2, {
+    results: arrayUnion({ date: getUnixOfToday(), beweging, norm }),
+  });
+}
+
+export async function getCategories(docIdPatient) {
+  try {
+    console.log(docIdPatient);
+    let map = new Map();
+    const docRef = doc(db, "patienten", docIdPatient);
+    const colRef = collection(docRef, "excersizeCategory");
+    const querySnapshot = await getDocs(colRef);
+    querySnapshot.forEach((doc) => {
+      map.set(doc.data().name, doc.data().results);
+    });
+    console.log(map);
+    return map;
+  } catch (error) {
+    console.error("Error getting categories", error);
+  }
+}
+
+export async function getCategoryResults(docIdPatient, excersizeCategory) {
   const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
   const docRef2 = doc(colRef, excersizeCategory);
 
   const docSnap = await getDoc(docRef2);
-  console.log(docSnap.data());
+  console.log(docSnap.data().results);
   return docSnap.data();
+}
+
+export async function deleteCategory(docIdPatient, excersizeCategory) {
+  const docRef = doc(db, "patienten", docIdPatient);
+  const colRef = collection(docRef, "excersizeCategory");
+  const docRef2 = doc(colRef, excersizeCategory);
+  await deleteDoc(docRef2);
 }
 
 // https://firebase.google.com/docs/firestore/query-data/queries

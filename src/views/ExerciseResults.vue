@@ -2,14 +2,12 @@
   <div :style="blurrStyle()">
     <nav-bar-top></nav-bar-top>
 
-    <!-- //! is not dynamic yet -->
-    <h1 class="title">Rechter onder arm</h1>
-    <!-- //! graph has to be installed and used -->
+    <h1 class="title">{{ routeName }}</h1>
     <main>
       <div class="result_container">
         <b>Meest recente metingen </b>
         <movement-percentage-in-time
-          :dataProp="graphResults"
+          :data-prop="graphResults"
         ></movement-percentage-in-time>
       </div>
 
@@ -21,13 +19,17 @@
             <th>Beweging (graden)</th>
             <th>Vergeleken tot de norm i (%)</th>
           </tr>
+          <!-- {{
+            JSON.stringify(results)
+          }} -->
           <template v-for="result in results" :key="result">
+            <!-- <template v-for="(obj2, pos2) in obj" :key="pos2"> -->
             <tr>
-              <!-- //! not dynamic yet firestore is needed -->
-              <td>{{ result.date }}</td>
-              <td>{{ result.MovementInDegree }}</td>
-              <td>{{ result.comparedToNorm }}</td>
+              <td>{{ unixToDateTime(result.date) }}</td>
+              <td>{{ result.beweging }}</td>
+              <td>{{ result.norm }}</td>
             </tr>
+            <!-- </template> -->
           </template>
         </table>
       </div>
@@ -53,11 +55,16 @@
 </template>
 
 <script>
+import { unixToDateTime } from "../Controllers/unix.js";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import MovementPercentageInTime from "../components/tiles/charts/MovementPercentageInTime.vue";
-import results from "../db/results.json";
-import { ReformatArrayList } from "../Controllers/ReformatArrayList.js";
 import DeleteForm from "../components/forms/DeleteForm.vue";
+import {
+  getCategoryResults,
+  deleteCategory,
+  addResultToCategory,
+} from "../db/fdb";
+import { useRoute } from "vue-router";
 
 export default {
   name: "Exercise results",
@@ -69,22 +76,65 @@ export default {
 
   data() {
     return {
-      results: null,
-      graphResults: null,
+      results: [],
+      graphResults: [],
       showForm: false,
+      route: useRoute(),
+      unixToDateTime,
+      routeName: "",
     };
   },
 
   methods: {
+    // returnGraphData() {
+
+    // },
+    async getCategoryResults() {
+      let docIdPatient = this.route.params.name;
+      let docIdCategory = this.route.params.category;
+
+      // await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
+
+      const getCategoryResultsConst = await getCategoryResults(
+        docIdPatient,
+        docIdCategory
+      );
+      const results = getCategoryResultsConst.results;
+      const name = getCategoryResultsConst.results;
+      this.routeName = getCategoryResultsConst.name;
+
+      console.log(docIdCategory);
+      // 24-11-1998 11:20:30 van de results alle dates in een list en beweging in graden
+      // {[date]:beweging}
+
+      const graphResults = results.reduce((res, val, i) => {
+        res[unixToDateTime(val.date)] = val.beweging;
+        return res;
+      }, {});
+      console.log(graphResults);
+      this.graphResults = graphResults;
+
+      console.log(results);
+      this.results = results;
+      // this.graphResults = this.results;
+    },
     goBackToPatient() {
       this.$router.push({ name: "patient" });
     },
     addMeasurement() {
-      this.$router.push({ name: "measureInfo" });
+      let name = this.route.params.name;
+      let category = this.route.params.category;
+      this.$router.push({
+        name: "measureInfo",
+        params: { name: name, category: category },
+      });
     },
-    deleteCategory() {
-      //! delete category from the patient with firestore and than route to categories
-      // this.$router.push({name:"patient"}) and params
+    async deleteCategory() {
+      let docIdPatient = this.route.params.name;
+      let docIdCategory = this.route.params.category;
+      console.log(docIdCategory);
+      await deleteCategory(docIdPatient, docIdCategory);
+
       this.$router.push({ name: "patient" });
     },
     blurrStyle() {
@@ -106,9 +156,14 @@ export default {
     },
   },
   mounted() {
-    this.results = results;
+    this.getCategoryResults();
+
+    // unixToDateTime(1655844129);
+    // this.results = results;
+
     // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
-    this.graphResults = ReformatArrayList(results);
+    // this.graphResults = ReformatArrayList(results);
+    // console.log(this.graphResults);
   },
 };
 </script>

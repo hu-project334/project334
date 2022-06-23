@@ -9,23 +9,33 @@
       <table>
         <tr>
           <td class="header_name"><b class="table_content">Naam </b></td>
-          <td> <div class="table_data"> {{ name }} </div></td>
+          <td>
+            <div class="table_data">{{ name }}</div>
+          </td>
         </tr>
         <tr>
           <td class="header_name"><b>E-mail</b></td>
-          <td> <div class="table_data"> {{ email }} </div></td>
+          <td>
+            <div class="table_data">{{ email }}</div>
+          </td>
         </tr>
         <tr>
           <td class="header_name"><b>Gewicht (kg)</b></td>
-          <td> <div class="table_data"> {{ weight }} </div></td>
+          <td>
+            <div class="table_data">{{ weight }}</div>
+          </td>
         </tr>
         <tr>
           <td class="header_name"><b>Lengte (m)</b></td>
-          <td> <div class="table_data"> {{ heightInM }} </div></td>
+          <td>
+            <div class="table_data">{{ heightInM }}</div>
+          </td>
         </tr>
         <tr>
           <td class="header_name"><b>leeftijd </b></td>
-          <td> <div class="table_data"> {{ age }} </div></td>
+          <td>
+            <div class="table_data">{{ age }}</div>
+          </td>
         </tr>
       </table>
       <button class="editButton" @click="showEditForm">
@@ -33,19 +43,16 @@
       </button>
     </div>
 
-    <template v-for="category in categories" :key="category">
+    <template v-for="[name, results] in categories" :key="docKeyCategory">
       <div class="category">
         <div class="text-holder">
           <p>
-            <b>{{ category.category }} </b>
+            <b>{{ name }} </b>
           </p>
-          <p>Laatste meting: {{ category.lastMeasure }}</p>
+          <!-- <p>Laatste meting: {{ category.lastMeasure }}</p> -->
         </div>
         <!-- TOO set param for patient -> category -> results -->
-        <button
-          class="see-results"
-          @click="goToExerciseResults(category.category)"
-        >
+        <button class="see-results" @click="goToExerciseResults(name)">
           Bekijk
         </button>
       </div>
@@ -80,10 +87,11 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import _ from "lodash";
-import categories from "../db/exerciseCategories.json";
+// import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
-import { getSinglePatient, deletePatient } from "../db/fdb";
+import { getSinglePatient, deletePatient, getCategories } from "../db/fdb";
+// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
@@ -110,16 +118,25 @@ export default {
       email: "",
       fysio: this.$store.getters.getUser.uid,
       route: useRoute(),
+      patientID: null,
     };
   },
 
   mounted() {
     this.getPatientData();
-
-    this.categories = categories;
+    this.getCategories();
+    console.log(this.categories);
   },
 
   methods: {
+    // TODO fix
+    async getCategories() {
+      const docIdPatient = this.route.params.name;
+      console.log(docIdPatient);
+      let categories = await getCategories(docIdPatient);
+      this.categories = categories;
+      console.log(this.categories);
+    },
     async getPatientData() {
       const docKey = this.route.params.name;
       let patient = await getSinglePatient(docKey);
@@ -147,7 +164,7 @@ export default {
       });
     },
 
-    goToCategory(category) {
+    goToCategory() {
       const name = this.route.params.name;
       this.$router.push({
         name: "addCategorie",
@@ -220,10 +237,10 @@ tr td {
   padding-left: 1%;
   margin-right: 100px;
 }
-table { 
-    table-layout:fixed;
-    width: 98%;
-    margin-right: 2%;
+table {
+  table-layout: fixed;
+  width: 98%;
+  margin-right: 2%;
 }
 
 .header_name {

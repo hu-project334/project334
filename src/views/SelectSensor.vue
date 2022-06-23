@@ -1,29 +1,29 @@
 <template>
-    <div id="loadText" class="loadText">{{loadingText}}</div>
-    <div id="screen">
-        <nav-bar-top></nav-bar-top>
-        <h1 class="title">Koppel sensor</h1>
-        
-        <div class="info_container">
-          <p class="boxTitle"> Een sensor koppelen </p>
-          <p> 1. Klik op 'Koppel sensor' hieronder</p>
-          <p> 2. Klik op de sensor die u wilt verbinden</p>
-          <p> 3. Klik op verbinden</p>
-        </div>
-        
-        <button class="connectSensorButton" @click="connectSensor()">
-            <b>Koppel sensor</b>
-        </button>
-        
-        <footer>
-            <button class="backBtn" @click="goBackToInfo()"><b>Terug</b></button>
-        </footer>
+  <div id="loadText" class="loadText">{{ loadingText }}</div>
+  <div id="screen">
+    <nav-bar-top></nav-bar-top>
+    <h1 class="title">Koppel sensor</h1>
+
+    <div class="info_container">
+      <p class="boxTitle">Een sensor koppelen</p>
+      <p>1. Klik op 'Koppel sensor' hieronder</p>
+      <p>2. Klik op de sensor die u wilt verbinden</p>
+      <p>3. Klik op verbinden</p>
     </div>
+
+    <button class="connectSensorButton" @click="connectSensor()">
+      <b>Koppel sensor</b>
+    </button>
+
+    <footer>
+      <button class="backBtn" @click="goBackToInfo()"><b>Terug</b></button>
+    </footer>
+  </div>
 </template>
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
-import { findBluetoothDevices } from "/src/libraries/interface.js";
+import { XsensDot } from "/src/libraries/bluetooth.js";
 
 var loading = false;
 
@@ -32,26 +32,30 @@ export default {
   components: {
     NavBarTop,
   },
-  data(){
+  data() {
     return {
       loadingText: "",
-    }
+      XsensDotSensor: null,
+    };
   },
-
-  mounted(){
-    window.onclick = function(){
-      if(loading){
+  created() {
+    this.XsensDotSensor = new XsensDot();
+  },
+  mounted() {
+    window.onclick = function () {
+      if (loading) {
         document.getElementById("screen").style = "";
         this.loadingText = "";
         loading = false;
       }
-    }
+    };
   },
 
   methods: {
+  
     // Function copied from https://masteringjs.io/tutorials/fundamentals/wait-1-second-then#:~:text=To%20delay%20a%20function%20execution,call%20fn%20after%201%20second.
     delay(time) {
-      return new Promise(resolve => setTimeout(resolve, time));
+      return new Promise((resolve) => setTimeout(resolve, time));
     },
     goBackToInfo() {
       this.$router.push({ name: "measureInfo" });
@@ -59,42 +63,43 @@ export default {
     connectSensor() {
       this.delay(100).then(() => this.connect());
     },
-    connect(){
-      document.getElementById("screen").style = "filter: blur(24px); opacity: 0.6;";
+    connect() {
+      document.getElementById("screen").style =
+        "filter: blur(24px); opacity: 0.6;";
       this.loadingText = "loading...";
       loading = true;
       this.loadAnimation();
-      findBluetoothDevices().then(() => {
-          return new Promise((resolve) => {
-              this.$router.push({ name: "measure" });
-              document.getElementById("screen").style = "";
-              this.loadingText = "";
-              loading = false;
-              resolve();
-          });
+      this.XsensDotSensor.findAndConnect().then(() => {
+        return new Promise((resolve) => {
+          this.$router.push({ name: "measure" });
+          document.getElementById("screen").style = "";
+          this.loadingText = "";
+          loading = false;
+          resolve();
+        });
       });
     },
     loadAnimation() {
       setTimeout(() => {
-          if(loading){
-              this.loadingText = "loading...";
-          }
+        if (loading) {
+          this.loadingText = "loading...";
+        }
       }, 500);
       setTimeout(() => {
-          if(loading){
-              this.loadingText = "loading..";
-          }
+        if (loading) {
+          this.loadingText = "loading..";
+        }
       }, 1000);
       setTimeout(() => {
-          if(loading){
-              this.loadingText = "loading.";
-          }
+        if (loading) {
+          this.loadingText = "loading.";
+        }
       }, 1500);
       setTimeout(() => {
-          if(loading){
-              this.loadingText = "loading";
-              this.loadAnimation();
-          }
+        if (loading) {
+          this.loadingText = "loading";
+          this.loadAnimation();
+        }
       }, 2000);
     },
   },
@@ -128,10 +133,10 @@ export default {
 }
 
 .boxTitle {
-   padding-top: 3%;
-   padding-left: 3%;
-   font-weight: bold;
-   font-size: 1.5em; 
+  padding-top: 3%;
+  padding-left: 3%;
+  font-weight: bold;
+  font-size: 1.5em;
 }
 
 .info_container {
