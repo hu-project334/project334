@@ -48,14 +48,11 @@ export default {
         this.loadingText = "";
         loading = false;
       }
-      test();
     };
   },
 
   methods: {
-    test() {
-      console.log("werkt dit we ");
-    },
+  
     // Function copied from https://masteringjs.io/tutorials/fundamentals/wait-1-second-then#:~:text=To%20delay%20a%20function%20execution,call%20fn%20after%201%20second.
     delay(time) {
       return new Promise((resolve) => setTimeout(resolve, time));
