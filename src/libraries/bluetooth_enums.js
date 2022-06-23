@@ -109,24 +109,6 @@ export const syncMsgEnum = Object.freeze({
   getSyncStatus: 0x08, // Check if the sensor is already synced (syncStatus notification will be sent)
 });
 
-// Payload mode ID's
-// eslint-disable-next-line no-unused-vars
-export const payloadIDsEnum = Object.freeze({
-  highFidelityMag: 0x01, // Medium Payload which can only be parsed by Xsens SDK
-  extendedQuaternion: 0x02, // Medium Payload containing timestamp, quaternion, free acceleration, status, clipCountAcc, clipCountGyr
-  completeQuaternion: 0x03, // Medium Payload containing timestamp, quaterion, free acceleration
-  orientationEuler: 0x04, // Short Payload containing timestamp, euler
-  orientationQuaternion: 0x05, // Short Payload containing timestamp, quaternion
-  freeAcceleration: 0x06, // Short Payload containing timestamp, free acceleration
-  extendedEuler: 0x07, // Medium Payload containing timestamp, euler, free acceleration, status, clipCountAcc, clipCountGyr
-  completeEuler: 0x10, // Medium Payload containing timestamp, euler, free acceleration
-  highFidelity: 0x11, // Medium Payload which can only be parsed by Xsens SDK
-  deltaQuantitiesMag: 0x12, // Medium Payload containing timestamp, dq, dv, magnetic field
-  deltaQuantities: 0x13, // Medium Payload containing timestamp, dq, dv
-  rateQuantitiesMag: 0x14, // Medium Payload containing timestamp, acceleration, angular velocity, magnetic field
-  rateQuantities: 0x15, // Medium Payload containing timestamp, acceleration, angular velocity
-})
-
 /**
  * getKeyByValue function takes an Enum object where it searches for
  * the given value and returns the found key name

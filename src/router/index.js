@@ -35,7 +35,6 @@ const router = createRouter({
       name: "exerciseResults",
       component: () => import("../views/ExerciseResults.vue"),
     },
-    ,
     {
       path: "/selectSensor",
       name: "selectSensor",

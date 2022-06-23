@@ -10,9 +10,9 @@
       <tr>
         <td class="header_name"><b class="table_content" >Tijd (m:s:ms) </b></td>
         <td>
-          <span id="minutes">00:</span>
-          <span id="seconds">00:</span>
-          <span id="milliseconds">00</span>
+          <span id="minutes">{{minutes}}:</span>
+          <span id="seconds">{{seconds}}:</span>
+          <span id="milliseconds">{{miliseconds}}</span>
         </td>
       </tr>
       <tr>
@@ -29,7 +29,7 @@
         class="measureButtonBlue"
         @click="measure()"
         id="button1"
-      ><b id="button1Text">Start meting</b>
+      ><b>{{button1text}}</b>
     </button>
 
     <button
@@ -60,15 +60,21 @@
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 
 var measureState = "idle";
-var miliseconds  = 0;
-var seconds      = 0;
-var minutes      = 0;
 var timer;
 
 export default {
   name: "Select Sensor",
   components: {
     NavBarTop,
+  },
+
+  data() {
+    return{
+      miliseconds: 0,
+      seconds: 0,
+      minutes: 0,
+      button1text: "Start meting"
+    }
   },
 
   methods: {
@@ -85,24 +91,21 @@ export default {
 
     //bron: https://dev.to/walternascimentobarroso/creating-a-timer-with-javascript-8b7
     updateTimer() {
-      if ((miliseconds += 10) == 1000) {
-        miliseconds = 0;
-        seconds++;
+      if ((this.miliseconds += 10) == 1000) {
+        this.miliseconds = 0;
+        this.seconds++;
       }
-      if (seconds == 60) {
-        seconds = 0;
-        minutes++;
+      if (this.seconds == 60) {
+        this.seconds = 0;
+        this.minutes++;
       }
-      document.getElementById('minutes').innerHTML = minutes+":";
-      document.getElementById('seconds').innerHTML = seconds+":";
-      document.getElementById('milliseconds').innerHTML = miliseconds;
     },
 
     measure() {
       if(measureState == "idle"){
         document.getElementById("button1").classList.toggle('measureButtonBlue');
         document.getElementById("button1").classList.toggle('measureButtonRed');
-        document.getElementById("button1Text").innerHTML = 'Stop meting';
+        this.button1text = "Stop meting";
 
         clearInterval(timer);
         timer = setInterval(() => { this.updateTimer(); }, 10);
@@ -112,7 +115,7 @@ export default {
       else if(measureState == "measuring"){
         document.getElementById("button1").classList.toggle('measureButtonBlue');
         document.getElementById("button1").classList.toggle('measureButtonRed');
-        document.getElementById("button1Text").innerHTML = 'Begin opnieuw';
+        this.button1text = "Begin opnieuw";
 
         document.getElementById("button2").style = ('margin-top: 0.5rem; display: inline');
         document.getElementById("button3").style = ('margin-top: 0.5rem; display: inline');
@@ -121,17 +124,14 @@ export default {
         measureState = "results";
       }
       else if(measureState == "results"){
-        document.getElementById("button1Text").innerHTML = 'Start meting';
         document.getElementById("button2").style = ('margin-top: 0.5rem; display: none');
         document.getElementById("button3").style = ('margin-top: 0.5rem; display: none');
+        this.button1text = "Start meting";
 
-        miliseconds  = 0;
-        seconds      = 0;
-        minutes      = 0;
+        this.miliseconds  = 0;
+        this.seconds      = 0;
+        this.minutes      = 0;
         clearInterval(timer);
-        document.getElementById('minutes').innerHTML = minutes+":";
-        document.getElementById('seconds').innerHTML = seconds+":";
-        document.getElementById('milliseconds').innerHTML = miliseconds;
 
         measureState = "idle";
       }

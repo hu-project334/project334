@@ -3,19 +3,17 @@
   <h1 class="title">Info meting</h1>
   <main>
     <div class="info_container">
-      <p id="titleText" class="boxTitle">Plaats de sensor</p>
+      <p class="boxTitle">{{ titleText }}</p>
       <img
         id="infoImage"
         class="infoImage"
         src="@/assets/measureImages/underArm1.png"
       />
       <hr class="line" />
-      <p id="infoBox1">
-        1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)
-      </p>
-      <p id="infoBox2">2. Zorg ervoor dat de sensor stevig vast zit</p>
-      <p id="infoBox3"></p>
-      <p id="infoBox4"></p>
+      <p>{{ infoBox1 }}</p>
+      <p>{{ infoBox2 }}</p>
+      <p>{{ infoBox3 }}</p>
+      <p>{{ infoBox4 }}</p>
 
       <div>
         <img
@@ -24,7 +22,7 @@
           src="@/assets/empty.png"
           @click="previousPanel()"
         />
-        <div id="indexBox" class="indexText">1/3</div>
+        <div class="indexText">{{ indexBox }}</div>
         <img
           id="rightArrow"
           class="arrowImageRight"
@@ -56,6 +54,17 @@ export default {
     NavBarTop,
   },
 
+  data() {
+    return {
+      titleText: "Plaats de sensor",
+      indexBox: "1/3",
+      infoBox1: "1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)",
+      infoBox2: "2. Zorg ervoor dat de sensor stevig vast zit",
+      infoBox3: "",
+      infoBox4: "",
+    };
+  },
+
   methods: {
     goBackToResults() {
       this.$router.push({ name: "exerciseResults" });
@@ -68,37 +77,34 @@ export default {
         textIndex += 1;
       }
       if (textIndex == 2) {
-        document.getElementById("indexBox").innerHTML = "2/3";
+        this.indexBox = "2/3";
         document.getElementById("leftArrow").src = "/src/assets/arrowLeft.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML =
-          "Beweging van de meting";
+        this.titleText = "Beweging van de meting";
         document.getElementById("infoImage").src =
           "/src/assets/measureImages/underArm2.png";
 
-        document.getElementById("infoBox1").innerHTML =
+        this.infoBox1 =
           "1. Zorg dat de patiënt zijn/haar arm zo recht mogelijk strekt";
-        document.getElementById("infoBox2").innerHTML =
+        this.infoBox2 =
           "2. Laat de patiënt zijn/haar arm zo ver mogelijk terug te laten bewegen (zoals weergegeven)";
-        document.getElementById("infoBox3").innerHTML = "";
-        document.getElementById("infoBox4").innerHTML = "";
+        this.infoBox3 = "";
+        this.infoBox4 = "";
       } else if (textIndex == 3) {
-        document.getElementById("indexBox").innerHTML = "3/3";
+        this.indexBox = "3/3";
         document.getElementById("rightArrow").src = "/src/assets/empty.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML = "Start van de meting";
+        this.titleText = "Start van de meting";
         document.getElementById("infoImage").src =
           "/src/assets/measureImages/startStop.png";
 
-        document.getElementById("infoBox1").innerHTML =
-          '1. klik hieronder op "Koppel sensor"';
-        document.getElementById("infoBox2").innerHTML =
-          "2. koppel een sensor en klik op start";
-        document.getElementById("infoBox3").innerHTML =
+        this.infoBox1 = '1. klik hieronder op "Koppel sensor"';
+        this.infoBox2 = "2. koppel een sensor en klik op start";
+        this.infoBox3 =
           "3. Zorg ervoor dat de patiënt zijn/haar boven arm zo horizontaal mogelijk  houdt";
-        document.getElementById("infoBox4").innerHTML =
+        this.infoBox4 =
           "4. Zodra de patiënt zijn/haar top punt  heeft bereikt; druk op stop";
       }
     },
@@ -107,35 +113,35 @@ export default {
         textIndex -= 1;
       }
       if (textIndex == 2) {
-        document.getElementById("indexBox").innerHTML = "2/3";
+        this.indexBox = "2/3";
         document.getElementById("rightArrow").src =
           "/src/assets/arrowRight.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML =
-          "Beweging van de meting";
+        this.titleText = "Beweging van de meting";
         document.getElementById("infoImage").src =
           "/src/assets/measureImages/underArm2.png";
 
-        document.getElementById("infoBox1").innerHTML =
+        this.infoBox1 =
           "1. Zorg dat de patiënt zijn/haar arm zo recht mogelijk strekt";
-        document.getElementById("infoBox2").innerHTML =
+        this.infoBox2 =
           "2. Laat de patiënt zijn/haar arm zo ver mogelijk terug te laten bewegen (zoals weergegeven)";
-        document.getElementById("infoBox3").innerHTML = "";
-        document.getElementById("infoBox4").innerHTML = "";
+        this.infoBox3 = "";
+        this.infoBox4 = "";
       } else if (textIndex == 1) {
-        document.getElementById("indexBox").innerHTML = "1/3";
+        this.indexBox = "1/3";
         document.getElementById("leftArrow").src = "/src/assets/empty.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML = "Plaats de sensor";
+        this.titleText = "Plaats de sensor";
         document.getElementById("infoImage").src =
           "/src/assets/measureImages/underArm1.png";
 
-        document.getElementById("infoBox1").innerHTML =
+        this.infoBox1 =
           "1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)";
-        document.getElementById("infoBox2").innerHTML =
-          "2. Zorg ervoor dat de sensor stevig vast zit";
+        this.infoBox2 = "2. Zorg ervoor dat de sensor stevig vast zit";
+        this.infoBox3 = "";
+        this.infoBox4 = "";
       }
     },
   },
