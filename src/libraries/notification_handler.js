@@ -45,5 +45,4 @@ class notification_handler {
     }
 }
 
-let NotificationHandler = new notification_handler();
-export { NotificationHandler };
+export { notification_handler };

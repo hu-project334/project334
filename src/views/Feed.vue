@@ -5,6 +5,7 @@ Register.vue - base vue
 
   <p><button @click="getData()">connect</button></p>
   <p><button @click="sync()">synchronize</button></p>
+  <input type="text" name="device name" placeholder="enter new device name" :value="device_name" @change="updateDeviceName">
   <p><button @click="identify()">identify device</button></p>
   <h2>Device name: {{ device_name }}</h2>
   <h2>Battery level: {{ batterylevel }}</h2>
@@ -21,13 +22,6 @@ Register.vue - base vue
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import { XsensDot } from "/src/libraries/bluetooth.js";
-import {
-  findBluetoothDevices,
-  startRTStream,
-  stopRTStream,
-  getSyncStatusSensor,
-  setGlobal,
-} from "/src/libraries/interface.js";
 
 export default {
   name: "Feed",
@@ -49,7 +43,6 @@ export default {
   created() {
     window.addEventListener("beforeunload", this.handler);
     this.XsensDotSensor = new XsensDot();
-    setGlobal(this.XsensDotSensor);
     this.batterylevel = this.XsensDotSensor.battery_level;
     this.x = this.XsensDotSensor.rotation.x;
     this.y = this.XsensDotSensor.rotation.y;
@@ -96,10 +89,10 @@ export default {
   },
   methods: {
     getData() {
-      findBluetoothDevices(this.XsensDotSensor);
+      this.XsensDotSensor.findAndConnect();
     },
     sync() {
-      getSyncStatusSensor(this.XsensDotSensor);
+      this.XsensDotSensor.getSyncStatusSensor();
     },
     identify() {
       this.XsensDotSensor.blinkDeviceLED();
@@ -108,11 +101,18 @@ export default {
       this.XsensDotSensor.downloadDataToCSV();
     },
     streamData() {
-      startRTStream(this.XsensDotSensor);
+      this.XsensDotSensor.startRTStream();
     },
     stopDataStream() {
-      stopRTStream(this.XsensDotSensor);
+      this.XsensDotSensor.stopRTStream();
+    },
+    updateDeviceName(e) {
+      this.XsensDotSensor.writeDeviceName(e.target.value.trim())
     },
   },
 };
 </script>
+<style scoped>
+
+
+</style>
