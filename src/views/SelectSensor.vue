@@ -1,5 +1,5 @@
 <template>
-    <div id="loadText" class="loadText"></div>
+    <div id="loadText" class="loadText">{{loadingText}}</div>
     <div id="screen">
         <nav-bar-top></nav-bar-top>
         <h1 class="title">Koppel sensor</h1>
@@ -23,7 +23,7 @@
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
-import { XsensDot } from "/src/libraries/bluetooth.js";
+import { findBluetoothDevices } from "/src/libraries/interface.js";
 
 var loading = false;
 
@@ -33,16 +33,16 @@ export default {
     NavBarTop,
   },
   data(){
-    XsensDotSensor: null
+    return {
+      loadingText: "",
+    }
   },
-  created(){
-    this.XsensDotSensor = new XsensDot();
-  },
+
   mounted(){
     window.onclick = function(){
       if(loading){
         document.getElementById("screen").style = "";
-        document.getElementById("loadText").innerHTML = "";
+        this.loadingText = "";
         loading = false;
       }
     }
@@ -61,14 +61,14 @@ export default {
     },
     connect(){
       document.getElementById("screen").style = "filter: blur(24px); opacity: 0.6;";
-      document.getElementById("loadText").innerHTML = "loading...";
+      this.loadingText = "loading...";
       loading = true;
       this.loadAnimation();
-      this.XsensDotSensor.findAndConnect().then(() => {
+      findBluetoothDevices().then(() => {
           return new Promise((resolve) => {
               this.$router.push({ name: "measure" });
               document.getElementById("screen").style = "";
-              document.getElementById("loadText").innerHTML = "";
+              this.loadingText = "";
               loading = false;
               resolve();
           });
@@ -77,22 +77,22 @@ export default {
     loadAnimation() {
       setTimeout(() => {
           if(loading){
-              document.getElementById("loadText").innerHTML = "loading...";
+              this.loadingText = "loading...";
           }
       }, 500);
       setTimeout(() => {
           if(loading){
-              document.getElementById("loadText").innerHTML = "loading..";
+              this.loadingText = "loading..";
           }
       }, 1000);
       setTimeout(() => {
           if(loading){
-              document.getElementById("loadText").innerHTML = "loading.";
+              this.loadingText = "loading.";
           }
       }, 1500);
       setTimeout(() => {
           if(loading){
-              document.getElementById("loadText").innerHTML = "loading";
+              this.loadingText = "loading";
               this.loadAnimation();
           }
       }, 2000);
