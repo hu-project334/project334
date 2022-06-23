@@ -2,30 +2,40 @@
   <div :style="blurrStyle()">
     <NavBarTop></NavBarTop>
 
-    <h1 class="title">{{ name }} {{ surName }}</h1>
+    <h1 class="title">{{ name }}</h1>
 
-    <div class="container">
+    <div class="info_container">
       <b>Patiënt gegevens</b>
       <table>
         <tr>
           <td class="header_name"><b class="table_content">Naam </b></td>
-          <td>{{ name }} {{ surName }}</td>
+          <td>
+            <div class="table_data">{{ name }}</div>
+          </td>
         </tr>
         <tr>
-          <td class="header_name"><b>Gewicht </b></td>
-          <td>{{ weight }}</td>
+          <td class="header_name"><b>E-mail</b></td>
+          <td>
+            <div class="table_data">{{ email }}</div>
+          </td>
         </tr>
         <tr>
-          <td class="header_name"><b>Lengte </b></td>
-          <td>{{ heightInM }}</td>
+          <td class="header_name"><b>Gewicht (kg)</b></td>
+          <td>
+            <div class="table_data">{{ weight }}</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="header_name"><b>Lengte (m)</b></td>
+          <td>
+            <div class="table_data">{{ heightInM }}</div>
+          </td>
         </tr>
         <tr>
           <td class="header_name"><b>leeftijd </b></td>
-          <td>{{ age }}</td>
-        </tr>
-        <tr>
-          <td class="header_name"><b>Patiënt nummer</b></td>
-          <td>{{ patientID }}</td>
+          <td>
+            <div class="table_data">{{ age }}</div>
+          </td>
         </tr>
       </table>
       <button class="editButton" @click="showEditForm">
@@ -129,7 +139,6 @@ export default {
     },
     async getPatientData() {
       const docKey = this.route.params.name;
-      console.log(docKey);
       let patient = await getSinglePatient(docKey);
 
       this.name = patient.name;
@@ -149,7 +158,6 @@ export default {
     },
     goToExerciseResults(category) {
       let docKey = this.route.params.name;
-      console.log(category);
       this.$router.push({
         name: "exerciseResults",
         params: { name: docKey, category: category },
@@ -209,8 +217,7 @@ p {
   margin: 0;
 }
 
-/* patient data */
-.container {
+.info_container {
   margin-top: 1%;
   height: 50%;
   margin-right: 5%;
@@ -218,23 +225,36 @@ p {
   background: white;
   width: 90%;
   border-radius: 15px;
-  padding-bottom: 0.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  padding-top: 0.5rem;
-  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
 }
+
+/* patient data */
+
 tr td {
   border: 2px solid #00a1e1;
   padding-left: 1%;
-  width: 100%;
+  margin-right: 100px;
 }
+table {
+  table-layout: fixed;
+  width: 98%;
+  margin-right: 2%;
+}
+
 .header_name {
   padding-left: 1%;
-  width: 20%;
+  width: 110px;
 }
 .table_content {
-  margin-right: 100px;
+  margin-right: 70px;
+}
+
+.table_data {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* list of categories */
@@ -302,14 +322,16 @@ tr td {
 }
 
 .editButton {
-  width: 100%;
   background-color: #0275d8;
   border-radius: 10px;
   color: #f8f9fa;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   border: none;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  margin-left: 0%;
+  width: 98%;
+  margin-right: 2%;
 }
 
 .editButton:hover {

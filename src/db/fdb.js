@@ -28,20 +28,6 @@ import { getUnixOfToday } from "../controllers/unix";
 
 const db = getFirestore();
 
-// dummy data
-async function dummyDataPatients(patientsRef, uid) {
-  await setDoc(doc(patientsRef), {
-    id: 2,
-    name: "Milo",
-    surName: "Belien",
-    weight: 70,
-    dateOfBirth: "28-09-2002",
-    heightInM: 1.83,
-    email: "milo.belien@student.hu.nl",
-    fysiotherapeutNummer: uid,
-  });
-}
-
 /**--------------------------- FUNCTIONS --------------------------- */
 
 export async function createFysio(name, email, uid) {
@@ -104,6 +90,7 @@ export async function addCategorie(docIdPatient, type) {
   console.log(docIdPatient);
   const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
+  const map = new Map();
   setDoc(doc(colRef, type), {
     name: type,
     results: {
