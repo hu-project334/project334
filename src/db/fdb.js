@@ -131,7 +131,7 @@ export async function getCategoryResults(docIdPatient, excersizeCategory) {
 
   const docSnap = await getDoc(docRef2);
   console.log(docSnap.data().results);
-  return docSnap.data().results;
+  return docSnap.data();
 }
 
 export async function deleteCategory(docIdPatient, excersizeCategory) {

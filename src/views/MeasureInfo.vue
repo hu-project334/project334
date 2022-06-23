@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { useRoute } from "vue-router";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 
 var textIndex = 1;
@@ -62,10 +63,21 @@ export default {
       infoBox2: "2. Zorg ervoor dat de sensor stevig vast zit",
       infoBox3: "",
       infoBox4: "",
+      route: useRoute(),
     };
+  },
+  mounted() {
+    this.dynamicPanels();
   },
 
   methods: {
+    dynamicPanels() {
+      const category = this.route.params.category;
+      if (category === "elleboog-flexie-extensie-rechts") {
+        console.log("elleboog-flexie-extensie");
+      }
+    },
+
     goBackToResults() {
       this.$router.push({ name: "exerciseResults" });
     },

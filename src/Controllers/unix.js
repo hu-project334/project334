@@ -4,7 +4,6 @@ export function unixToDateTime(unix) {
     .replace("T", " ")
     .split(".")
     .shift();
-  console.log(humanDateFormat);
   return humanDateFormat;
 }
 

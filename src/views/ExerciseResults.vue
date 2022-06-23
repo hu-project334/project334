@@ -2,7 +2,7 @@
   <div :style="blurrStyle()">
     <nav-bar-top></nav-bar-top>
 
-    <h1 class="title">Rechter onder arm</h1>
+    <h1 class="title">{{ routeName }}</h1>
     <main>
       <div class="result_container">
         <b>Meest recente metingen </b>
@@ -83,6 +83,7 @@ export default {
       showForm: false,
       route: useRoute(),
       unixToDateTime,
+      routeName: "",
     };
   },
 
@@ -96,10 +97,15 @@ export default {
 
       // await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
 
-      const results = await getCategoryResults(docIdPatient, docIdCategory);
+      const getCategoryResultsConst = await getCategoryResults(
+        docIdPatient,
+        docIdCategory
+      );
+      const results = getCategoryResultsConst.results;
+      const name = getCategoryResultsConst.results;
+      this.routeName = getCategoryResultsConst.name;
 
-      // let list = Object.keys(results);
-
+      console.log(docIdCategory);
       // 24-11-1998 11:20:30 van de results alle dates in een list en beweging in graden
       // {[date]:beweging}
 

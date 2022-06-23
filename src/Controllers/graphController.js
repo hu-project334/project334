@@ -13,13 +13,11 @@ export function ReformatArrayList(arraylistWithObjects) {
 }
 
 export function unixToDateTimeReverse(unix) {
-  console.log(unix);
   const humanDateFormat = new Date(unix)
     .toISOString()
     .replace("T", " ")
     .split(".")
     .shift();
-  console.log(humanDateFormat);
   return humanDateFormat;
 }
 
