@@ -93,11 +93,7 @@ export async function addCategorie(docIdPatient, type) {
   const map = new Map();
   setDoc(doc(colRef, type), {
     name: type,
-    results: {
-      1655839884: { beweging: 170, norm: 3 },
-      1655840016: { beweging: 140, norm: 97 },
-      1655840085: { beweging: 120, norm: 40 },
-    },
+    results: [],
   });
 }
 
@@ -107,7 +103,7 @@ export async function addResultToCategory(docIdPatient, type, beweging, norm) {
   const docRef2 = doc(colRef, type);
 
   await updateDoc(docRef2, {
-    results: arrayUnion(getUnixOfToday(), { beweging, norm }),
+    results: arrayUnion({ date: getUnixOfToday(), beweging, norm }),
   });
 }
 

@@ -1,15 +1,13 @@
 export function unixToDateTime(unix) {
-  const milliseconds = unix * 1000;
-  const dateObject = new Date(milliseconds);
-  const date = dateObject.toLocaleDateString();
-  const time = dateObject.toLocaleTimeString();
-
-  const humanDateFormat = date + " " + time;
+  const humanDateFormat = new Date(unix)
+    .toISOString()
+    .replace("T", " ")
+    .split(".")
+    .shift();
+  console.log(humanDateFormat);
   return humanDateFormat;
 }
 
 export function getUnixOfToday() {
-  let today = new Date();
-  let unix = Math.round(today.getTime());
-  return unix;
+  return new Date().getTime();
 }

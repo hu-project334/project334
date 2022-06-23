@@ -14,25 +14,11 @@ export function ReformatArrayList(arraylistWithObjects) {
 
 export function unixToDateTimeReverse(unix) {
   console.log(unix);
-  const milliseconds = unix * 1000;
-  const dateObject = new Date(milliseconds);
-  // const date = dateObject.toLocaleDateString("en-US");
-  var dateString =
-    dateObject.getUTCFullYear() +
-    "-" +
-    ("0" + (dateObject.getUTCMonth() + 1)).slice(-2) +
-    "-" +
-    ("0" + dateObject.getUTCDate()).slice(-2) +
-    " " +
-    ("0" + dateObject.getUTCHours()).slice(-2) +
-    ":" +
-    ("0" + dateObject.getUTCMinutes()).slice(-2) +
-    ":" +
-    ("0" + dateObject.getUTCSeconds()).slice(-2);
-
-  // const time = dateObject.toLocaleTimeString();
-
-  const humanDateFormat = dateString;
+  const humanDateFormat = new Date(unix)
+    .toISOString()
+    .replace("T", " ")
+    .split(".")
+    .shift();
   console.log(humanDateFormat);
   return humanDateFormat;
 }

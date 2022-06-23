@@ -6,7 +6,9 @@
     <main>
       <div class="result_container">
         <b>Meest recente metingen </b>
-        <movement-percentage-in-time></movement-percentage-in-time>
+        <movement-percentage-in-time
+          :data-prop="graphResults"
+        ></movement-percentage-in-time>
       </div>
 
       <div class="recent_results">
@@ -17,12 +19,15 @@
             <th>Beweging (graden)</th>
             <th>Vergeleken tot de norm i (%)</th>
           </tr>
-          <template v-for="(obj, pos) in results" :key="result">
+          <!-- {{
+            JSON.stringify(results)
+          }} -->
+          <template v-for="result in results" :key="result">
             <!-- <template v-for="(obj2, pos2) in obj" :key="pos2"> -->
             <tr>
-              <td>{{ unixToDateTime(pos) }}</td>
-              <td>{{ obj.beweging }}</td>
-              <td>{{ obj.norm }}</td>
+              <td>{{ unixToDateTime(result.date) }}</td>
+              <td>{{ result.beweging }}</td>
+              <td>{{ result.norm }}</td>
             </tr>
             <!-- </template> -->
           </template>
@@ -73,8 +78,8 @@ export default {
 
   data() {
     return {
-      results: null,
-      graphResults: null,
+      results: [],
+      graphResults: [],
       showForm: false,
       route: useRoute(),
       unixToDateTime,
@@ -89,14 +94,24 @@ export default {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
 
-      // await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
+      await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
 
-      this.results = await getCategoryResults(docIdPatient, docIdCategory);
-      // console.log(unixToDateTimeReverse(1655844129));
+      const results = await getCategoryResults(docIdPatient, docIdCategory);
 
-      console.log(this.results); // returned een proxy waar ik geen map functies op kan toepassen
+      // let list = Object.keys(results);
 
-      // this.results = results;
+      // 24-11-1998 11:20:30 van de results alle dates in een list en beweging in graden
+      // {[date]:beweging}
+
+      const graphResults = results.reduce((res, val, i) => {
+        res[unixToDateTime(val.date)] = val.beweging;
+        return res;
+      }, {});
+      console.log(graphResults);
+      this.graphResults = graphResults;
+
+      console.log(results);
+      this.results = results;
       // this.graphResults = this.results;
     },
     goBackToPatient() {
