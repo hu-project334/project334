@@ -59,8 +59,8 @@ class XsensDot {
      * disconnect allows you to disconnect from the currently connected device
      */
     disconnect() {
+        this.sensor_status = "disconnected";
         if (!this.device) {
-            this.sensor_status = "disconnected";
             return Promise.reject('Device is not connected.');
         }
         return this.device.gatt.disconnect();
