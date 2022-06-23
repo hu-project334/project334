@@ -23,7 +23,7 @@
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
-import { findBluetoothDevices } from "/src/libraries/interface.js";
+import { XsensDot } from "/src/libraries/bluetooth.js";
 
 var loading = false;
 
@@ -72,7 +72,7 @@ export default {
       this.loadingText = "loading...";
       loading = true;
       this.loadAnimation();
-      findBluetoothDevices().then(() => {
+      this.XsensDotSensor.findAndConnect().then(() => {
         return new Promise((resolve) => {
           this.$router.push({ name: "measure" });
           document.getElementById("screen").style = "";
