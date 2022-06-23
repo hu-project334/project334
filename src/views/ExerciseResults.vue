@@ -96,14 +96,19 @@ export default {
 
       console.log(this.results); // returned een proxy waar ik geen map functies op kan toepassen
 
-      this.results = results;
+      // this.results = results;
       // this.graphResults = this.results;
     },
     goBackToPatient() {
       this.$router.push({ name: "patient" });
     },
     addMeasurement() {
-      this.$router.push({ name: "measureInfo" });
+      let name = this.route.params.name;
+      let category = this.route.params.category;
+      this.$router.push({
+        name: "measureInfo",
+        params: { name: name, category: category },
+      });
     },
     async deleteCategory() {
       let docIdPatient = this.route.params.name;

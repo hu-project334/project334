@@ -3,26 +3,43 @@
   <h1 class="title">Info meting</h1>
   <main>
     <div class="info_container">
-      <p id="titleText" class="boxTitle"> Plaats de sensor </p>
-      <img id="infoImage" class="infoImage" src="@/assets/measureImages/underArm1.png" />
-      <hr class="line">
-      <p id="infoBox1">1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)</p>
+      <p id="titleText" class="boxTitle">Plaats de sensor</p>
+      <img
+        id="infoImage"
+        class="infoImage"
+        src="@/assets/measureImages/underArm1.png"
+      />
+      <hr class="line" />
+      <p id="infoBox1">
+        1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)
+      </p>
       <p id="infoBox2">2. Zorg ervoor dat de sensor stevig vast zit</p>
       <p id="infoBox3"></p>
       <p id="infoBox4"></p>
-      <img id="leftArrow" class="arrowImage" src="@/assets/empty.png" @click="previousPanel()"/>
+      <img
+        id="leftArrow"
+        class="arrowImage"
+        src="@/assets/empty.png"
+        @click="previousPanel()"
+      />
       <div id="indexBox" class="indexText">1/3</div>
-      <img id="rightArrow" class="arrowImage" src="@/assets/arrowRight.png" @click="nextPanel()"/>
+      <img
+        id="rightArrow"
+        class="arrowImage"
+        src="@/assets/arrowRight.png"
+        @click="nextPanel()"
+      />
     </div>
   </main>
 
-  <button class="connectSensorButton" @click="goToConnectSensor()"><b>Koppel sensor</b></button>
+  <button class="connectSensorButton" @click="goToConnectSensor()">
+    <b>Koppel sensor</b>
+  </button>
 
-  <div style="margin-top: 80px;"></div>
+  <div style="margin-top: 80px"></div>
   <footer>
     <button class="backBtn" @click="goBackToResults()"><b>Terug</b></button>
   </footer>
-  
 </template>
 
 <script>
@@ -44,63 +61,78 @@ export default {
       this.$router.push({ name: "selectSensor" });
     },
     nextPanel() {
-      if (textIndex != 3){
+      if (textIndex != 3) {
         textIndex += 1;
       }
-      if (textIndex == 2){
-        document.getElementById("indexBox").innerHTML = '2/3';
+      if (textIndex == 2) {
+        document.getElementById("indexBox").innerHTML = "2/3";
         document.getElementById("leftArrow").src = "/src/assets/arrowLeft.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML = 'Beweging van de meting';
-        document.getElementById("infoImage").src = "/src/assets/measureImages/underArm2.png";
+        document.getElementById("titleText").innerHTML =
+          "Beweging van de meting";
+        document.getElementById("infoImage").src =
+          "/src/assets/measureImages/underArm2.png";
 
-        document.getElementById("infoBox1").innerHTML = '1. Zorg dat de patiënt zijn/haar arm zo recht mogelijk strekt';
-        document.getElementById("infoBox2").innerHTML = '2. Laat de patiënt zijn/haar arm zo ver mogelijk terug te laten bewegen (zoals weergegeven)';
-        document.getElementById("infoBox3").innerHTML = '';
-        document.getElementById("infoBox4").innerHTML = '';
-      }
-      else if(textIndex == 3){
-        document.getElementById("indexBox").innerHTML = '3/3';
+        document.getElementById("infoBox1").innerHTML =
+          "1. Zorg dat de patiënt zijn/haar arm zo recht mogelijk strekt";
+        document.getElementById("infoBox2").innerHTML =
+          "2. Laat de patiënt zijn/haar arm zo ver mogelijk terug te laten bewegen (zoals weergegeven)";
+        document.getElementById("infoBox3").innerHTML = "";
+        document.getElementById("infoBox4").innerHTML = "";
+      } else if (textIndex == 3) {
+        document.getElementById("indexBox").innerHTML = "3/3";
         document.getElementById("rightArrow").src = "/src/assets/empty.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML = 'Start van de meting';
-        document.getElementById("infoImage").src = "/src/assets/measureImages/startStop.png";
+        document.getElementById("titleText").innerHTML = "Start van de meting";
+        document.getElementById("infoImage").src =
+          "/src/assets/measureImages/startStop.png";
 
-        document.getElementById("infoBox1").innerHTML = '1. klik hieronder op "Koppel sensor"';
-        document.getElementById("infoBox2").innerHTML = '2. koppel een sensor en klik op start';
-        document.getElementById("infoBox3").innerHTML = '3. Zorg ervoor dat de patiënt zijn/haar boven arm zo horizontaal mogelijk  houdt';
-        document.getElementById("infoBox4").innerHTML = '4. Zodra de patiënt zijn/haar top punt  heeft bereikt; druk op stop';
+        document.getElementById("infoBox1").innerHTML =
+          '1. klik hieronder op "Koppel sensor"';
+        document.getElementById("infoBox2").innerHTML =
+          "2. koppel een sensor en klik op start";
+        document.getElementById("infoBox3").innerHTML =
+          "3. Zorg ervoor dat de patiënt zijn/haar boven arm zo horizontaal mogelijk  houdt";
+        document.getElementById("infoBox4").innerHTML =
+          "4. Zodra de patiënt zijn/haar top punt  heeft bereikt; druk op stop";
       }
     },
     previousPanel() {
-      if (textIndex != 1){
+      if (textIndex != 1) {
         textIndex -= 1;
       }
-      if (textIndex == 2){
-        document.getElementById("indexBox").innerHTML = '2/3';
-        document.getElementById("rightArrow").src = "/src/assets/arrowRight.png";
+      if (textIndex == 2) {
+        document.getElementById("indexBox").innerHTML = "2/3";
+        document.getElementById("rightArrow").src =
+          "/src/assets/arrowRight.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML = 'Beweging van de meting';
-        document.getElementById("infoImage").src = "/src/assets/measureImages/underArm2.png";
+        document.getElementById("titleText").innerHTML =
+          "Beweging van de meting";
+        document.getElementById("infoImage").src =
+          "/src/assets/measureImages/underArm2.png";
 
-        document.getElementById("infoBox1").innerHTML = '1. Zorg dat de patiënt zijn/haar arm zo recht mogelijk strekt';
-        document.getElementById("infoBox2").innerHTML = '2. Laat de patiënt zijn/haar arm zo ver mogelijk terug te laten bewegen (zoals weergegeven)';
-        document.getElementById("infoBox3").innerHTML = '';
-        document.getElementById("infoBox4").innerHTML = '';
-      }
-      else if(textIndex == 1){
-        document.getElementById("indexBox").innerHTML = '1/3';
+        document.getElementById("infoBox1").innerHTML =
+          "1. Zorg dat de patiënt zijn/haar arm zo recht mogelijk strekt";
+        document.getElementById("infoBox2").innerHTML =
+          "2. Laat de patiënt zijn/haar arm zo ver mogelijk terug te laten bewegen (zoals weergegeven)";
+        document.getElementById("infoBox3").innerHTML = "";
+        document.getElementById("infoBox4").innerHTML = "";
+      } else if (textIndex == 1) {
+        document.getElementById("indexBox").innerHTML = "1/3";
         document.getElementById("leftArrow").src = "/src/assets/empty.png";
 
         // V Moet dynamisch V
-        document.getElementById("titleText").innerHTML = 'Plaats de sensor';
-        document.getElementById("infoImage").src = "/src/assets/measureImages/underArm1.png";
+        document.getElementById("titleText").innerHTML = "Plaats de sensor";
+        document.getElementById("infoImage").src =
+          "/src/assets/measureImages/underArm1.png";
 
-        document.getElementById("infoBox1").innerHTML = '1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)';
-        document.getElementById("infoBox2").innerHTML = '2. Zorg ervoor dat de sensor stevig vast zit';
+        document.getElementById("infoBox1").innerHTML =
+          "1. Plaats de sensor op de rechter onder arm (zoals afgebeeld)";
+        document.getElementById("infoBox2").innerHTML =
+          "2. Zorg ervoor dat de sensor stevig vast zit";
       }
     },
   },
@@ -124,20 +156,20 @@ export default {
 }
 
 .boxTitle {
-   padding-top: 3%;
-   padding-left: 3%;
-   font-weight: bold;
-   font-size: 1.5em; 
+  padding-top: 3%;
+  padding-left: 3%;
+  font-weight: bold;
+  font-size: 1.5em;
 }
 
 .indexText {
-    font-weight: bold;
-    font-size: 1.2em; 
-    margin: 0px;
-    padding-left: 34%;
-    padding-right: 34%;
-    text-align: center;
-    display: inline;
+  font-weight: bold;
+  font-size: 1.2em;
+  margin: 0px;
+  padding-left: 34%;
+  padding-right: 34%;
+  text-align: center;
+  display: inline;
 }
 
 .infoImage {
@@ -154,10 +186,10 @@ export default {
 }
 
 .line {
-    width: 96%;
-    height: 5px;
-    background-color: black;
-    margin-left: 0px;
+  width: 96%;
+  height: 5px;
+  background-color: black;
+  margin-left: 0px;
 }
 
 /* result graph*/
