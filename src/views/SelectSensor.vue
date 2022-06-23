@@ -1,25 +1,24 @@
 <template>
+    <div id="loadText" class="loadText"></div>
     <div id="screen">
         <nav-bar-top></nav-bar-top>
         <h1 class="title">Koppel sensor</h1>
-
+        
         <div class="info_container">
           <p class="boxTitle"> Een sensor koppelen </p>
           <p> 1. Klik op 'Koppel sensor' hieronder</p>
           <p> 2. Klik op de sensor die u wilt verbinden</p>
           <p> 3. Klik op verbinden</p>
         </div>
-
+        
         <button class="connectSensorButton" @click="connectSensor()">
             <b>Koppel sensor</b>
         </button>
-
-        <div style="margin-top: 80px;"></div>
+        
         <footer>
             <button class="backBtn" @click="goBackToInfo()"><b>Terug</b></button>
         </footer>
     </div>
-    <div id="loadText" class="loadText"></div>
 </template>
 
 <script>
@@ -107,7 +106,9 @@ export default {
   color: white;
   position: absolute;
   font-size: 3em;
-  margin-left: 30%
+  margin-top: 70%;
+  margin-left: 30%;
+  z-index: 1;
 }
 
 .title {
