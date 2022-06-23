@@ -6,21 +6,21 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Elleboog flexie &</b></div>
-      <div><b class="categoryTitle">extensie links</b></div>
+      <div><b class="categoryTitle">Elleboog flexie & extensie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
+
     </div>
     <img
       class="addImage"
       src="@/assets/add.png"
       @click="addSelected('elleboog-flexie-extensie-links')"
     />
+    
   </div>
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Elleboog flexie &</b></div>
-      <div><b class="categoryTitle">extensie rechts</b></div>
+      <div><b class="categoryTitle">Elleboog flexie & extensie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -80,8 +80,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Knie extensie &</b></div>
-      <div><b class="categoryTitle">flexie links</b></div>
+      <div><b class="categoryTitle">Knie extensie & flexie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -93,8 +92,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Knie extensie &</b></div>
-      <div><b class="categoryTitle">flexie rechts</b></div>
+      <div><b class="categoryTitle">Knie extensie & flexie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -106,8 +104,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
-      <div><b class="categoryTitle">links</b></div>
+      <div><b class="categoryTitle">Enkel dorsaalflexie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -119,8 +116,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Enkel dorsaalflexie</b></div>
-      <div><b class="categoryTitle">rechts</b></div>
+      <div><b class="categoryTitle">Enkel dorsaalflexie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -132,8 +128,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Enkel plantairflexie</b></div>
-      <div><b class="categoryTitle">links</b></div>
+      <div><b class="categoryTitle">Enkel plantairflexie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -145,8 +140,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Enkel plantairflexie</b></div>
-      <div><b class="categoryTitle">rechts</b></div>
+      <div><b class="categoryTitle">Enkel plantairflexie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -182,8 +176,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Elleboog pronatie</b></div>
-      <div><b class="categoryTitle">links</b></div>
+      <div><b class="categoryTitle">Elleboog pronatie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -195,8 +188,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Elleboog pronatie</b></div>
-      <div><b class="categoryTitle">rechts</b></div>
+      <div><b class="categoryTitle">Elleboog pronatie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -208,8 +200,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Elleboog supinatie</b></div>
-      <div><b class="categoryTitle">links</b></div>
+      <div><b class="categoryTitle">Elleboog supinatie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -221,8 +212,7 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Elleboog supinatie</b></div>
-      <div><b class="categoryTitle">rechts</b></div>
+      <div><b class="categoryTitle">Elleboog supinatie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
@@ -309,6 +299,7 @@ export default {
 
 .textBox {
   margin: 15px;
+  max-width: 60%;
 }
 
 .categoryTitle {

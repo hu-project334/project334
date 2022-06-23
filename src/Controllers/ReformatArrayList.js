@@ -11,8 +11,3 @@ export function ReformatArrayList(arraylistWithObjects) {
   
   return newResults;
 }
-
-// from : [ {"04-04-2022": 45}  ,{"04-04-2022": 45}, {"04-04-2022": 45}  ]
-// function DateInRightOrder(arraylistWithObjects) {}
-
-// calculate average movement function
