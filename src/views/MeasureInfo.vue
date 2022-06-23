@@ -91,7 +91,9 @@ export default {
       }});
     },
     goToConnectSensor() {
-      this.$router.push({ name: "selectSensor" });
+      const patientId = this.route.params.name;
+      const category = this.route.params.category;
+      this.$router.push({ name: "selectSensor" ,params: {name:patientId,category:category}});
     },
     nextPanel() {
       if (textIndex != 3) {
