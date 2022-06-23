@@ -24,6 +24,8 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import { XsensDot } from "/src/libraries/bluetooth.js";
+import store from "../store/userStore.js";
+
 
 var loading = false;
 
@@ -70,7 +72,11 @@ export default {
       loading = true;
       this.loadAnimation();
       this.XsensDotSensor.findAndConnect().then(() => {
+        // koppelen van de store met de xsensdoteObject
+        store.commit("setXsenseDotObject", this.XsensDotSensor);
+        console.log(this.XsensDotSensor)
         return new Promise((resolve) => {
+        
           this.$router.push({ name: "measure" });
           document.getElementById("screen").style = "";
           this.loadingText = "";

@@ -16,6 +16,9 @@ export default new Vuex.Store({
     isLogedIn() {
       return localStorage.getItem("user") !== null;
     },
+    getXsenseDotObject(){
+      return JSON .parse(localStorage.getItem("XsenseDotObject"));
+    }
   },
 
   mutations: {
@@ -24,6 +27,7 @@ export default new Vuex.Store({
     },
     setXsenseDotObject(state, XsenseDotObject) {
       state.XsenseDotObject = XsenseDotObject;
+      localStorage.setItem("XsenseDotObject",JSON.stringify(XsenseDotObject));
     },
 
     setPatientEmail(state, email) {

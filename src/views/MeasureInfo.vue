@@ -47,6 +47,7 @@
 import { useRoute } from "vue-router";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 
+
 var textIndex = 1;
 
 export default {
@@ -64,14 +65,19 @@ export default {
       infoBox3: "",
       infoBox4: "",
       route: useRoute(),
+      XsenseDotObject: {},
     };
   },
   mounted() {
     this.dynamicPanels();
+    
   },
 
   methods: {
     dynamicPanels() {
+       const  object =  this.$store.getters.getXsenseDotObject
+      console.log(object)
+   
       const category = this.route.params.category;
       if (category === "elleboog-flexie-extensie-rechts") {
         console.log("elleboog-flexie-extensie");
@@ -79,7 +85,10 @@ export default {
     },
 
     goBackToResults() {
-      this.$router.push({ name: "exerciseResults" });
+      
+      this.$router.push({ name: "exerciseResults" ,params:{
+
+      }});
     },
     goToConnectSensor() {
       this.$router.push({ name: "selectSensor" });
