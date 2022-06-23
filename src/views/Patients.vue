@@ -12,7 +12,7 @@
             <p>
               <b>{{ patient.name }} </b>
             </p>
-            <p class="text">{{ patient.email }}</p>
+            <p class="text" style="word-break: break-word;">{{ patient.email }}</p>
           </div>
           <button class="seeResultsButton" @click="goToPatient(docKey)">
             <b> Ga naar patiënt</b>

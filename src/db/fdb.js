@@ -22,23 +22,8 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
-import store from "../store/userStore";
 
 const db = getFirestore();
-
-// dummy data
-async function dummyDataPatients(patientsRef, uid) {
-  await setDoc(doc(patientsRef), {
-    id: 2,
-    name: "Milo",
-    surName: "Belien",
-    weight: 70,
-    dateOfBirth: "28-09-2002",
-    heightInM: 1.83,
-    email: "milo.belien@student.hu.nl",
-    fysiotherapeutNummer: uid,
-  });
-}
 
 /**--------------------------- FUNCTIONS --------------------------- */
 

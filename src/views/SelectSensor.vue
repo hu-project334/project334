@@ -1,18 +1,24 @@
 <template>
+    <div id="loadText" class="loadText"></div>
     <div id="screen">
         <nav-bar-top></nav-bar-top>
         <h1 class="title">Koppel sensor</h1>
-
+        
+        <div class="info_container">
+          <p class="boxTitle"> Een sensor koppelen </p>
+          <p> 1. Klik op 'Koppel sensor' hieronder</p>
+          <p> 2. Klik op de sensor die u wilt verbinden</p>
+          <p> 3. Klik op verbinden</p>
+        </div>
+        
         <button class="connectSensorButton" @click="connectSensor()">
             <b>Koppel sensor</b>
         </button>
-
-        <div style="margin-top: 80px;"></div>
+        
         <footer>
             <button class="backBtn" @click="goBackToInfo()"><b>Terug</b></button>
         </footer>
     </div>
-    <h1 id="loadText" class="loadText"></h1>
 </template>
 
 <script>
@@ -27,47 +33,64 @@ export default {
     NavBarTop,
   },
 
+  mounted(){
+    window.onclick = function(){
+      if(loading){
+        document.getElementById("screen").style = "";
+        document.getElementById("loadText").innerHTML = "";
+        loading = false;
+      }
+    }
+  },
+
   methods: {
+    // Function copied from https://masteringjs.io/tutorials/fundamentals/wait-1-second-then#:~:text=To%20delay%20a%20function%20execution,call%20fn%20after%201%20second.
+    delay(time) {
+      return new Promise(resolve => setTimeout(resolve, time));
+    },
     goBackToInfo() {
       this.$router.push({ name: "measureInfo" });
     },
     connectSensor() {
-        document.getElementById("screen").style = "filter: blur(24px); opacity: 0.6;";
-        document.getElementById("loadText").innerHTML = "loading...";
-        loading = true;
-        this.loadAnimation();
-        findBluetoothDevices().then(() => {
-            return new Promise((resolve) => {
-                this.$router.push({ name: "measure" });
-                document.getElementById("screen").style = "";
-                document.getElementById("loadText").innerHTML = "";
-                loading = false;
-                resolve();
-            });
-        });
+      this.delay(100).then(() => this.connect());
+    },
+    connect(){
+      document.getElementById("screen").style = "filter: blur(24px); opacity: 0.6;";
+      document.getElementById("loadText").innerHTML = "loading...";
+      loading = true;
+      this.loadAnimation();
+      findBluetoothDevices().then(() => {
+          return new Promise((resolve) => {
+              this.$router.push({ name: "measure" });
+              document.getElementById("screen").style = "";
+              document.getElementById("loadText").innerHTML = "";
+              loading = false;
+              resolve();
+          });
+      });
     },
     loadAnimation() {
-        setTimeout(() => {
-            if(loading){
-                document.getElementById("loadText").innerHTML = "loading...";
-            }
-        }, 500);
-        setTimeout(() => {
-            if(loading){
-                document.getElementById("loadText").innerHTML = "loading..";
-            }
-        }, 1000);
-        setTimeout(() => {
-            if(loading){
-                document.getElementById("loadText").innerHTML = "loading.";
-            }
-        }, 1500);
-        setTimeout(() => {
-            if(loading){
-                document.getElementById("loadText").innerHTML = "loading";
-                this.loadAnimation();
-            }
-        }, 2000);
+      setTimeout(() => {
+          if(loading){
+              document.getElementById("loadText").innerHTML = "loading...";
+          }
+      }, 500);
+      setTimeout(() => {
+          if(loading){
+              document.getElementById("loadText").innerHTML = "loading..";
+          }
+      }, 1000);
+      setTimeout(() => {
+          if(loading){
+              document.getElementById("loadText").innerHTML = "loading.";
+          }
+      }, 1500);
+      setTimeout(() => {
+          if(loading){
+              document.getElementById("loadText").innerHTML = "loading";
+              this.loadAnimation();
+          }
+      }, 2000);
     },
   },
 };
@@ -81,8 +104,11 @@ export default {
 
 .loadText {
   color: white;
+  position: absolute;
   font-size: 3em;
-  margin-left: 30%
+  margin-top: 70%;
+  margin-left: 30%;
+  z-index: 1;
 }
 
 .title {
@@ -94,6 +120,26 @@ export default {
   font-size: 3em;
   width: 80%;
   text-align: center;
+}
+
+.boxTitle {
+   padding-top: 3%;
+   padding-left: 3%;
+   font-weight: bold;
+   font-size: 1.5em; 
+}
+
+.info_container {
+  margin-top: 1%;
+  height: 50%;
+  margin-right: 5%;
+  margin-left: 5%;
+  background: white;
+  width: 90%;
+  border-radius: 15px;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
 }
 
 /* buttons */
