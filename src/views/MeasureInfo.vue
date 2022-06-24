@@ -75,8 +75,8 @@ export default {
 
   methods: {
     dynamicPanels() {
-       const  object =  this.$store.getters.getXsenseDotObject
-      console.log(object)
+      //  const  object =  this.$store.getters.getXsenseDotObject
+      // console.log(object)
    
       const category = this.route.params.category;
       if (category === "elleboog-flexie-extensie-rechts") {

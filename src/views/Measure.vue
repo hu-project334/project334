@@ -17,7 +17,7 @@
       </tr>
       <tr>
         <td class="header_name"><b>Beweging (graden) </b></td>
-        <td>-</td>
+        <td> {{ maxAngle }} </td>
       </tr>
       <tr>
         <td class="header_name"><b>Procent van de norm </b></td>
@@ -58,6 +58,9 @@
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
+import { XsensDotSensor } from "/src/libraries/bluetooth.js";
+import { addResultToCategory } from "../db/fdb";
+import { useRoute } from "vue-router";
 
 var measureState = "idle";
 var timer;
@@ -73,13 +76,19 @@ export default {
       miliseconds: 0,
       seconds: 0,
       minutes: 0,
-      button1text: "Start meting"
+      maxAngle: 0,
+      route: useRoute(),
+      button1text: "Start meting",
     }
   },
-
   methods: {
-    saveMeasurement(){
-
+    async saveMeasurement(){
+      if(!this.maxAngle == 0){
+        let docIdPatient = this.route.params.name;
+        let docIdCategory = this.route.params.category;
+        console.log(docIdPatient, docIdCategory)
+        await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, 0);
+      }
     },
     deleteMeasurement(){
 
@@ -101,8 +110,15 @@ export default {
       }
     },
 
-    measure() {
-      if(measureState == "idle"){
+    async measure() {
+      if(XsensDotSensor.device == null){
+        console.log("No device connected")
+      }
+      if(measureState == "idle") {
+
+        console.log(XsensDotSensor)
+        XsensDotSensor.startRTStream();
+
         document.getElementById("button1").classList.toggle('measureButtonBlue');
         document.getElementById("button1").classList.toggle('measureButtonRed');
         this.button1text = "Stop meting";
@@ -122,6 +138,10 @@ export default {
 
         clearInterval(timer);
         measureState = "results";
+
+        await XsensDotSensor.stopRTStream();
+        this.maxAngle = XsensDotSensor.max_angle;
+
       }
       else if(measureState == "results"){
         document.getElementById("button2").style = ('margin-top: 0.5rem; display: none');
