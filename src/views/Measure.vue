@@ -86,7 +86,6 @@ export default {
       if(!this.maxAngle == 0){
         let docIdPatient = this.route.params.name;
         let docIdCategory = this.route.params.category;
-        console.log(docIdPatient, docIdCategory)
         await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, 0);
       }
     },
