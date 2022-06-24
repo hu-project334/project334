@@ -79,11 +79,12 @@ export default {
       maxAngle: 0,
       route: useRoute(),
       button1text: "Start meting",
-      
+
     }
   },
   methods: {
     async saveMeasurement(){
+     
       if(!this.maxAngle == 0){
         let docIdPatient = this.route.params.name;
         let docIdCategory = this.route.params.category;
