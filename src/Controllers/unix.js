@@ -8,5 +8,9 @@ export function unixToDateTime(unix) {
 }
 
 export function getUnixOfToday() {
-  return new Date().getTime();
+  let rightDate = new Date().toLocaleDateString()
+  let splitDate = String(rightDate).split("-");
+  let newDate = splitDate[2] + "-" + splitDate[1] + "-" + splitDate[0];
+  const humanDateFormat= new Date(unix).toLocaleTimeString() + " " + newDate;
+  return humanDateFormat;
 }
