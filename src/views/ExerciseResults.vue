@@ -105,7 +105,6 @@ export default {
       const name = getCategoryResultsConst.results;
       this.routeName = getCategoryResultsConst.name;
 
-      console.log(docIdCategory);
       // 24-11-1998 11:20:30 van de results alle dates in een list en beweging in graden
       // {[date]:beweging}
 
@@ -113,10 +112,8 @@ export default {
         res[unixToDateTime(val.date)] = val.beweging;
         return res;
       }, {});
-      console.log(graphResults);
       this.graphResults = graphResults;
 
-      console.log(results);
       this.results = results;
       // this.graphResults = this.results;
     },
@@ -134,7 +131,6 @@ export default {
     async deleteCategory() {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
-      console.log(docIdCategory);
       await deleteCategory(docIdPatient, docIdCategory);
 
       this.$router.push({ name: "patient" });
