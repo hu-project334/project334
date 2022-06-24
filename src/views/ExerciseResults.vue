@@ -261,6 +261,7 @@ th {
   margin-left: 5%;
   width: 90%;
   margin-right: 5%;
+  margin-bottom: 5rem;
   padding: 0.5rem;
   background-color: #e6302b;
   color: white;
