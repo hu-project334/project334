@@ -20,21 +20,21 @@
           </td>
         </tr>
         <tr>
-          <td class="header_name"><b>Gewicht (kg)</b></td>
+          <td class="header_name"><b>Gewicht</b></td>
           <td>
-            <div class="table_data">{{ weight }}</div>
+            <div class="table_data">{{ weight }} kg</div>
           </td>
         </tr>
         <tr>
-          <td class="header_name"><b>Lengte (m)</b></td>
+          <td class="header_name"><b>Lengte</b></td>
           <td>
-            <div class="table_data">{{ heightInM }}</div>
+            <div class="table_data">{{ heightInM }} m</div>
           </td>
         </tr>
         <tr>
           <td class="header_name"><b>leeftijd </b></td>
           <td>
-            <div class="table_data">{{ age }}</div>
+            <div class="table_data">{{ age }} jaar</div>
           </td>
         </tr>
       </table>
@@ -43,11 +43,11 @@
       </button>
     </div>
 
-    <template v-for="[name, results] in categories" :key="docKeyCategory">
+    <template v-for="[name] in categories" :key="docKeyCategory">
       <div class="category">
         <div class="text-holder">
           <p>
-            <b>{{ name }} </b>
+            <div style="max-width: 100%; word-break: break-word;"><b>{{ name }}</b></div>
           </p>
           <!-- <p>Laatste meting: {{ category.lastMeasure }}</p> -->
         </div>
@@ -95,6 +95,7 @@ import { getSinglePatient, deletePatient, getCategories } from "../db/fdb";
 import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
+import { getUnixOfToday } from '../controllers/unix';
 
 export default {
   name: "patients",
@@ -142,6 +143,7 @@ export default {
       let patient = await getSinglePatient(docKey);
 
       this.name = patient.name;
+      this.name = new Date().toLocaleTimeString() + " " + new Date().toLocaleDateString();
       this.weight = patient.weight;
       this.age = formatBirthDateToAge(patient.dateOfBirth);
       this.heightInM = patient.heightInM;
@@ -296,7 +298,7 @@ table {
   padding: 0.5rem;
   background-color: #e6302b;
   margin-top: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   color: white;
   border: none;
 }

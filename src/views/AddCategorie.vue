@@ -4,7 +4,7 @@
 
   <!-- MOET DYNAMISC -->
 
-  <div class="categoryBox">
+  <div class="categoryBox" style="display: none">
     <div class="textBox">
       <div><b class="categoryTitle">Elleboog flexie & extensie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
@@ -254,6 +254,7 @@ export default {
       let docIdPatient = this.route.params.name;
       console.log(type);
       addCategorie(docIdPatient, type);
+      this.$router.push({ name: "patient" });
     },
   },
 };
@@ -345,3 +346,6 @@ footer {
   background-color: #f4f4f4;
 }
 </style>
+
+
+
