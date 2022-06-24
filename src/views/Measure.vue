@@ -61,6 +61,7 @@ import NavBarTop from "../components/navbars/NavBarTop.vue";
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
 import { addResultToCategory } from "../db/fdb";
 import { useRoute } from "vue-router";
+import jsonMovementData from "/src/libraries/movement_data.json"
 
 var measureState = "idle";
 var timer;
@@ -86,7 +87,52 @@ export default {
       if(!this.maxAngle == 0){
         let docIdPatient = this.route.params.name;
         let docIdCategory = this.route.params.category;
-        await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, 0);
+        const category = this.route.params.category;
+        let norm = 0
+        let gender = "man"
+        let age = "20-44"
+
+        if(age <= 8) {
+          age = "2-8"
+        } else if (age <= 19) {
+          age = "9-19"
+        } else if(age <= 44) {
+          age = "20-44"
+        } else {
+          age = "45+"
+        }
+
+        console.log(jsonMovementData["elleboog-flexie-extensie"])
+        if (category === "elleboog-flexie-extensie-rechts" || category === "elleboog-flexie-extensie-links") {
+          norm = jsonMovementData["elleboog-flexie-extensie"][gender][age]
+        }
+        else if (category === "heup-extensie-links" || category === "heup-extensie-rechts") {
+          norm = jsonMovementData["heup-extensie"][gender][age]
+        }
+        else if (category === "heup-flexie-links" || category === "heup-flexie-rechts") {
+          norm = jsonMovementData["heup-flexie"][gender][age]
+        }
+        else if (category === "knie-extensie-flexie-links" || category === "knie-extensie-flexie-rechts") {
+          norm = jsonMovementData["knie-extensie-flexie"][gender][age]
+        }
+        else if (category === "enkel-dorsaalflexie-links" || category === "enkel-dorsaalflexie-rechts") {
+          norm = jsonMovementData["enkel-dorsaalflexie"][gender][age]
+        }
+        else if (category === "enkel-plantairflexie-links" || category === "enkel-plantairflexie-rechts") {
+          norm = jsonMovementData["enkel-plantairflexie"][gender][age]
+        }
+        else if (category === "shouder-flexie-links" || category === "shouder-flexie-rechts") {
+          norm = jsonMovementData["shouder-flexie"][gender][age]
+        }
+        else if (category === "elleboog-pronatie-links" || category === "elleboog-pronatie-rechts") {
+          norm = jsonMovementData["elleboog-pronatie"][gender][age]
+        }
+        else if (category === "elleboog-supinatie-links" || category === "elleboog-supinatie-rechts") {
+          norm = jsonMovementData["elleboog-supinatie"][gender][age]
+        }
+
+        norm = ((this.maxAngle / norm ) * 100).toFixed(2)
+        await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, norm);
       }
     },
     deleteMeasurement(){
