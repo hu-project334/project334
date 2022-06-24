@@ -21,7 +21,7 @@
       </tr>
       <tr>
         <td class="header_name"><b>Procent van de norm </b></td>
-        <td>-</td>
+        <td>{{norm}}</td>
       </tr>
     </table>
 
@@ -80,7 +80,7 @@ export default {
       maxAngle: 0,
       route: useRoute(),
       button1text: "Start meting",
-
+      norm: 0
     }
   },
   methods: {
@@ -141,6 +141,7 @@ export default {
         }
 
         norm = ((this.maxAngle / norm ) * 100).toFixed(2)
+        this.norm = norm;
         await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, norm);
       }
     },
