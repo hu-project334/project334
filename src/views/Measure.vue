@@ -85,8 +85,14 @@ export default {
   },
   methods: {
     async saveMeasurement(){
+         let age = this.$store.state.age;
+       let gender = this.$store.state.gender;
+      console.log(age, gender)
      
+
       if(!this.maxAngle == 0){
+
+        
         let docIdPatient = this.route.params.name;
         let docIdCategory = this.route.params.category;
         const category = this.route.params.category;
