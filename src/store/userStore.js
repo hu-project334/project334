@@ -6,7 +6,8 @@ createApp(App).use(Vuex);
 export default new Vuex.Store({
   state: {
     user: "",
-    currentPatient: {}
+    gender: null,
+    age: null,
 
     
   },
@@ -17,8 +18,11 @@ export default new Vuex.Store({
     isLogedIn() {
       return localStorage.getItem("user") !== null;
     },
-    getPatient(state){
-      return state.currentPatient;
+    getPatientGender(state){
+      return state.gender;
+    },
+    getPatientGender(state){
+      return state.age;
     }
 
   },
@@ -26,9 +30,15 @@ export default new Vuex.Store({
     changeProfilePicture(state, photoUrl) {
       state.user.photoUrl = photoUrl;
     },
-    setPatient(state, patient) {
-      state.currentPatient = patient;
+    setPatientGender(state, gender) {
+      state.gender = gender
     },
+    setPatientAge(state,age){
+      state.age = age;
+
+
+    },
+
     setUser(state, user) {
       state.user = user;
       localStorage.setItem("user", JSON.stringify(state.user));

@@ -95,6 +95,10 @@ export default {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
 
+       let age = this.$store.state.age;
+       let gender = this.$store.state.gender;
+      console.log(age, gender)
+
       // await addResultToCategory(docIdPatient, docIdCategory,90  ,"nog niet bekend");
 
       const getCategoryResultsConst = await getCategoryResults(

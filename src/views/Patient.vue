@@ -142,7 +142,8 @@ export default {
       const docKey = this.route.params.name;
       let patient = await getSinglePatient(docKey);
       // hier
-      this.$store.commit("setPatient",patient);
+      this.$store.commit("setPatientGender",patient.gender);
+      this.$store.commit("setPatientAge", formatBirthDateToAge(patient.dateOfBirth))
 
 
       this.name = patient.name;
