@@ -79,6 +79,7 @@ export default {
       maxAngle: 0,
       route: useRoute(),
       button1text: "Start meting",
+      
     }
   },
   methods: {

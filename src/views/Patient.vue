@@ -96,6 +96,7 @@ import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
 
+
 export default {
   name: "patients",
   components: {
@@ -129,7 +130,6 @@ export default {
   },
 
   methods: {
-    // TODO fix
     async getCategories() {
       const docIdPatient = this.route.params.name;
       console.log(docIdPatient);
@@ -138,8 +138,12 @@ export default {
       console.log(this.categories);
     },
     async getPatientData() {
+      
       const docKey = this.route.params.name;
       let patient = await getSinglePatient(docKey);
+      // hier
+      this.$store.commit("setPatient",patient);
+
 
       this.name = patient.name;
       this.weight = patient.weight;

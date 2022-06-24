@@ -95,7 +95,7 @@ export default {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
 
-      // await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
+      // await addResultToCategory(docIdPatient, docIdCategory,90  ,"nog niet bekend");
 
       const getCategoryResultsConst = await getCategoryResults(
         docIdPatient,
