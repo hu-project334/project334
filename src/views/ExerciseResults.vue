@@ -17,7 +17,7 @@
           <tr>
             <th>Datum</th>
             <th>Beweging (graden)</th>
-            <th>Vergeleken tot de norm i (%)</th>
+            <th>Vergeleken tot de norm i</th>
           </tr>
           <!-- {{
             JSON.stringify(results)
@@ -26,8 +26,8 @@
             <!-- <template v-for="(obj2, pos2) in obj" :key="pos2"> -->
             <tr>
               <td>{{ unixToDateTime(result.date) }}</td>
-              <td>{{ result.beweging }}</td>
-              <td>{{ result.norm }}</td>
+              <td>{{ result.beweging }}°</td>
+              <td>{{ result.norm }}%</td>
             </tr>
             <!-- </template> -->
           </template>
@@ -62,7 +62,6 @@ import DeleteForm from "../components/forms/DeleteForm.vue";
 import {
   getCategoryResults,
   deleteCategory,
-  addResultToCategory,
 } from "../db/fdb";
 import { useRoute } from "vue-router";
 
@@ -86,14 +85,14 @@ export default {
   },
 
   methods: {
-    // returnGraphData() {
-
-    // },
     async getCategoryResults() {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
 
-      // await addResultToCategory(docIdPatient, docIdCategory, 120, 63);
+       let age = this.$store.state.age;
+       let gender = this.$store.state.gender;
+
+      // await addResultToCategory(docIdPatient, docIdCategory,90  ,"nog niet bekend");
 
       const getCategoryResultsConst = await getCategoryResults(
         docIdPatient,
@@ -103,7 +102,6 @@ export default {
       const name = getCategoryResultsConst.results;
       this.routeName = getCategoryResultsConst.name;
 
-      console.log(docIdCategory);
       // 24-11-1998 11:20:30 van de results alle dates in een list en beweging in graden
       // {[date]:beweging}
 
@@ -111,10 +109,8 @@ export default {
         res[unixToDateTime(val.date)] = val.beweging;
         return res;
       }, {});
-      console.log(graphResults);
       this.graphResults = graphResults;
 
-      console.log(results);
       this.results = results;
       // this.graphResults = this.results;
     },
@@ -132,7 +128,6 @@ export default {
     async deleteCategory() {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
-      console.log(docIdCategory);
       await deleteCategory(docIdPatient, docIdCategory);
 
       this.$router.push({ name: "patient" });
@@ -157,13 +152,6 @@ export default {
   },
   mounted() {
     this.getCategoryResults();
-
-    // unixToDateTime(1655844129);
-    // this.results = results;
-
-    // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
-    // this.graphResults = ReformatArrayList(results);
-    // console.log(this.graphResults);
   },
 };
 </script>
@@ -215,12 +203,20 @@ export default {
 
 tr td {
   border: 2px solid #00a1e1;
+  padding-left: 1%;
+  margin-right: 100px;
+}
+table {
+  table-layout: fixed;
+  width: 98%;
+  margin-right: 2%;
 }
 td {
   width: 40%;
 }
 th {
   border: 2px solid #00a1e1;
+  padding-left: 1%;
 }
 
 /* buttons */

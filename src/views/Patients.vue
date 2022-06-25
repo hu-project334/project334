@@ -43,7 +43,6 @@ import LinkParamButton from "../components/btns/LinkParamButton.vue";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { getPatients } from "../db/fdb";
 import PatientForm from "../components/forms/PatientCreatorForm.vue";
-// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 
 export default {
   name: "patients",
@@ -69,15 +68,12 @@ export default {
   methods: {
     async getPatientsFromFireStore() {
       let uid = this.$store.getters.getUser.uid;
-      // this.patients = getPatients();
 
       await getPatients(uid).then((results) => {
         this.patients = results;
       });
     },
     goToPatient(docKey) {
-      // let changedName = deleteWhiteSpaceFromString(naam);
-      // this.$store.commit("setPatientEmail", email);
       this.$router.push({
         name: "patient",
         params: { name: docKey },

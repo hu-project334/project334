@@ -24,6 +24,7 @@ class XsensDot {
         this.rawTime = 0
         this.min = new THREE.Euler(Infinity, Infinity, Infinity, 'XYZ')
         this.max = new THREE.Euler(-Infinity, -Infinity, -Infinity, 'XYZ')
+        this.max_angle = 0
         this.minQuat = undefined
         this.maxQuat = undefined
         this.ackEnum = recMsgEnum
@@ -440,4 +441,5 @@ class XsensDot {
 
 }
 
-export { XsensDot  };
+let XsensDotSensor = new XsensDot()
+export { XsensDotSensor };
