@@ -10,9 +10,13 @@
       <p id="infoBox2">2. Zorg ervoor dat de sensor stevig vast zit</p>
       <p id="infoBox3"></p>
       <p id="infoBox4"></p>
-      <img id="leftArrow" class="arrowImage" src="@/assets/empty.png" @click="previousPanel()"/>
-      <div id="indexBox" class="indexText">1/3</div>
-      <img id="rightArrow" class="arrowImage" src="@/assets/arrowRight.png" @click="nextPanel()"/>
+
+      <div>
+        <img id="leftArrow" class="arrowImageLeft" src="@/assets/empty.png" @click="previousPanel()"/>
+        <div id="indexBox" class="indexText">1/3</div>
+        <img id="rightArrow" class="arrowImageRight" src="@/assets/arrowRight.png" @click="nextPanel()"/>
+      </div>
+      
     </div>
   </main>
 
@@ -124,20 +128,16 @@ export default {
 }
 
 .boxTitle {
-   padding-top: 3%;
-   padding-left: 3%;
-   font-weight: bold;
-   font-size: 1.5em; 
+  padding-top: 3%;
+  padding-left: 3%;
+  font-weight: bold;
+  font-size: 1.5em; 
 }
 
 .indexText {
-    font-weight: bold;
-    font-size: 1.2em; 
-    margin: 0px;
-    padding-left: 34%;
-    padding-right: 34%;
-    text-align: center;
-    display: inline;
+  font-weight: bold;
+  font-size: 1.2em; 
+  text-align: center;
 }
 
 .infoImage {
@@ -145,19 +145,32 @@ export default {
   height: auto;
   padding-right: 2em;
   padding-left: 2em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.arrowImage {
+.arrowImageLeft {
   max-width: 35px;
   height: auto;
-  display: inline;
+  position: absolute;
+}
+
+.arrowImageRight {
+  max-width: 35px;
+  height: auto;
+  display:block; 
+  margin-left:auto;
+  margin-right:10px; 
+  position: relative; 
+  margin-top: -28px
 }
 
 .line {
-    width: 96%;
-    height: 5px;
-    background-color: black;
-    margin-left: 0px;
+  width: 96%;
+  height: 5px;
+  background-color: black;
+  margin-left: 0px;
 }
 
 /* result graph*/

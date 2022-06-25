@@ -109,7 +109,6 @@ export default {
     this.results = results;
     // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
     this.graphResults = ReformatArrayList(results);
-    console.log(this.graphResults);
   },
 };
 </script>
