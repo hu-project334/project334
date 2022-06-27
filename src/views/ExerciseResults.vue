@@ -25,7 +25,7 @@
           <template v-for="result in results" :key="result">
             <!-- <template v-for="(obj2, pos2) in obj" :key="pos2"> -->
             <tr>
-              <td>{{ unixToDateTime(result.date) }}</td>
+              <td>{{ result.date }}</td>
               <td>{{ result.beweging }}°</td>
               <td>{{ result.norm }}%</td>
             </tr>
@@ -55,11 +55,8 @@
 </template>
 
 <script>
-import { unixToDateTime } from "../Controllers/unix.js";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import MovementPercentageInTime from "../components/tiles/charts/MovementPercentageInTime.vue";
-// import results from "../db/results.json";
-import { unixToDateTimeReverse } from "../Controllers/graphController.js";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import {
   getCategoryResults,
@@ -81,7 +78,6 @@ export default {
       graphResults: [],
       showForm: false,
       route: useRoute(),
-      unixToDateTime,
       routeName: "",
     };
   },
@@ -108,7 +104,7 @@ export default {
       // {[date]:beweging}
 
       const graphResults = results.reduce((res, val, i) => {
-        res[unixToDateTime(val.date)] = val.beweging;
+        res[val.date] = val.beweging;
         return res;
       }, {});
       this.graphResults = graphResults;
