@@ -24,7 +24,7 @@ import {
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
 import store from "../store/userStore";
-import { getUnixOfToday } from "../controllers/unix";
+import { getUnixOfToday } from "../controllers/unix.js";
 
 const db = getFirestore();
 
@@ -81,13 +81,13 @@ export async function getSinglePatient(docKey) {
 }
 
 export async function deletePatient(docKey) {
-  console.log(docKey);
+  // console.log(docKey);
   const docRef = doc(db, "patienten", docKey);
   await deleteDoc(docRef);
 }
 
 export async function addCategorie(docIdPatient, type) {
-  console.log(docIdPatient);
+  // console.log(docIdPatient);
   const docRef = doc(db, "patienten", docIdPatient);
   const colRef = collection(docRef, "excersizeCategory");
   const map = new Map();
@@ -109,7 +109,7 @@ export async function addResultToCategory(docIdPatient, type, beweging, norm) {
 
 export async function getCategories(docIdPatient) {
   try {
-    console.log(docIdPatient);
+    // console.log(docIdPatient);
     let map = new Map();
     const docRef = doc(db, "patienten", docIdPatient);
     const colRef = collection(docRef, "excersizeCategory");
@@ -117,7 +117,7 @@ export async function getCategories(docIdPatient) {
     querySnapshot.forEach((doc) => {
       map.set(doc.data().name, doc.data().results);
     });
-    console.log(map);
+    // console.log(map);
     return map;
   } catch (error) {
     console.error("Error getting categories", error);
@@ -130,7 +130,7 @@ export async function getCategoryResults(docIdPatient, excersizeCategory) {
   const docRef2 = doc(colRef, excersizeCategory);
 
   const docSnap = await getDoc(docRef2);
-  console.log(docSnap.data().results);
+  // console.log(docSnap.data().results);
   return docSnap.data();
 }
 

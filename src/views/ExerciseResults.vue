@@ -17,7 +17,7 @@
           <tr>
             <th>Datum</th>
             <th>Beweging (graden)</th>
-            <th>Vergeleken tot de norm i (%)</th>
+            <th>Vergeleken tot de norm i</th>
           </tr>
           <!-- {{
             JSON.stringify(results)
@@ -25,9 +25,9 @@
           <template v-for="result in results" :key="result">
             <!-- <template v-for="(obj2, pos2) in obj" :key="pos2"> -->
             <tr>
-              <td>{{ unixToDateTime(result.date) }}</td>
-              <td>{{ result.beweging }}</td>
-              <td>{{ result.norm }}</td>
+              <td>{{ result.date }}</td>
+              <td>{{ result.beweging }}°</td>
+              <td>{{ result.norm }}%</td>
             </tr>
             <!-- </template> -->
           </template>
@@ -55,16 +55,12 @@
 </template>
 
 <script>
-import { unixToDateTime } from "../Controllers/unix.js";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import MovementPercentageInTime from "../components/tiles/charts/MovementPercentageInTime.vue";
-// import results from "../db/results.json";
-import { unixToDateTimeReverse } from "../Controllers/graphController.js";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import {
   getCategoryResults,
   deleteCategory,
-  addResultToCategory,
 } from "../db/fdb";
 import { useRoute } from "vue-router";
 
@@ -82,22 +78,17 @@ export default {
       graphResults: [],
       showForm: false,
       route: useRoute(),
-      unixToDateTime,
       routeName: "",
     };
   },
 
   methods: {
-    // returnGraphData() {
-
-    // },
     async getCategoryResults() {
       let docIdPatient = this.route.params.name;
       let docIdCategory = this.route.params.category;
 
        let age = this.$store.state.age;
        let gender = this.$store.state.gender;
-      console.log(age, gender)
 
       // await addResultToCategory(docIdPatient, docIdCategory,90  ,"nog niet bekend");
 
@@ -113,7 +104,7 @@ export default {
       // {[date]:beweging}
 
       const graphResults = results.reduce((res, val, i) => {
-        res[unixToDateTime(val.date)] = val.beweging;
+        res[val.date] = val.beweging;
         return res;
       }, {});
       this.graphResults = graphResults;
@@ -159,13 +150,6 @@ export default {
   },
   mounted() {
     this.getCategoryResults();
-
-    // unixToDateTime(1655844129);
-    // this.results = results;
-
-    // https://riptutorial.com/javascript/example/7860/using-map-to-reformat-objects-in-an-array
-    // this.graphResults = ReformatArrayList(results);
-    // console.log(this.graphResults);
   },
 };
 </script>
@@ -217,12 +201,20 @@ export default {
 
 tr td {
   border: 2px solid #00a1e1;
+  padding-left: 1%;
+  margin-right: 100px;
+}
+table {
+  table-layout: fixed;
+  width: 98%;
+  margin-right: 2%;
 }
 td {
   width: 40%;
 }
 th {
   border: 2px solid #00a1e1;
+  padding-left: 1%;
 }
 
 /* buttons */

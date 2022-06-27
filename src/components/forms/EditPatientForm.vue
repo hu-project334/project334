@@ -99,11 +99,12 @@ export default {
     };
   },
   mounted() { 
-      document.getElementsByName('email')[0].placeholder='Naampje';
-      document.getElementsByName('naam')[0].placeholder='Naampje';
-      document.getElementsByName('geslacht')[0].placeholder='Naampje';
-      document.getElementsByName('gewicht')[0].placeholder='Naampje';
-      document.getElementsByName('lengte')[0].placeholder='Naampje';
+      // Replace the '-' with the patient's corresponding data
+      document.getElementsByName('email')[0].placeholder='-';
+      document.getElementsByName('naam')[0].placeholder='-';
+      document.getElementsByName('geslacht')[0].placeholder='-';
+      document.getElementsByName('gewicht')[0].placeholder='-';
+      document.getElementsByName('lengte')[0].placeholder='-';
   },
 
   methods: {

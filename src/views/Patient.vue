@@ -87,15 +87,13 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import _ from "lodash";
-// import categories from "../db/exerciseCategories.json";
 import LinkButton from "../components/btns/LinkButton.vue";
 import { formatBirthDateToAge } from "../Controllers/AgeCalculatorController.js";
 import { getSinglePatient, deletePatient, getCategories } from "../db/fdb";
-// import { deleteWhiteSpaceFromString } from "../Controllers/StringChanger";
 import { useRoute } from "vue-router";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
-import { getUnixOfToday } from '../controllers/unix';
+
 
 
 export default {
@@ -173,7 +171,6 @@ export default {
         name: "addCategorie",
         params: { name: name },
       });
-      // this.$router.push({ name: "addCategorie" });
     },
     blurrStyle() {
       if (this.showFormDelete | this.showFormEdit) {
@@ -199,7 +196,7 @@ export default {
     },
     editPatient() {
       this.closeForm();
-      // Edit de patient's gegevens
+      // TODO Edit de patient's gegevens
     },
   },
 };

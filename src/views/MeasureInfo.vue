@@ -174,7 +174,6 @@ export default {
     },
 
     goBackToResults() {
-      
       this.$router.push({ name: "exerciseResults" ,params:{
 
       }});
