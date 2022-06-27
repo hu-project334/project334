@@ -4,7 +4,7 @@
   <!-- //! is not dynamic yet -->
   <h1 class="title">Meet</h1>
   <!-- //! graph has to be installed and used -->
-  <div class="container">
+  <div class="info_container">
     <b>Meet resultaten</b>
     <table>
       <tr>
@@ -17,11 +17,11 @@
       </tr>
       <tr>
         <td class="header_name"><b>Beweging (graden) </b></td>
-        <td>-</td>
+        <td> {{ maxAngle }}° </td>
       </tr>
       <tr>
         <td class="header_name"><b>Procent van de norm </b></td>
-        <td>-</td>
+        <td>{{norm}}%</td>
       </tr>
     </table>
 
@@ -58,6 +58,11 @@
 
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
+import { XsensDotSensor } from "/src/libraries/bluetooth.js";
+import { addResultToCategory } from "../db/fdb";
+import { useRoute } from "vue-router";
+import jsonMovementData from "/src/libraries/movement_data.json"
+import { getUnixOfToday } from "../controllers/unix.js";
 
 var measureState = "idle";
 var timer;
@@ -73,16 +78,24 @@ export default {
       miliseconds: 0,
       seconds: 0,
       minutes: 0,
-      button1text: "Start meting"
+      maxAngle: 0.00,
+      route: useRoute(),
+      button1text: "Start meting",
+      norm: 0.00
     }
   },
-
   methods: {
-    saveMeasurement(){
-
+    async saveMeasurement(){
+      if(!this.maxAngle == 0){
+        console.log("Unix: " + getUnixOfToday())
+        let docIdPatient = this.route.params.name;
+        let docIdCategory = this.route.params.category;
+        await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, this.norm);
+        this.$router.push({ name: "exerciseResults" ,params:{}});
+      }
     },
     deleteMeasurement(){
-
+      this.$router.push({ name: "exerciseResults" ,params:{}});
     },
     goBackToSelect() {
       clearInterval(timer);
@@ -101,8 +114,13 @@ export default {
       }
     },
 
-    measure() {
-      if(measureState == "idle"){
+    async measure() {
+      if(XsensDotSensor.device == null){
+        console.log("No device connected")
+      }
+      if(measureState == "idle") {
+        XsensDotSensor.startRTStream();
+
         document.getElementById("button1").classList.toggle('measureButtonBlue');
         document.getElementById("button1").classList.toggle('measureButtonRed');
         this.button1text = "Stop meting";
@@ -122,6 +140,54 @@ export default {
 
         clearInterval(timer);
         measureState = "results";
+
+        await XsensDotSensor.stopRTStream();
+
+        const category = this.route.params.category;
+        let TMPnorm = 0
+        let age = this.$store.state.age;
+        let gender = this.$store.state.gender;
+
+        if(age <= 8) {
+          age = "2-8"
+        } else if (age <= 19) {
+          age = "9-19"
+        } else if(age <= 44) {
+          age = "20-44"
+        } else {
+          age = "45+"
+        }
+
+        if (category === "elleboog-flexie-extensie-rechts" || category === "elleboog-flexie-extensie-links") {
+          TMPnorm = jsonMovementData["elleboog-flexie-extensie"][gender][age]
+        }
+        else if (category === "heup-extensie-links" || category === "heup-extensie-rechts") {
+          TMPnorm = jsonMovementData["heup-extensie"][gender][age]
+        }
+        else if (category === "heup-flexie-links" || category === "heup-flexie-rechts") {
+          TMPnorm = jsonMovementData["heup-flexie"][gender][age]
+        }
+        else if (category === "knie-extensie-flexie-links" || category === "knie-extensie-flexie-rechts") {
+          TMPnorm = jsonMovementData["knie-extensie-flexie"][gender][age]
+        }
+        else if (category === "enkel-dorsaalflexie-links" || category === "enkel-dorsaalflexie-rechts") {
+          TMPnorm = jsonMovementData["enkel-dorsaalflexie"][gender][age]
+        }
+        else if (category === "enkel-plantairflexie-links" || category === "enkel-plantairflexie-rechts") {
+          TMPnorm = jsonMovementData["enkel-plantairflexie"][gender][age]
+        }
+        else if (category === "shouder-flexie-links" || category === "shouder-flexie-rechts") {
+          TMPnorm = jsonMovementData["shouder-flexie"][gender][age]
+        }
+        else if (category === "elleboog-pronatie-links" || category === "elleboog-pronatie-rechts") {
+          TMPnorm = jsonMovementData["elleboog-pronatie"][gender][age]
+        }
+        else if (category === "elleboog-supinatie-links" || category === "elleboog-supinatie-rechts") {
+          TMPnorm = jsonMovementData["elleboog-supinatie"][gender][age]
+        }
+        
+        this.maxAngle = XsensDotSensor.max_angle;
+        this.norm = ((this.maxAngle / TMPnorm ) * 100).toFixed(2);
       }
       else if(measureState == "results"){
         document.getElementById("button2").style = ('margin-top: 0.5rem; display: none');
@@ -133,6 +199,8 @@ export default {
         this.minutes      = 0;
         clearInterval(timer);
 
+        this.maxAngle = 0.00;
+        this.norm = 0.00;
         measureState = "idle";
       }
 
@@ -157,7 +225,7 @@ export default {
   text-align: center;
 }
 
-.container {
+.info_container {
   margin-top: 1%;
   height: 50%;
   margin-right: 5%;
@@ -165,20 +233,23 @@ export default {
   background: white;
   width: 90%;
   border-radius: 15px;
-  padding-bottom: 0.5rem;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  padding-top: 0.5rem;
-  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
 }
 tr td {
   border: 2px solid #00a1e1;
   padding-left: 1%;
-  width: 100%;
+  margin-right: 100px;
+}
+table {
+  table-layout: fixed;
+  width: 98%;
+  margin-right: 2%;
 }
 .header_name {
   padding-left: 1%;
-  width: 20%;
+  width: 40%;
 }
 .table_content{
   margin-right: 100px;
@@ -202,8 +273,7 @@ tr td {
 }
 
 .measureButtonBlue {
-  margin-left: 2%;
-  margin-right: 2%;
+  margin-left: 1%;
   margin-top: 2rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
@@ -220,8 +290,7 @@ tr td {
 }
 
 .measureButtonRed {
-  margin-left: 2%;
-  margin-right: 2%;
+  margin-left: 1%;
   margin-top: 2rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;

@@ -46,6 +46,7 @@
 import { useRoute } from "vue-router";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 
+
 var textIndex = 1;
 
 export default {
@@ -173,10 +174,12 @@ export default {
     },
 
     goBackToResults() {
-      this.$router.push({ name: "exerciseResults" });
+      this.$router.push({ name: "exerciseResults" ,params:{}});
     },
     goToConnectSensor() {
-      this.$router.push({ name: "selectSensor" });
+      const patientId = this.route.params.name;
+      const category = this.route.params.category;
+      this.$router.push({ name: "selectSensor" ,params: {name:patientId,category:category}});
     },
     nextPanel() {
       if (textIndex != 3) {

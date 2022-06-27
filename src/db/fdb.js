@@ -24,7 +24,7 @@ import {
 import { getAuth } from "firebase/auth";
 const auth = getAuth(); // Wordt gebruikt in testPatient functie
 import store from "../store/userStore";
-import { getUnixOfToday } from "../controllers/unix";
+import { getUnixOfToday } from "../controllers/unix.js";
 
 const db = getFirestore();
 

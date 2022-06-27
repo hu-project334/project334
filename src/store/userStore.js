@@ -6,8 +6,10 @@ createApp(App).use(Vuex);
 export default new Vuex.Store({
   state: {
     user: "",
-    patientEmail: "",
-    XsenseDotObject: null,
+    gender: null,
+    age: null,
+
+    
   },
   getters: {
     getUser() {
@@ -16,22 +18,27 @@ export default new Vuex.Store({
     isLogedIn() {
       return localStorage.getItem("user") !== null;
     },
-  },
+    getPatientGender(state){
+      return state.gender;
+    },
+    getPatientGender(state){
+      return state.age;
+    }
 
+  },
   mutations: {
     changeProfilePicture(state, photoUrl) {
       state.user.photoUrl = photoUrl;
     },
-    setXsenseDotObject(state, XsenseDotObject) {
-      state.XsenseDotObject = XsenseDotObject;
+    setPatientGender(state, gender) {
+      state.gender = gender
+    },
+    setPatientAge(state,age){
+      state.age = age;
+
+
     },
 
-    setPatientEmail(state, email) {
-      // using localstorage to save patient email for fdb function temporary solution
-      localStorage.removeItem("patientEmail");
-      state.patientEmail = email;
-      localStorage.setItem("patientEmail", JSON.stringify(state.patientEmail));
-    },
     setUser(state, user) {
       state.user = user;
       localStorage.setItem("user", JSON.stringify(state.user));

@@ -70,19 +70,7 @@ export default {
     };
   },
   computed: {
-    // TODO fix profile image
-    // getProfileImage() {
-    //   console.log(this.$store.getters.getUser.photoURL);
-    //   if (
-    //     typeof this.$store.getters.getUser.photoURL === "undefined" ||
-    //     this.$store.getters.getUser.photoURL === null
-    //   ) {
-    //     // return new URL(`../../lib/Carousel/assets/${name}`, import.meta.url).href
-    //     return new URL("src/assets/blackImage.jpg", import.meta.url);
-    //   } else {
-    //     return this.$store.getters.getUser.photoURL;
-    //   }
-    // },
+ 
   },
   methods: {
     logOut() {
