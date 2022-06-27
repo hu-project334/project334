@@ -59,10 +59,11 @@
 <script>
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import { XsensDotSensor } from "/src/libraries/bluetooth.js";
-import { addResultToCategory } from "../db/fdb";
+import { addResultToCategory,getSinglePatient } from "../db/fdb";
 import { useRoute } from "vue-router";
 import jsonMovementData from "/src/libraries/movement_data.json"
 import { getUnixOfToday } from "../controllers/unix.js";
+import { formatBirthDateToAge} from "../Controllers/AgeCalculatorController"
 
 var measureState = "idle";
 var timer;
@@ -81,10 +82,11 @@ export default {
       maxAngle: 0.00,
       route: useRoute(),
       button1text: "Start meting",
-      norm: 0.00
+      norm: 0.00,
+      patient: null
     }
   },
-  methods: {
+  methods:{
     async saveMeasurement(){
       if(!this.maxAngle == 0){
         // console.log("Unix: " + getUnixOfToday())
@@ -113,6 +115,7 @@ export default {
         this.minutes++;
       }
     },
+
 
     async measure() {
       if(XsensDotSensor.device == null){
@@ -143,10 +146,14 @@ export default {
 
         await XsensDotSensor.stopRTStream();
 
+           const docKey = this.route.params.name;
+           let patient = await getSinglePatient(docKey);
+
         const category = this.route.params.category;
         let TMPnorm = 0
-        let age = this.$store.state.age;
-        let gender = String(this.$store.state.gender).toLowerCase();
+        let age = formatBirthDateToAge(patient.dateOfBirth);
+
+        let gender = String(patient.gender).toLocaleLowerCase();
 
         if(age <= 8) {
           age = "2-8"
