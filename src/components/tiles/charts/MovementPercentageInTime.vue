@@ -18,7 +18,7 @@ export default {
     return {};
   },
   mounted() {
-    console.log(this.dataProp);
+    // console.log(this.dataProp);
   },
 };
 </script>

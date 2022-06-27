@@ -87,7 +87,7 @@ export default {
   methods: {
     async saveMeasurement(){
       if(!this.maxAngle == 0){
-        console.log("Unix: " + getUnixOfToday())
+        // console.log("Unix: " + getUnixOfToday())
         let docIdPatient = this.route.params.name;
         let docIdCategory = this.route.params.category;
         await addResultToCategory(docIdPatient, docIdCategory, this.maxAngle, this.norm);
@@ -146,7 +146,7 @@ export default {
         const category = this.route.params.category;
         let TMPnorm = 0
         let age = this.$store.state.age;
-        let gender = this.$store.state.gender;
+        let gender = String(this.$store.state.gender).toLowerCase();
 
         if(age <= 8) {
           age = "2-8"
