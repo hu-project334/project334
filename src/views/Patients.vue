@@ -4,6 +4,7 @@
 
     <h1 class="title">Patiënten</h1>
 
+
     <main>
       <template v-for="[docKey, patient] in patients" :key="patient">
         <div class="patient">
