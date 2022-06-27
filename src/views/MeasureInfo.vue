@@ -174,7 +174,9 @@ export default {
     },
 
     goBackToResults() {
-      this.$router.push({ name: "exerciseResults" ,params:{}});
+      this.$router.push({ name: "exerciseResults" ,params:{
+
+      }});
     },
     goToConnectSensor() {
       const patientId = this.route.params.name;

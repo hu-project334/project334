@@ -95,6 +95,7 @@ import DeleteForm from "../components/forms/DeleteForm.vue";
 import EditForm from "../components/forms/EditPatientForm.vue";
 
 
+
 export default {
   name: "patients",
   components: {

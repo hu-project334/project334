@@ -58,6 +58,8 @@
 import { unixToDateTime } from "../Controllers/unix.js";
 import NavBarTop from "../components/navbars/NavBarTop.vue";
 import MovementPercentageInTime from "../components/tiles/charts/MovementPercentageInTime.vue";
+// import results from "../db/results.json";
+import { unixToDateTimeReverse } from "../Controllers/graphController.js";
 import DeleteForm from "../components/forms/DeleteForm.vue";
 import {
   getCategoryResults,
