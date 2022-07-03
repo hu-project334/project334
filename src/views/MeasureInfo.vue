@@ -7,6 +7,7 @@
       <img
         id="infoImage"
         class="infoImage"
+        :src="infoImageSetting" 
       />
       <hr class="line" />
       <p>{{ infoBox1 }}</p>
@@ -16,14 +17,12 @@
 
       <div>
         <img
-          id="leftArrow"
-          class="arrowImageLeft"
-          src="@/assets/empty.png"
+        class="arrowImageLeft"
+          :src="leftArrowImageSetting"
           @click="previousPanel()"
         />
         <div class="indexText">{{ indexBox }}</div>
         <img
-          id="rightArrow"
           class="arrowImageRight"
           src="@/assets/arrowRight.png"
           @click="nextPanel()"
@@ -70,6 +69,12 @@ export default {
       categoryActionText1: "",
       categoryActionText1: "",
       categoryActionImage: "",
+
+      // trying
+      infoImageSetting: "",
+      leftArrowImageSetting: "",
+      rightArrowImageSetting: ""
+
     };
   },
   mounted() {
@@ -162,10 +167,12 @@ export default {
       }
 
       this.indexBox = "1/3";
-      document.getElementById("leftArrow").src = "/src/assets/empty.png";
+      this.leftArrowImageSetting = "/src/assets/empty.png";
+      // document.getElementById("leftArrow").src = "/src/assets/empty.png";
 
       this.titleText = "Plaats de sensor";
-      document.getElementById("infoImage").src = this.categoryMountImage;
+      this.infoImageSetting = this.categoryMountImage;
+      // document.getElementById("infoImage").src = this.categoryMountImage;
 
       this.infoBox1 = "1. "+this.categoryMountText1;
       this.infoBox2 = "2. "+this.categoryMountText2;
@@ -189,10 +196,14 @@ export default {
       }
       if (textIndex == 2) {
         this.indexBox = "2/3";
-        document.getElementById("leftArrow").src = "/src/assets/arrowLeft.png";
+        this.leftArrowImageSetting = "/src/assets/arrowLeft.png";
+        console.log("textIndex=", textIndex)
+        // document.getElementById("leftArrow").src = "/src/assets/arrowLeft.png";
 
         this.titleText = "Beweging van de meting";
-        document.getElementById("infoImage").src = this.categoryActionImage;
+        this.infoImageSetting = this.categoryActionImage; 
+
+        // document.getElementById("infoImage").src = this.categoryActionImage;
 
         this.infoBox1 = "1. "+this.categoryActionText1;
         this.infoBox2 = "2. "+this.categoryActionText2;
@@ -201,10 +212,13 @@ export default {
 
       } else if (textIndex == 3) {
         this.indexBox = "3/3";
-        document.getElementById("rightArrow").src = "/src/assets/empty.png";
+        this.rightArrowImageSetting = "/src/assets/empty.png";
+        // document.getElementById("rightArrow").src = "/src/assets/empty.png";
 
         this.titleText = "Start van de meting";
-        document.getElementById("infoImage").src ="/src/assets/measureImages/startStop.png";
+        this.infoImageSetting = "/src/assets/measureImages/startStop.png";
+  
+        // document.getElementById("infoImage").src ="/src/assets/measureImages/startStop.png";
 
         this.infoBox1 = '1. klik hieronder op "Koppel sensor"';
         this.infoBox2 = "2. koppel een sensor en klik op start";
@@ -218,10 +232,14 @@ export default {
       }
       if (textIndex == 2) {
         this.indexBox = "2/3";
-        document.getElementById("rightArrow").src = "/src/assets/arrowRight.png";
+        this.rightArrowImageSetting = "/src/assets/arrowRight.png";
+        // document.getElementById("rightArrow").src = "/src/assets/arrowRight.png";
 
         this.titleText = "Beweging van de meting";
-        document.getElementById("infoImage").src = this.categoryActionImage;
+        
+        this.infoImageSetting = this.categoryActionImage;
+        // Hier moet naar gekeken worden.
+        // document.getElementById("infoImage").src = this.categoryActionImage;
 
         this.infoBox1 = "1. "+this.categoryActionText1;
         this.infoBox2 = "2. "+this.categoryActionText2;
@@ -229,10 +247,13 @@ export default {
         this.infoBox4 = "";
       } else if (textIndex == 1) {
         this.indexBox = "1/3";
-        document.getElementById("leftArrow").src = "/src/assets/empty.png";
+        this.leftArrowImageSetting = "/src/assets/empty.png";
+        // document.getElementById("leftArrow").src = "/src/assets/empty.png";
 
         this.titleText = "Plaats de sensor";
-        document.getElementById("infoImage").src = this.categoryMountImage;
+
+        this.infoImageSetting = this.categoryMountImage;
+        // document.getElementById("infoImage").src = this.categoryMountImage;
 
         this.infoBox1 = "1. "+this.categoryMountText1;
         this.infoBox2 = "2. "+this.categoryMountText2;

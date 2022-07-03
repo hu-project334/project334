@@ -4,7 +4,7 @@
 
   <!-- MOET DYNAMISC -->
 
-  <div class="categoryBox" style="display: none">
+  <div class="categoryBox">
     <div class="textBox">
       <div><b class="categoryTitle">Elleboog flexie & extensie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
@@ -152,25 +152,25 @@
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Shouder flexie links</b></div>
+      <div><b class="categoryTitle">Schouder flexie links</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
       class="addImage"
       src="@/assets/add.png"
-      @click="addSelected('shouder-flexie-links')"
+      @click="addSelected('schouder-flexie-links')"
     />
   </div>
 
   <div class="categoryBox">
     <div class="textBox">
-      <div><b class="categoryTitle">Shouder flexie rechts</b></div>
+      <div><b class="categoryTitle">Schouder flexie rechts</b></div>
       <div class="categorySubText">1 Xsens sensor vereist</div>
     </div>
     <img
       class="addImage"
       src="@/assets/add.png"
-      @click="addSelected('shouder-flexie-rechts')"
+      @click="addSelected('schouder-flexie-rechts')"
     />
   </div>
 
